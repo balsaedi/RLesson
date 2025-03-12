@@ -107,6 +107,10 @@ launch_lesson("module1-environment")
 
 - R version 3.5.0 or higher
 - RStudio (recommended for the best interactive experience)
+- Rtools must be installed (required for installing R packages from GitHub)
+  - Windows users: Download Rtools from https://cran.r-project.org/bin/windows/Rtools/
+  - Mac users: Install Xcode Command Line Tools
+  - Linux users: Install R development packages (r-base-dev or r-devel)
 - Internet connection (for initial installation)
 
 ## Troubleshooting
@@ -114,9 +118,13 @@ launch_lesson("module1-environment")
 If you encounter issues during installation:
 
 1. Make sure you have the latest version of R and RStudio
-2. Check that you can install packages from CRAN
-3. Try installing the dependencies manually before installing RLesson
-4. If problems persist, please report the issue on GitHub
+2. **Verify Rtools is properly installed**:
+   - For Windows users: Run `pkgbuild::has_build_tools(debug = TRUE)` in R to check if Rtools is correctly configured
+   - For Mac users: Run `pkgbuild::has_build_tools(debug = TRUE)` to check if Xcode tools are available
+3. Check that you can install packages from CRAN
+4. Try installing the dependencies manually before installing RLesson
+5. If you see compiler or build errors, it's usually related to Rtools configuration
+6. If problems persist, please report the issue on GitHub
 
 ## License
 
