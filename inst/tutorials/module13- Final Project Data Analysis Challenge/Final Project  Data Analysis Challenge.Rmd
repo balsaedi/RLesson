@@ -1,0 +1,1109 @@
+---
+title: "Final Project: Data Analysis Challenge"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Apply all your R skills to analyze a real-world dataset"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+
+# Load the dataset
+data(diamonds, package = "ggplot2")
+
+# Create a sample for easier handling
+set.seed(123)
+project_diamonds <- diamonds[sample(nrow(diamonds), 2000), ]
+
+# Save the sampled data as CSV in a temp file for later use
+temp_file <- tempfile(fileext = ".csv")
+write.csv(project_diamonds, temp_file, row.names = FALSE)
+```
+
+## Introduction to the Final Project
+
+Congratulations on making it through all the R programming lessons! This final project will help you apply everything you've learned throughout the course. You'll work with a real-world dataset about diamonds and perform various analyses to extract insights.
+
+### Project Overview
+
+In this project, you will:
+
+1. Explore and understand the dataset
+2. Clean and prepare the data for analysis
+3. Create visualizations to reveal patterns
+4. Perform statistical analysis
+5. Build a predictive model
+6. Communicate your findings
+
+Each section of this project covers skills from multiple modules, helping you integrate your knowledge. The project is designed to be challenging but achievable with the skills you've acquired.
+
+### The Dataset
+
+You'll be working with the `diamonds` dataset from the ggplot2 package. This dataset contains information about nearly 54,000 diamonds, including:
+
+- **carat**: weight of the diamond (0.2-5.01)
+- **cut**: quality of the cut (Fair, Good, Very Good, Premium, Ideal)
+- **color**: diamond color, from D (best) to J (worst)
+- **clarity**: measurement of how clear the diamond is (I1 (worst), SI2, SI1, VS2, VS1, VVS2, VVS1, IF (best))
+- **depth**: percentage depth = z / mean(x, y)
+- **table**: width of top of diamond relative to widest point
+- **price**: price in US dollars (\$326-\$18,823)
+- **x, y, z**: length, width, and depth in mm
+
+Let's get started!
+
+## Part 1: Data Exploration
+
+First, let's explore the diamonds dataset to understand its structure and contents.
+
+### Exercise 1.1: Basic Data Exploration
+
+Perform the following tasks to get familiar with the dataset:
+
+1. Load the diamonds dataset (we've provided a sample of 2,000 diamonds)
+2. Display the structure of the dataset
+3. Show the first 10 rows
+4. Calculate summary statistics for all variables
+5. Check for missing values in the dataset
+
+```{r ex1-1, exercise=TRUE}
+# Load the diamonds sample
+diamonds_sample <- project_diamonds
+
+# Your code here
+
+```
+
+```{r ex1-1-solution}
+# Load the diamonds sample
+diamonds_sample <- project_diamonds
+
+# Display the structure
+str(diamonds_sample)
+
+# Show the first 10 rows
+head(diamonds_sample, 10)
+
+# Calculate summary statistics
+summary(diamonds_sample)
+
+# Check for missing values
+sapply(diamonds_sample, function(x) sum(is.na(x)))
+```
+
+```{r ex1-1-check}
+grade_this({
+  # Check the submitted code
+  user_code <- .user_code
+  
+  # Check for specific functions
+  has_str <- grepl("str\\(", user_code)
+  has_head <- grepl("head\\(", user_code)
+  has_summary <- grepl("summary\\(", user_code)
+  has_na_check <- grepl("is\\.na\\(", user_code)
+  
+  if (!has_str) {
+    fail("Make sure to use str() to examine the structure of the dataset")
+  } else if (!has_head) {
+    fail("Make sure to use head() to look at the first rows of the dataset")
+  } else if (!has_summary) {
+    fail("Make sure to use summary() to generate summary statistics")
+  } else if (!has_na_check) {
+    fail("Make sure to check for missing values using is.na()")
+  } else {
+    pass("Great job exploring the dataset!")
+  }
+})
+```
+
+### Exercise 1.2: Categorical Variables
+
+Examine the categorical variables in the dataset:
+
+1. Create a frequency table for each of the categorical variables (cut, color, clarity)
+2. Calculate the proportion of diamonds in each category
+3. Create a bar chart for the 'cut' variable
+4. Create a bar chart for the 'clarity' variable, ordered from worst to best clarity
+
+```{r ex1-2, exercise=TRUE}
+# Your code here
+
+```
+
+```{r ex1-2-solution}
+# Frequency tables
+cut_table <- table(diamonds_sample$cut)
+color_table <- table(diamonds_sample$color)
+clarity_table <- table(diamonds_sample$clarity)
+
+# Display frequency tables
+cut_table
+color_table
+clarity_table
+
+# Calculate proportions
+prop.table(cut_table) * 100
+prop.table(color_table) * 100
+prop.table(clarity_table) * 100
+
+# Bar chart for cut
+barplot(cut_table, main = "Distribution of Cut Quality", 
+        xlab = "Cut", ylab = "Frequency", col = "skyblue")
+
+# Bar chart for clarity (ordered from worst to best)
+# Define clarity levels in correct order (worst to best)
+clarity_levels <- c("I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF")
+clarity_ordered <- factor(diamonds_sample$clarity, levels = clarity_levels)
+
+# Create bar chart
+barplot(table(clarity_ordered), main = "Distribution of Clarity", 
+        xlab = "Clarity (worst to best)", ylab = "Frequency", col = "lightgreen")
+```
+
+```{r ex1-2-check}
+grade_this({
+  # Check for specific functions and variables
+  user_code <- .user_code
+  
+  has_table <- grepl("table\\(", user_code)
+  has_prop_table <- grepl("prop\\.table\\(", user_code)
+  has_barplot <- grepl("barplot\\(", user_code)
+  has_clarity_factor <- grepl("factor\\(.*clarity", user_code) || 
+                         grepl("levels\\s*=\\s*c\\([\"']I1[\"']", user_code)
+  
+  if (!has_table) {
+    fail("Make sure to create frequency tables using the table() function")
+  } else if (!has_prop_table) {
+    fail("Calculate the proportions using prop.table()")
+  } else if (!has_barplot) {
+    fail("Create bar charts using barplot()")
+  } else if (!has_clarity_factor) {
+    fail("Make sure to order the clarity levels from worst to best")
+  } else {
+    pass("Excellent analysis of the categorical variables!")
+  }
+})
+```
+
+### Exercise 1.3: Numerical Variables
+
+Now let's examine the numerical variables:
+
+1. Calculate the mean, median, standard deviation, and range for carat, depth, table, and price
+2. Create histograms for carat, depth, table, and price
+3. Create a boxplot of price by cut
+4. Create a scatterplot of price vs. carat
+
+```{r ex1-3, exercise=TRUE}
+# Your code here
+
+```
+
+```{r ex1-3-solution}
+# Calculate statistics for numerical variables
+num_vars <- c("carat", "depth", "table", "price")
+stats_list <- lapply(num_vars, function(var) {
+  data <- diamonds_sample[[var]]
+  c(Mean = mean(data), 
+    Median = median(data), 
+    SD = sd(data), 
+    Min = min(data), 
+    Max = max(data),
+    Range = max(data) - min(data))
+})
+names(stats_list) <- num_vars
+
+# Display the statistics
+stats_list
+
+# Histograms
+par(mfrow = c(2, 2))
+hist(diamonds_sample$carat, main = "Distribution of Carat", 
+     xlab = "Carat", col = "lightblue", breaks = 30)
+hist(diamonds_sample$depth, main = "Distribution of Depth", 
+     xlab = "Depth", col = "lightgreen", breaks = 30)
+hist(diamonds_sample$table, main = "Distribution of Table", 
+     xlab = "Table", col = "pink", breaks = 30)
+hist(diamonds_sample$price, main = "Distribution of Price", 
+     xlab = "Price", col = "orange", breaks = 30)
+par(mfrow = c(1, 1))
+
+# Boxplot of price by cut
+boxplot(price ~ cut, data = diamonds_sample,
+        main = "Price by Cut Quality",
+        xlab = "Cut", ylab = "Price",
+        col = rainbow(5))
+
+# Scatterplot of price vs. carat
+plot(diamonds_sample$carat, diamonds_sample$price,
+     main = "Price vs. Carat",
+     xlab = "Carat", ylab = "Price",
+     pch = 19, col = "blue", cex = 0.5)
+```
+
+```{r ex1-3-check}
+grade_this({
+  # Check for specific functions
+  user_code <- .user_code
+  
+  has_mean <- grepl("mean\\(", user_code)
+  has_median <- grepl("median\\(", user_code)
+  has_sd <- grepl("sd\\(", user_code)
+  has_hist <- grepl("hist\\(", user_code)
+  has_boxplot <- grepl("boxplot\\(", user_code)
+  has_plot <- grepl("plot\\(", user_code) || grepl("ggplot\\(", user_code)
+  
+  if (!has_mean || !has_median || !has_sd) {
+    fail("Calculate the mean, median, and standard deviation for the numerical variables")
+  } else if (!has_hist) {
+    fail("Create histograms for the numerical variables")
+  } else if (!has_boxplot) {
+    fail("Create a boxplot of price by cut")
+  } else if (!has_plot) {
+    fail("Create a scatterplot of price vs. carat")
+  } else {
+    pass("Great analysis of the numerical variables!")
+  }
+})
+```
+
+## Part 2: Data Manipulation
+
+Now that we have explored the data, let's work on manipulating and transforming it.
+
+### Exercise 2.1: Creating New Variables
+
+Create the following new variables in the diamonds dataset:
+
+1. `price_per_carat`: price divided by carat
+2. `volume`: calculated as x * y * z
+3. `is_expensive`: a logical variable that is TRUE if the price is greater than the 75th percentile
+4. `clarity_group`: a factor with levels "Low" (I1, SI2, SI1), "Medium" (VS2, VS1), and "High" (VVS2, VVS1, IF)
+
+```{r ex2-1, exercise=TRUE}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# Your code here
+
+```
+
+```{r ex2-1-solution}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# 1. price_per_carat
+diamonds_sample$price_per_carat <- diamonds_sample$price / diamonds_sample$carat
+
+# 2. volume
+diamonds_sample$volume <- diamonds_sample$x * diamonds_sample$y * diamonds_sample$z
+
+# 3. is_expensive
+price_75th <- quantile(diamonds_sample$price, 0.75)
+diamonds_sample$is_expensive <- diamonds_sample$price > price_75th
+
+# 4. clarity_group
+diamonds_sample$clarity_group <- cut(
+  as.numeric(diamonds_sample$clarity),
+  breaks = c(0, 3, 5, 8),
+  labels = c("Low", "Medium", "High")
+)
+
+# Alternative for clarity_group using case_when
+# diamonds_sample$clarity_group <- case_when(
+#   diamonds_sample$clarity %in% c("I1", "SI2", "SI1") ~ "Low",
+#   diamonds_sample$clarity %in% c("VS2", "VS1") ~ "Medium",
+#   diamonds_sample$clarity %in% c("VVS2", "VVS1", "IF") ~ "High"
+# )
+
+# View the new variables
+head(diamonds_sample[, c("price", "carat", "price_per_carat", "volume", "is_expensive", "clarity", "clarity_group")])
+
+# Check summary statistics of the new variables
+summary(diamonds_sample[, c("price_per_carat", "volume", "is_expensive", "clarity_group")])
+```
+
+```{r ex2-1-check}
+grade_this({
+  # Check for specific operations
+  user_code <- .user_code
+  
+  has_ppc <- grepl("price_per_carat|price.*\\/.*carat", user_code)
+  has_volume <- grepl("volume|x.*\\*.*y.*\\*.*z", user_code)
+  has_expensive <- grepl("is_expensive|price.*>.*quantile|price.*>.*median", user_code)
+  has_clarity_group <- grepl("clarity_group", user_code) && 
+                      (grepl("cut\\(.*clarity", user_code) || 
+                       grepl("case_when\\(", user_code) || 
+                       grepl("ifelse\\(", user_code))
+  
+  if (!has_ppc) {
+    fail("Make sure to create the price_per_carat variable")
+  } else if (!has_volume) {
+    fail("Make sure to create the volume variable as x * y * z")
+  } else if (!has_expensive) {
+    fail("Make sure to create the is_expensive logical variable")
+  } else if (!has_clarity_group) {
+    fail("Make sure to create the clarity_group factor variable")
+  } else {
+    pass("Excellent job creating new variables!")
+  }
+})
+```
+
+### Exercise 2.2: Filtering and Summarizing
+
+Perform the following data manipulations:
+
+1. Filter the dataset to include only diamonds with an Ideal cut and color D, E, or F
+2. Calculate the average price, average carat, and count of diamonds for each clarity level
+3. Find the diamonds with the top 10 highest price-to-carat ratios
+4. Calculate the correlation between diamond dimensions (x, y, z), volume, and price
+
+```{r ex2-2, exercise=TRUE}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# Your code here
+
+```
+
+```{r ex2-2-solution}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# Add price_per_carat for part 3
+diamonds_sample$price_per_carat <- diamonds_sample$price / diamonds_sample$carat
+diamonds_sample$volume <- diamonds_sample$x * diamonds_sample$y * diamonds_sample$z
+
+# 1. Filter for Ideal cut and colors D, E, or F
+premium_diamonds <- diamonds_sample[
+  diamonds_sample$cut == "Ideal" & 
+  diamonds_sample$color %in% c("D", "E", "F"),
+]
+
+# Display count and percentage
+count_premium <- nrow(premium_diamonds)
+pct_premium <- count_premium / nrow(diamonds_sample) * 100
+cat("Premium diamonds count:", count_premium, "(",
+    round(pct_premium, 1), "% of total)\n")
+
+# 2. Calculate stats by clarity
+clarity_stats <- aggregate(
+  cbind(price, carat) ~ clarity, 
+  data = diamonds_sample,
+  FUN = function(x) c(mean = mean(x), count = length(x))
+)
+
+# Format the results for better display
+clarity_stats_formatted <- data.frame(
+  clarity = clarity_stats$clarity,
+  avg_price = clarity_stats$price[, "mean"],
+  avg_carat = clarity_stats$carat[, "mean"],
+  count = clarity_stats$carat[, "count"]
+)
+
+# Sort by clarity levels
+clarity_order <- c("I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF")
+clarity_stats_formatted <- clarity_stats_formatted[
+  match(clarity_order, clarity_stats_formatted$clarity),
+]
+
+# Display clarity stats
+print(clarity_stats_formatted)
+
+# 3. Find top 10 highest price-to-carat ratios
+top_price_carat <- diamonds_sample[
+  order(diamonds_sample$price_per_carat, decreasing = TRUE),
+][1:10, ]
+
+# Display top 10
+print(top_price_carat[, c("carat", "cut", "color", "clarity", "price", "price_per_carat")])
+
+# 4. Calculate correlations
+cor_vars <- diamonds_sample[, c("x", "y", "z", "volume", "price", "carat")]
+cor_matrix <- cor(cor_vars, use = "complete.obs")
+print(round(cor_matrix, 3))
+```
+
+```{r ex2-2-check}
+grade_this({
+  # Check for specific operations
+  user_code <- .user_code
+  
+  has_filter <- grepl("cut\\s*==\\s*[\"']Ideal[\"']", user_code) && 
+               grepl("color\\s*%in%\\s*c\\([\"']D[\"']|color\\s*==\\s*[\"']D[\"']\\s*\\|", user_code)
+  
+  has_aggregate <- grepl("aggregate\\(", user_code) || 
+                  (grepl("group_by\\(", user_code) && grepl("summarize\\(", user_code))
+  
+  has_top10 <- grepl("order\\(.*price.*carat", user_code) || 
+              grepl("arrange\\(.*price.*carat", user_code) || 
+              grepl("sort\\(.*price.*carat", user_code)
+  
+  has_cor <- grepl("cor\\(", user_code)
+  
+  if (!has_filter) {
+    fail("Make sure to filter for Ideal cut and colors D, E, or F")
+  } else if (!has_aggregate) {
+    fail("Calculate statistics for each clarity level")
+  } else if (!has_top10) {
+    fail("Find the top 10 diamonds by price-to-carat ratio")
+  } else if (!has_cor) {
+    fail("Calculate the correlation between diamond dimensions and price")
+  } else {
+    pass("Great job manipulating and summarizing the data!")
+  }
+})
+```
+
+## Part 3: Data Visualization
+
+Let's create some more sophisticated visualizations to better understand the relationships in the data.
+
+### Exercise 3.1: Advanced Plotting
+
+Create the following visualizations using ggplot2:
+
+1. A scatterplot of price vs. carat, colored by cut, with a smoothed trendline
+2. A boxplot of price by cut, faceted by clarity
+3. A violin plot showing the distribution of price_per_carat by cut
+4. A heatmap showing the average price for different combinations of cut and color
+
+```{r ex3-1, exercise=TRUE}
+# Start with the prepared data
+diamonds_sample <- project_diamonds
+diamonds_sample$price_per_carat <- diamonds_sample$price / diamonds_sample$carat
+
+# Your code here using ggplot2
+
+```
+
+```{r ex3-1-solution}
+# Start with the prepared data
+diamonds_sample <- project_diamonds
+diamonds_sample$price_per_carat <- diamonds_sample$price / diamonds_sample$carat
+
+# 1. Scatterplot of price vs. carat, colored by cut, with smoothed trendline
+ggplot(diamonds_sample, aes(x = carat, y = price, color = cut)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE) +
+  labs(title = "Price vs. Carat by Cut",
+       x = "Carat",
+       y = "Price (USD)") +
+  theme_minimal()
+
+# 2. Boxplot of price by cut, faceted by clarity
+ggplot(diamonds_sample, aes(x = cut, y = price, fill = cut)) +
+  geom_boxplot() +
+  facet_wrap(~ clarity) +
+  labs(title = "Price Distribution by Cut and Clarity",
+       x = "Cut",
+       y = "Price (USD)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+
+# 3. Violin plot showing the distribution of price_per_carat by cut
+ggplot(diamonds_sample, aes(x = cut, y = price_per_carat, fill = cut)) +
+  geom_violin() +
+  labs(title = "Price per Carat Distribution by Cut",
+       x = "Cut",
+       y = "Price per Carat (USD)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# 4. Heatmap showing the average price for different combinations of cut and color
+diamonds_avg <- aggregate(price ~ cut + color, data = diamonds_sample, FUN = mean)
+
+ggplot(diamonds_avg, aes(x = color, y = cut, fill = price)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  labs(title = "Average Price by Cut and Color",
+       x = "Color",
+       y = "Cut",
+       fill = "Avg Price (USD)") +
+  theme_minimal()
+```
+
+```{r ex3-1-check}
+grade_this({
+  # Check for specific ggplot elements
+  user_code <- .user_code
+  
+  has_ggplot <- grepl("ggplot\\(", user_code)
+  has_geom_point <- grepl("geom_point\\(", user_code)
+  has_geom_smooth <- grepl("geom_smooth\\(", user_code)
+  has_geom_boxplot <- grepl("geom_boxplot\\(", user_code)
+  has_facet <- grepl("facet_", user_code)
+  has_geom_violin <- grepl("geom_violin\\(", user_code)
+  has_geom_tile <- grepl("geom_tile\\(", user_code)
+  
+  if (!has_ggplot) {
+    fail("Make sure to use ggplot2 for your visualizations")
+  } else if (!has_geom_point || !has_geom_smooth) {
+    fail("Create a scatterplot with geom_point() and add a smoothed line with geom_smooth()")
+  } else if (!has_geom_boxplot || !has_facet) {
+    fail("Create a boxplot with geom_boxplot() and facet it by clarity")
+  } else if (!has_geom_violin) {
+    fail("Create a violin plot with geom_violin()")
+  } else if (!has_geom_tile) {
+    fail("Create a heatmap with geom_tile()")
+  } else {
+    pass("Excellent work creating advanced visualizations!")
+  }
+})
+```
+
+## Part 4: Statistical Analysis
+
+Now, let's perform some statistical analyses to formally test relationships in the data.
+
+### Exercise 4.1: Correlation and Regression
+
+Perform the following statistical analyses:
+
+1. Calculate the correlation between price and all numeric variables
+2. Fit a simple linear regression model predicting price from carat
+3. Fit a multiple regression model predicting price from carat, cut, color, and clarity
+4. Compare the two models and interpret the results
+
+```{r ex4-1, exercise=TRUE}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# Your code here
+
+```
+
+```{r ex4-1-solution}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# 1. Calculate correlations with price
+numeric_vars <- diamonds_sample[, sapply(diamonds_sample, is.numeric)]
+cor_with_price <- cor(numeric_vars)[, "price"]
+cor_sorted <- sort(abs(cor_with_price), decreasing = TRUE)
+print(cor_sorted)
+
+# 2. Simple linear regression: price ~ carat
+simple_model <- lm(price ~ carat, data = diamonds_sample)
+summary(simple_model)
+
+# 3. Multiple regression model
+multi_model <- lm(price ~ carat + cut + color + clarity, data = diamonds_sample)
+summary(multi_model)
+
+# 4. Compare models
+cat("\nModel Comparison:\n")
+cat("Simple model R-squared:", round(summary(simple_model)$r.squared, 4), "\n")
+cat("Multiple model R-squared:", round(summary(multi_model)$r.squared, 4), "\n")
+cat("Improvement:", round((summary(multi_model)$r.squared - summary(simple_model)$r.squared) * 100, 2), "percentage points\n\n")
+
+# Formal model comparison with ANOVA
+anova_result <- anova(simple_model, multi_model)
+print(anova_result)
+
+# Plot residuals for multiple model
+par(mfrow = c(2, 2))
+plot(multi_model)
+par(mfrow = c(1, 1))
+```
+
+```{r ex4-1-check}
+grade_this({
+  # Check for specific statistical operations
+  user_code <- .user_code
+  
+  has_cor <- grepl("cor\\(", user_code)
+  has_simple_lm <- grepl("lm\\(.*price\\s*~\\s*carat", user_code)
+  has_multi_lm <- grepl("lm\\(.*price\\s*~\\s*carat.*cut.*color.*clarity", user_code)
+  has_comparison <- grepl("anova\\(|r\\.squared", user_code)
+  
+  if (!has_cor) {
+    fail("Calculate the correlation between price and all numeric variables")
+  } else if (!has_simple_lm) {
+    fail("Fit a simple linear regression model: price ~ carat")
+  } else if (!has_multi_lm) {
+    fail("Fit a multiple regression model with carat, cut, color, and clarity")
+  } else if (!has_comparison) {
+    fail("Compare the models using R-squared or ANOVA")
+  } else {
+    pass("Great job with the statistical analysis!")
+  }
+})
+```
+
+### Exercise 4.2: ANOVA and Group Differences
+
+Perform ANOVA and other statistical tests to compare groups:
+
+1. Conduct a one-way ANOVA to test if price differs significantly across cut categories
+2. Conduct a one-way ANOVA to test if price differs significantly across color categories
+3. Perform a t-test to compare price_per_carat between "Ideal" and "Fair" cut diamonds
+4. Visualize the results of your analyses
+
+```{r ex4-2, exercise=TRUE}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+diamonds_sample$price_per_carat <- diamonds_sample$price / diamonds_sample$carat
+
+# Your code here
+
+```
+
+```{r ex4-2-solution}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+diamonds_sample$price_per_carat <- diamonds_sample$price / diamonds_sample$carat
+
+# 1. ANOVA for price across cut categories
+cut_anova <- aov(price ~ cut, data = diamonds_sample)
+cut_anova_summary <- summary(cut_anova)
+print("ANOVA for price ~ cut:")
+print(cut_anova_summary)
+
+# Post-hoc test if ANOVA is significant
+if (cut_anova_summary[[1]]$`Pr(>F)`[1] < 0.05) {
+  cut_tukey <- TukeyHSD(cut_anova)
+  print(cut_tukey)
+}
+
+# 2. ANOVA for price across color categories
+color_anova <- aov(price ~ color, data = diamonds_sample)
+color_anova_summary <- summary(color_anova)
+print("ANOVA for price ~ color:")
+print(color_anova_summary)
+
+# Post-hoc test if ANOVA is significant
+if (color_anova_summary[[1]]$`Pr(>F)`[1] < 0.05) {
+  color_tukey <- TukeyHSD(color_anova)
+  print(color_tukey)
+}
+
+# 3. T-test for price_per_carat between Ideal and Fair cuts
+ideal_diamonds <- diamonds_sample$price_per_carat[diamonds_sample$cut == "Ideal"]
+fair_diamonds <- diamonds_sample$price_per_carat[diamonds_sample$cut == "Fair"]
+
+t_test_result <- t.test(ideal_diamonds, fair_diamonds)
+print("T-test for price_per_carat between Ideal and Fair cuts:")
+print(t_test_result)
+
+# 4. Visualize the results
+# Boxplots for cut and price
+par(mfrow = c(2, 2))
+
+# Plot for cut ANOVA
+boxplot(price ~ cut, data = diamonds_sample,
+        main = "Price by Cut Quality",
+        xlab = "Cut", ylab = "Price (USD)",
+        col = rainbow(5))
+
+# Plot for color ANOVA
+boxplot(price ~ color, data = diamonds_sample,
+        main = "Price by Color",
+        xlab = "Color", ylab = "Price (USD)",
+        col = terrain.colors(7))
+
+# Box plot for t-test
+boxplot(list(Ideal = ideal_diamonds, Fair = fair_diamonds),
+        main = "Price per Carat: Ideal vs. Fair Cut",
+        ylab = "Price per Carat (USD)",
+        col = c("green", "red"))
+
+# Reset plot layout
+par(mfrow = c(1, 1))
+
+# Add a bar chart of means with error bars using ggplot2
+library(ggplot2)
+
+# For cut categories
+cut_means <- aggregate(price ~ cut, data = diamonds_sample, FUN = mean)
+cut_sd <- aggregate(price ~ cut, data = diamonds_sample, FUN = sd)
+cut_n <- aggregate(price ~ cut, data = diamonds_sample, FUN = length)
+cut_means$sd <- cut_sd$price
+cut_means$n <- cut_n$price
+cut_means$se <- cut_means$sd / sqrt(cut_means$n)
+cut_means$lower <- cut_means$price - 1.96 * cut_means$se
+cut_means$upper <- cut_means$price + 1.96 * cut_means$se
+
+ggplot(cut_means, aes(x = cut, y = price, fill = cut)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.2) +
+  labs(title = "Mean Price by Cut with 95% Confidence Intervals",
+       x = "Cut", y = "Mean Price (USD)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r ex4-2-check}
+grade_this({
+  # Check for specific statistical operations
+  user_code <- .user_code
+  
+  has_cut_anova <- grepl("aov\\(.*price\\s*~\\s*cut", user_code)
+  has_color_anova <- grepl("aov\\(.*price\\s*~\\s*color", user_code)
+  has_t_test <- grepl("t\\.test\\(", user_code)
+  has_visualization <- grepl("boxplot\\(|ggplot\\(", user_code)
+  
+  if (!has_cut_anova) {
+    fail("Conduct a one-way ANOVA to test if price differs across cut categories")
+  } else if (!has_color_anova) {
+    fail("Conduct a one-way ANOVA to test if price differs across color categories")
+  } else if (!has_t_test) {
+    fail("Perform a t-test comparing price_per_carat between Ideal and Fair diamonds")
+  } else if (!has_visualization) {
+    fail("Visualize your analyses using appropriate plots")
+  } else {
+    pass("Excellent statistical analysis of group differences!")
+  }
+})
+```
+
+## Part 5: Predictive Modeling
+
+In this final section, you'll build predictive models for diamond prices.
+
+### Exercise 5.1: Building a Predictive Model
+
+Build and evaluate predictive models for diamond price:
+
+1. Split the data into training (80%) and testing (20%) sets
+2. Build a multiple linear regression model to predict price using all relevant variables
+3. Build a more complex model using polynomial terms for carat (e.g., carat^2)
+4. Evaluate both models on the test set using RMSE (Root Mean Square Error)
+5. Visualize the actual vs. predicted prices
+
+```{r ex5-1, exercise=TRUE}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# Your code here
+
+```
+
+```{r ex5-1-solution}
+# Start with the diamonds sample
+diamonds_sample <- project_diamonds
+
+# 1. Split into training and testing sets
+set.seed(42)  # for reproducibility
+train_indices <- sample(1:nrow(diamonds_sample), 0.8 * nrow(diamonds_sample))
+train_data <- diamonds_sample[train_indices, ]
+test_data <- diamonds_sample[-train_indices, ]
+
+# Function to calculate RMSE
+rmse <- function(actual, predicted) {
+  sqrt(mean((actual - predicted)^2))
+}
+
+# 2. Build a multiple linear regression model
+model1 <- lm(price ~ carat + cut + color + clarity + depth + table, data = train_data)
+summary(model1)
+
+# 3. Build a model with polynomial term for carat
+model2 <- lm(price ~ poly(carat, 2) + cut + color + clarity + depth + table, data = train_data)
+summary(model2)
+
+# 4. Evaluate both models on the test set
+# Predictions for model 1
+pred1 <- predict(model1, newdata = test_data)
+rmse1 <- rmse(test_data$price, pred1)
+
+# Predictions for model 2
+pred2 <- predict(model2, newdata = test_data)
+rmse2 <- rmse(test_data$price, pred2)
+
+# Compare RMSE values
+cat("Model 1 (Linear) RMSE:", rmse1, "\n")
+cat("Model 2 (Polynomial) RMSE:", rmse2, "\n")
+cat("Improvement:", round((rmse1 - rmse2) / rmse1 * 100, 2), "%\n")
+
+# 5. Visualize actual vs. predicted prices
+# Create a data frame for visualization
+results <- data.frame(
+  Actual = test_data$price,
+  Model1 = pred1,
+  Model2 = pred2
+)
+
+# Plot for Model 1
+par(mfrow = c(1, 2))
+plot(results$Actual, results$Model1,
+     main = "Model 1: Actual vs. Predicted",
+     xlab = "Actual Price", ylab = "Predicted Price",
+     pch = 19, col = "blue", cex = 0.6)
+abline(0, 1, col = "red", lwd = 2)  # Perfect prediction line
+
+# Plot for Model 2
+plot(results$Actual, results$Model2,
+     main = "Model 2: Actual vs. Predicted",
+     xlab = "Actual Price", ylab = "Predicted Price",
+     pch = 19, col = "green", cex = 0.6)
+abline(0, 1, col = "red", lwd = 2)  # Perfect prediction line
+par(mfrow = c(1, 1))
+
+# Generate a scatter plot of residuals vs. fitted values for both models
+par(mfrow = c(1, 2))
+plot(pred1, pred1 - test_data$price,
+     main = "Model 1: Residuals vs. Fitted",
+     xlab = "Fitted values", ylab = "Residuals",
+     pch = 19, col = "blue", cex = 0.6)
+abline(h = 0, col = "red", lwd = 2)
+
+plot(pred2, pred2 - test_data$price,
+     main = "Model 2: Residuals vs. Fitted",
+     xlab = "Fitted values", ylab = "Residuals",
+     pch = 19, col = "green", cex = 0.6)
+abline(h = 0, col = "red", lwd = 2)
+par(mfrow = c(1, 1))
+```
+
+```{r ex5-1-check}
+grade_this({
+  # Check for specific model building elements
+  user_code <- .user_code
+  
+  has_split <- grepl("sample\\(|train_|test_", user_code)
+  has_lm1 <- grepl("lm\\(.*price\\s*~", user_code)
+  has_poly <- grepl("poly\\(.*carat|I\\(.*carat\\^2", user_code)
+  has_rmse <- grepl("rmse|sqrt\\(.*mean\\(.*\\^2", user_code)
+  has_plot <- grepl("plot\\(.*actual|ggplot\\(", user_code)
+  
+  if (!has_split) {
+    fail("Make sure to split your data into training and testing sets")
+  } else if (!has_lm1) {
+    fail("Build a multiple linear regression model")
+  } else if (!has_poly) {
+    fail("Include polynomial terms for carat in your second model")
+  } else if (!has_rmse) {
+    fail("Evaluate your models using RMSE")
+  } else if (!has_plot) {
+    fail("Visualize actual vs. predicted prices")
+  } else {
+    pass("Excellent work building and evaluating predictive models!")
+  }
+})
+```
+
+### Exercise 5.2: Feature Importance and Model Interpretation
+
+Analyze your model to understand which features are most important for predicting diamond prices:
+
+1. Extract and plot the coefficients from your final model
+2. Perform a variable importance analysis using the `caret` package (if available) or by comparing model performance with each variable removed
+3. Create partial dependence plots to visualize how each feature affects the predicted price
+4. Summarize your findings about what factors most influence diamond prices
+
+```{r ex5-2, exercise=TRUE}
+# Use your best model from the previous exercise
+# Your code here
+
+```
+
+```{r ex5-2-solution}
+# Use the polynomial model from the previous exercise
+# We'll recreate it here to ensure it's available
+diamonds_sample <- project_diamonds
+
+# Split into training and testing sets
+set.seed(42)
+train_indices <- sample(1:nrow(diamonds_sample), 0.8 * nrow(diamonds_sample))
+train_data <- diamonds_sample[train_indices, ]
+test_data <- diamonds_sample[-train_indices, ]
+
+# Rebuild the polynomial model
+final_model <- lm(price ~ poly(carat, 2) + cut + color + clarity + depth + table, data = train_data)
+
+# 1. Extract and plot model coefficients
+coefs <- coef(final_model)[-1]  # Remove intercept
+coef_names <- names(coefs)
+
+# Some preprocessing for better display
+coef_names <- gsub("poly\\(carat, 2\\)1", "carat", coef_names)
+coef_names <- gsub("poly\\(carat, 2\\)2", "carat^2", coef_names)
+coef_names <- gsub("cut|color|clarity", "", coef_names)
+
+# Create a coefficient plot
+barplot(coefs, names.arg = coef_names, 
+        main = "Model Coefficients",
+        xlab = "Features", ylab = "Coefficient Value",
+        col = "steelblue", las = 2, cex.names = 0.7)
+abline(h = 0, lty = 2)
+
+# 2. Variable importance analysis by comparing models
+var_importance <- data.frame(
+  Feature = character(),
+  RMSE_Increase = numeric(),
+  stringsAsFactors = FALSE
+)
+
+# Function to calculate RMSE
+rmse <- function(actual, predicted) {
+  sqrt(mean((actual - predicted)^2))
+}
+
+# Baseline RMSE with all features
+baseline_pred <- predict(final_model, newdata = test_data)
+baseline_rmse <- rmse(test_data$price, baseline_pred)
+
+# Check importance of each main feature group
+features <- c("carat", "cut", "color", "clarity", "depth", "table")
+
+for (feature in features) {
+  if (feature == "carat") {
+    # For carat, remove both the linear and quadratic terms
+    formula <- as.formula(paste("price ~", paste(setdiff(
+      c("poly(carat, 2)", "cut", "color", "clarity", "depth", "table"), 
+      "poly(carat, 2)"), collapse = " + ")))
+  } else {
+    # For other features, remove just that feature
+    formula <- as.formula(paste("price ~", paste(setdiff(
+      c("poly(carat, 2)", "cut", "color", "clarity", "depth", "table"), 
+      feature), collapse = " + ")))
+  }
+  
+  # Build reduced model
+  reduced_model <- lm(formula, data = train_data)
+  
+  # Make predictions and calculate RMSE
+  reduced_pred <- predict(reduced_model, newdata = test_data)
+  reduced_rmse <- rmse(test_data$price, reduced_pred)
+  
+  # Calculate the percentage increase in RMSE
+  pct_increase <- (reduced_rmse - baseline_rmse) / baseline_rmse * 100
+  
+  # Add to the importance dataframe
+  var_importance <- rbind(var_importance, data.frame(
+    Feature = feature,
+    RMSE_Increase = pct_increase
+  ))
+}
+
+# Sort by importance
+var_importance <- var_importance[order(var_importance$RMSE_Increase, decreasing = TRUE), ]
+
+# Create a bar chart of variable importance
+barplot(var_importance$RMSE_Increase, names.arg = var_importance$Feature,
+        main = "Feature Importance: % Increase in RMSE When Feature is Removed",
+        xlab = "Feature", ylab = "% Increase in RMSE",
+        col = "coral", las = 2)
+
+# 3. Create partial dependence plots
+# Function to create partial dependence for numeric variables
+create_partial_dependence <- function(model, data, variable, grid_size = 20) {
+  # Create grid of values for the variable
+  var_range <- range(data[[variable]])
+  grid <- seq(var_range[1], var_range[2], length.out = grid_size)
+  
+  # Initialize predictions vector
+  predictions <- numeric(grid_size)
+  
+  # For each value in the grid
+  for (i in 1:grid_size) {
+    # Create a copy of the data with the variable set to the grid value
+    new_data <- data
+    new_data[[variable]] <- grid[i]
+    
+    # Make predictions and average them
+    predictions[i] <- mean(predict(model, newdata = new_data))
+  }
+  
+  # Return data frame with grid values and average predictions
+  return(data.frame(x = grid, y = predictions))
+}
+
+# Partial dependence for carat
+pd_carat <- create_partial_dependence(final_model, test_data, "carat")
+plot(pd_carat$x, pd_carat$y, type = "l", col = "blue", lwd = 2,
+     main = "Partial Dependence Plot: Carat",
+     xlab = "Carat", ylab = "Average Predicted Price")
+
+# Partial dependence for depth
+pd_depth <- create_partial_dependence(final_model, test_data, "depth")
+plot(pd_depth$x, pd_depth$y, type = "l", col = "green", lwd = 2,
+     main = "Partial Dependence Plot: Depth",
+     xlab = "Depth", ylab = "Average Predicted Price")
+
+# Partial dependence for table
+pd_table <- create_partial_dependence(final_model, test_data, "table")
+plot(pd_table$x, pd_table$y, type = "l", col = "red", lwd = 2,
+     main = "Partial Dependence Plot: Table",
+     xlab = "Table", ylab = "Average Predicted Price")
+
+# 4. Summary of findings
+cat("\nSummary of Diamond Price Determinants:\n")
+cat("----------------------------------\n")
+cat("1. Most important features (in order):\n")
+for (i in 1:nrow(var_importance)) {
+  cat(sprintf("   %s: %.2f%% increase in error when removed\n", 
+              var_importance$Feature[i], var_importance$RMSE_Increase[i]))
+}
+
+cat("\n2. Key insights:\n")
+cat("   - Carat (weight) has the most substantial impact on price\n")
+cat("   - The relationship between carat and price is non-linear\n")
+cat("   - Clarity and color also significantly affect diamond prices\n")
+cat("   - Cut quality has a moderate effect on price\n")
+cat("   - Depth and table dimensions have the least impact among the variables\n")
+
+cat("\n3. Practical implications:\n")
+cat("   - When evaluating diamond value, prioritize carat weight, clarity, and color\n")
+cat("   - The value increase is not proportional to carat increase (diminishing returns)\n")
+cat("   - A better cut can compensate somewhat for lower clarity or color rating\n")
+```
+
+```{r ex5-2-check}
+grade_this({
+  # Check for specific model interpretation elements
+  user_code <- .user_code
+  
+  has_coef <- grepl("coef\\(|coefficients\\(", user_code)
+  has_importance <- grepl("importance|RMSE|rmse", user_code)
+  has_plot <- grepl("barplot\\(|plot\\(.*feature|ggplot\\(", user_code)
+  has_summary <- grepl("summary|findings|insight|important feature", user_code, ignore.case = TRUE)
+  
+  if (!has_coef) {
+    fail("Extract and examine the coefficients from your model")
+  } else if (!has_importance) {
+    fail("Perform a variable importance analysis")
+  } else if (!has_plot) {
+    fail("Create plots to visualize feature importance or effects")
+  } else if (!has_summary) {
+    fail("Summarize your findings about what factors influence diamond prices")
+  } else {
+    pass("Excellent work interpreting your model and identifying important features!")
+  }
+})
+```
+
+## Project Conclusion
+
+Congratulations on completing the final project! You've applied a wide range of R programming and data analysis skills to explore, visualize, and model the diamonds dataset.
+
+In this project, you:
+- Explored and understood the structure of the diamond price dataset
+- Created a variety of visualizations to reveal patterns in the data
+- Performed statistical tests to identify significant relationships
+- Built predictive models and evaluated their performance
+- Identified the key factors that influence diamond prices
+
+This comprehensive analysis has demonstrated your ability to work with real-world data and extract meaningful insights using R. The skills you've practiced in this project are widely applicable to many other data analysis scenarios you'll encounter in your career.
+
+### Next Steps
+
+If you want to further extend this project, here are some ideas:
+- Try more advanced modeling techniques (decision trees, random forests, etc.)
+- Create an interactive dashboard using Shiny
+- Compare this dataset with other diamond price datasets
+- Investigate how diamond pricing has changed over time
+
+Keep expanding your R skills and applying them to interesting datasets!

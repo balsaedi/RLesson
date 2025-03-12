@@ -13,7 +13,61 @@ description: "Learn about the R statistical environment and its core components"
 library(learnr)
 library(gradethis)
 gradethis::gradethis_setup()
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+
+# Load the dataset
+data(diamonds, package = "ggplot2")
+
+# Create a sample for easier handling
+set.seed(123)
+project_diamonds <- diamonds[sample(nrow(diamonds), 2000), ]
+
+# Save the sampled data as CSV in a temp file for later use
+temp_file <- tempfile(fileext = ".csv")
+write.csv(project_diamonds, temp_file, row.names = FALSE)
+
+# Create a function that will be used to check attempts before showing solutions
+count_attempts <- function() {
+  # Create a counter in the global environment (only accessible on server)
+  if (!exists("attempt_counts", envir = .GlobalEnv)) {
+    assign("attempt_counts", list(), envir = .GlobalEnv)
+  }
+  
+  function(label, user_code, ...) {
+    # Get current count for this exercise
+    counts <- get("attempt_counts", envir = .GlobalEnv)
+    current <- counts[[label]] %||% 0
+    
+    # Increment count
+    current <- current + 1
+    counts[[label]] <- current
+    assign("attempt_counts", counts, envir = .GlobalEnv)
+    
+    # Only allow solution after 2 attempts
+    if (current >= 2) {
+      return(TRUE) # Allow solution
+    } else {
+      # Add a message indicating attempts needed
+      feedback <- paste0("Solution available after 2 attempts. You've made ", 
+                        current, " attempt", ifelse(current == 1, "", "s"), " so far.")
+      return(list(message = feedback, correct = FALSE, type = "warning", location = "append"))
+    }
+  }
+}
+
+# Tutorial options
+tutorial_options(
+  exercise.timelimit = 60,
+  exercise.completion = FALSE,
+  exercise.eval = FALSE,       # Don't automatically evaluate code
+  exercise.checker = count_attempts(),  # Custom checker to count attempts
+  exercise.reveal_solution = TRUE  # Show solution buttons (our function will control access)
+)
 ```
+
 
 ## Introduction to the R Environment
 
