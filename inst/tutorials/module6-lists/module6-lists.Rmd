@@ -1,0 +1,963 @@
+---
+title: "Module 6: Lists in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Learn how to create and work with lists in R"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+## Introduction to Lists in R
+
+A list in R is a versatile data structure that can store elements of different types, including other lists. This makes lists extremely flexible for organizing complex, heterogeneous data.
+
+Key characteristics of lists:
+1. Can contain elements of different types (numeric, character, logical, etc.)
+2. Can contain different data structures (vectors, matrices, data frames, and even other lists)
+3. Elements can have names for easier access
+4. Each element can have a different length
+
+Lists are used for:
+- Storing related but heterogeneous data
+- Storing hierarchical or nested data
+- Returning multiple objects from functions
+- Building complex data structures
+
+Let's explore how to create, access, and manipulate lists in R!
+
+## Creating Lists
+
+Lists can be created using the `list()` function.
+
+```{r list-demo, echo=TRUE}
+# Creating a simple list
+my_list <- list(100, "Hello", TRUE, c(1, 2, 3))
+my_list
+
+# Creating a named list
+student <- list(
+  name = "John Smith",
+  age = 22,
+  grades = c(85, 92, 78, 90),
+  passed = TRUE
+)
+student
+```
+
+### Nested Lists
+
+Lists can contain other lists, creating hierarchical data structures.
+
+```{r nested-demo, echo=TRUE}
+# Creating a nested list
+university <- list(
+  name = "State University",
+  departments = list(
+    computer_science = list(
+      chair = "Dr. Smith",
+      students = 450,
+      courses = c("CS101", "CS202", "CS303")
+    ),
+    mathematics = list(
+      chair = "Dr. Johnson",
+      students = 320,
+      courses = c("MATH101", "MATH202", "MATH303")
+    )
+  ),
+  founded_year = 1965
+)
+
+# View the structure
+str(university)
+```
+
+### Exercise 1: Creating Lists
+
+Create the following lists:
+
+1. A simple list called `mixed_data` containing:
+   - A numeric value (42)
+   - A character string ("R Programming")
+   - A logical value (TRUE)
+   - A vector of 3 numbers of your choice
+
+2. A named list called `car` with the following elements:
+   - make: "Toyota"
+   - model: "Corolla"
+   - year: 2022
+   - colors: a vector of at least 3 available colors
+   - hybrid: TRUE or FALSE (your choice)
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+# Create a simple mixed list
+mixed_data <- list(42, "R Programming", TRUE, c(10, 20, 30))
+
+# Create a named list for a car
+car <- list(
+  make = "Toyota",
+  model = "Corolla",
+  year = 2022,
+  colors = c("Red", "Blue", "Silver", "Black"),
+  hybrid = TRUE
+)
+
+# Display the lists
+mixed_data
+car
+```
+
+```{r ex1-check}
+grade_this({
+  # Check for correct code patterns in user's submission
+  has_mixed_data <- grepl("mixed_data\\s*<-\\s*list\\s*\\(", .user_code)
+  has_numeric_value <- grepl("list\\s*\\(\\s*\\d+\\s*,", .user_code)
+  has_character_string <- grepl("[\"']R\\s*Programming[\"']", .user_code)
+  has_logical_value <- grepl("TRUE", .user_code)
+  has_numeric_vector <- grepl("c\\s*\\(\\s*\\d+\\s*,\\s*\\d+\\s*,\\s*\\d+", .user_code)
+  
+  has_car <- grepl("car\\s*<-\\s*list\\s*\\(", .user_code)
+  has_toyota <- grepl("make\\s*=\\s*[\"']Toyota[\"']", .user_code)
+  has_corolla <- grepl("model\\s*=\\s*[\"']Corolla[\"']", .user_code)
+  has_2022 <- grepl("year\\s*=\\s*2022", .user_code)
+  has_colors_vector <- grepl("colors\\s*=\\s*c\\s*\\(\\s*[\"'].*[\"']\\s*,\\s*[\"'].*[\"']\\s*,\\s*[\"'].*[\"']", .user_code)
+  has_hybrid <- grepl("hybrid\\s*=\\s*(TRUE|FALSE)", .user_code)
+  
+  # If the variables exist, also check their content
+  if (exists("mixed_data", envir = environment()) && exists("car", envir = environment())) {
+    md_ok <- is.list(mixed_data) && length(mixed_data) >= 4 &&
+            is.numeric(mixed_data[[1]]) && 
+            is.character(mixed_data[[2]]) &&
+            is.logical(mixed_data[[3]]) &&
+            is.numeric(mixed_data[[4]]) && length(mixed_data[[4]]) >= 3
+    
+    car_ok <- is.list(car) && length(car) >= 5 &&
+             all(c("make", "model", "year", "colors", "hybrid") %in% names(car)) &&
+             car$make == "Toyota" &&
+             car$model == "Corolla" &&
+             car$year == 2022 &&
+             is.character(car$colors) && length(car$colors) >= 3 &&
+             is.logical(car$hybrid)
+    
+    if (md_ok && car_ok) {
+      pass("Great job! Both lists are created correctly with the proper elements and types.")
+    } else if (!md_ok) {
+      fail("Check your 'mixed_data' list. It should have a number, string, logical value, and numeric vector in that order.")
+    } else {
+      fail("Check your 'car' list. It should have the correct names and element types as specified.")
+    }
+  } else if (has_mixed_data && has_numeric_value && has_character_string && has_logical_value && 
+            has_numeric_vector && has_car && has_toyota && has_corolla && 
+            has_2022 && has_colors_vector && has_hybrid) {
+    pass("Great job! Both lists are created correctly with the proper elements and types.")
+  } else if (!has_mixed_data || !has_numeric_value || !has_character_string || 
+            !has_logical_value || !has_numeric_vector) {
+    fail("Make sure 'mixed_data' is a list with a number (42), string ('R Programming'), logical value (TRUE), and numeric vector with at least 3 numbers.")
+  } else {
+    fail("Make sure 'car' is a list with make='Toyota', model='Corolla', year=2022, colors vector with at least 3 colors, and a logical hybrid value.")
+  }
+})
+```
+
+## Accessing List Elements
+
+There are several ways to access elements in a list:
+
+### Using Indices with Single Brackets `[ ]`
+
+This returns a sublist (still a list).
+
+```{r access-demo1, echo=TRUE}
+# Create a list
+student <- list(
+  name = "John Smith",
+  age = 22,
+  grades = c(85, 92, 78, 90),
+  passed = TRUE
+)
+
+# Access element by index
+student[1]  # Returns a list with the first element
+class(student[1])
+
+# Access multiple elements
+student[c(1, 3)]  # Returns a list with the first and third elements
+```
+
+### Using Double Brackets `[[ ]]` 
+
+This extracts the element itself.
+
+```{r access-demo2, echo=TRUE}
+# Access element by index
+student[[1]]  # Returns the value of the first element
+class(student[[1]])
+
+# Access element by name
+student[["name"]]  # Returns the value associated with "name"
+```
+
+### Using the `$` Operator
+
+This is a shorthand for accessing named elements.
+
+```{r access-demo3, echo=TRUE}
+# Access element by name
+student$name  # Same as student[["name"]]
+student$grades
+```
+
+### Accessing Nested Elements
+
+For nested lists, you can chain these accessors.
+
+```{r access-demo4, echo=TRUE}
+# Create a nested list
+university <- list(
+  name = "State University",
+  departments = list(
+    computer_science = list(
+      chair = "Dr. Smith",
+      students = 450
+    ),
+    mathematics = list(
+      chair = "Dr. Johnson",
+      students = 320
+    )
+  )
+)
+
+# Access nested elements
+university$departments$computer_science$chair
+
+# Alternative ways to access the same element
+university[["departments"]][["computer_science"]][["chair"]]
+university[[2]][[1]][[1]]
+```
+
+### Exercise 2: Accessing List Elements
+
+Using this list:
+
+```
+person <- list(
+  name = list(
+    first = "Jane",
+    last = "Doe"
+  ),
+  age = 28,
+  occupation = "Data Scientist",
+  skills = c("R", "Python", "SQL", "Machine Learning"),
+  contact = list(
+    email = "jane.doe@example.com",
+    phone = "555-123-4567"
+  )
+)
+```
+
+Access and store the following elements:
+1. Jane's last name (store as `last_name`)
+2. Jane's age (store as `person_age`)
+3. The list of Jane's skills (store as `person_skills`)
+4. Jane's email (store as `email_address`)
+5. The full name list (store as `full_name`)
+
+```{r ex2, exercise=TRUE}
+# Create the person list
+person <- list(
+  name = list(
+    first = "Jane",
+    last = "Doe"
+  ),
+  age = 28,
+  occupation = "Data Scientist",
+  skills = c("R", "Python", "SQL", "Machine Learning"),
+  contact = list(
+    email = "jane.doe@example.com",
+    phone = "555-123-4567"
+  )
+)
+
+# Write your code here
+
+```
+
+```{r ex2-solution}
+# Create the person list
+person <- list(
+  name = list(
+    first = "Jane",
+    last = "Doe"
+  ),
+  age = 28,
+  occupation = "Data Scientist",
+  skills = c("R", "Python", "SQL", "Machine Learning"),
+  contact = list(
+    email = "jane.doe@example.com",
+    phone = "555-123-4567"
+  )
+)
+
+# 1. Jane's last name
+last_name <- person$name$last
+# Alternative: last_name <- person[["name"]][["last"]]
+
+# 2. Jane's age
+person_age <- person$age
+# Alternative: person_age <- person[["age"]]
+
+# 3. Jane's skills
+person_skills <- person$skills
+# Alternative: person_skills <- person[["skills"]]
+
+# 4. Jane's email
+email_address <- person$contact$email
+# Alternative: email_address <- person[["contact"]][["email"]]
+
+# 5. Full name list
+full_name <- person$name
+# Alternative: full_name <- person[["name"]]
+
+# Display results
+last_name
+person_age
+person_skills
+email_address
+full_name
+```
+
+```{r ex2-check}
+grade_this({
+  # Check for correct code patterns
+  has_last_name <- grepl("last_name\\s*<-\\s*(person\\$name\\$last|person\\[\\[\\s*[\"']name[\"']\\s*\\]\\]\\[\\[\\s*[\"']last[\"']\\s*\\]\\])", .user_code)
+  
+  has_person_age <- grepl("person_age\\s*<-\\s*(person\\$age|person\\[\\[\\s*[\"']age[\"']\\s*\\]\\])", .user_code)
+  
+  has_person_skills <- grepl("person_skills\\s*<-\\s*(person\\$skills|person\\[\\[\\s*[\"']skills[\"']\\s*\\]\\])", .user_code)
+  
+  has_email_address <- grepl("email_address\\s*<-\\s*(person\\$contact\\$email|person\\[\\[\\s*[\"']contact[\"']\\s*\\]\\]\\[\\[\\s*[\"']email[\"']\\s*\\]\\])", .user_code)
+  
+  has_full_name <- grepl("full_name\\s*<-\\s*(person\\$name|person\\[\\[\\s*[\"']name[\"']\\s*\\]\\])", .user_code)
+  
+  # If variables exist, also check their values
+  if (exists("last_name", envir = environment()) && 
+      exists("person_age", envir = environment()) && 
+      exists("person_skills", envir = environment()) && 
+      exists("email_address", envir = environment()) && 
+      exists("full_name", envir = environment())) {
+    
+    ln_correct <- last_name == "Doe"
+    pa_correct <- person_age == 28
+    ps_correct <- is.vector(person_skills) && "R" %in% person_skills && "Python" %in% person_skills
+    ea_correct <- email_address == "jane.doe@example.com"
+    fn_correct <- is.list(full_name) && full_name$first == "Jane" && full_name$last == "Doe"
+    
+    if (ln_correct && pa_correct && ps_correct && ea_correct && fn_correct) {
+      pass("Excellent! You've correctly accessed all the list elements.")
+    } else {
+      if (!ln_correct) fail("Check your last_name value. It should be 'Doe'.")
+      if (!pa_correct) fail("Check your person_age value. It should be 28.")
+      if (!ps_correct) fail("Check your person_skills value. It should include 'R' and 'Python'.")
+      if (!ea_correct) fail("Check your email_address value. It should be 'jane.doe@example.com'.")
+      if (!fn_correct) fail("Check your full_name value. It should be the name list with first='Jane', last='Doe'.")
+    }
+  } else if (has_last_name && has_person_age && has_person_skills && has_email_address && has_full_name) {
+    pass("Excellent! You've correctly accessed all the list elements.")
+  } else {
+    if (!has_last_name) fail("Make sure to extract Jane's last name as: last_name <- person$name$last")
+    if (!has_person_age) fail("Make sure to extract Jane's age as: person_age <- person$age")
+    if (!has_person_skills) fail("Make sure to extract Jane's skills as: person_skills <- person$skills")
+    if (!has_email_address) fail("Make sure to extract Jane's email as: email_address <- person$contact$email")
+    if (!has_full_name) fail("Make sure to extract the full name list as: full_name <- person$name")
+  }
+})
+```
+
+## Modifying Lists
+
+Lists in R are mutable, meaning you can change their elements after creation.
+
+### Adding Elements
+
+```{r modify-demo1, echo=TRUE}
+# Create a list
+student <- list(
+  name = "John Smith",
+  age = 22,
+  grades = c(85, 92, 78, 90)
+)
+
+# Add a new element
+student$gpa <- 3.7
+student$enrolled <- TRUE
+
+# Add an element to a specific position
+student[[5]] <- "Senior"
+
+# View the updated list
+student
+```
+
+### Modifying Elements
+
+```{r modify-demo2, echo=TRUE}
+# Update an existing element
+student$name <- "John M. Smith"
+student$grades[4] <- 95  # Change the fourth grade
+
+# View the updated list
+student
+```
+
+### Removing Elements
+
+```{r modify-demo3, echo=TRUE}
+# Remove an element
+student$enrolled <- NULL
+
+# Alternative way using negative indexing
+student <- student[-5]  # Remove the fifth element
+
+# View the updated list
+student
+```
+
+### Exercise 3: Modifying Lists
+
+Start with this list:
+
+```
+employee <- list(
+  name = "Alex Johnson",
+  id = 12345,
+  department = "Marketing",
+  salary = 65000
+)
+```
+
+Make the following modifications:
+1. Add a `hire_date` element with the value "2021-03-15"
+2. Add a `skills` element with a vector of at least three skills
+3. Update the salary to 72000
+4. Add a nested `contact` list with elements for `email` and `phone`
+5. Remove the `id` element
+
+```{r ex3, exercise=TRUE}
+# Create the employee list
+employee <- list(
+  name = "Alex Johnson",
+  id = 12345,
+  department = "Marketing",
+  salary = 65000
+)
+
+# Write your code here
+
+```
+
+```{r ex3-solution}
+# Create the employee list
+employee <- list(
+  name = "Alex Johnson",
+  id = 12345,
+  department = "Marketing",
+  salary = 65000
+)
+
+# 1. Add hire_date
+employee$hire_date <- "2021-03-15"
+
+# 2. Add skills
+employee$skills <- c("Digital Marketing", "Social Media", "SEO", "Content Creation")
+
+# 3. Update salary
+employee$salary <- 72000
+
+# 4. Add nested contact list
+employee$contact <- list(
+  email = "alex.johnson@company.com",
+  phone = "555-987-6543"
+)
+
+# 5. Remove id
+employee$id <- NULL
+
+# Display updated list
+employee
+```
+
+```{r ex3-check}
+grade_this({
+  # Check for correct code patterns
+  has_hire_date <- grepl("employee\\$hire_date\\s*<-\\s*[\"']2021-03-15[\"']", .user_code)
+  
+  has_skills <- grepl("employee\\$skills\\s*<-\\s*c\\s*\\(\\s*[\"'].*[\"']\\s*,\\s*[\"'].*[\"']\\s*,\\s*[\"'].*[\"']", .user_code)
+  
+  has_salary_update <- grepl("employee\\$salary\\s*<-\\s*72000", .user_code)
+  
+  has_contact_list <- grepl("employee\\$contact\\s*<-\\s*list\\s*\\(", .user_code) &&
+                      grepl("email\\s*=", .user_code) && 
+                      grepl("phone\\s*=", .user_code)
+  
+  has_id_removal <- grepl("employee\\$id\\s*<-\\s*NULL", .user_code)
+  
+  # If employee variable exists, also check the actual list content
+  if (exists("employee", envir = environment()) && is.list(employee)) {
+    has_correct_hire_date <- !is.null(employee$hire_date) && 
+                           employee$hire_date == "2021-03-15"
+    
+    has_correct_skills <- !is.null(employee$skills) && 
+                        is.vector(employee$skills) && 
+                        length(employee$skills) >= 3
+    
+    has_correct_salary <- !is.null(employee$salary) && employee$salary == 72000
+    
+    has_correct_contact <- !is.null(employee$contact) && 
+                         is.list(employee$contact) && 
+                         !is.null(employee$contact$email) && 
+                         !is.null(employee$contact$phone)
+    
+    has_removed_id <- is.null(employee$id)
+    
+    if (has_correct_hire_date && has_correct_skills && has_correct_salary && 
+        has_correct_contact && has_removed_id) {
+      pass("Great job! You've successfully modified the employee list with all the required changes.")
+    } else {
+      if (!has_correct_hire_date) fail("Make sure to add the hire_date element with the value '2021-03-15'.")
+      if (!has_correct_skills) fail("Make sure to add a skills element with at least three skills.")
+      if (!has_correct_salary) fail("Make sure to update the salary to 72000.")
+      if (!has_correct_contact) fail("Make sure to add a nested contact list with email and phone elements.")
+      if (!has_removed_id) fail("Make sure to remove the id element.")
+    }
+  } else if (has_hire_date && has_skills && has_salary_update && has_contact_list && has_id_removal) {
+    pass("Great job! You've successfully modified the employee list with all the required changes.")
+  } else {
+    if (!has_hire_date) fail("Make sure to add hire_date as: employee$hire_date <- \"2021-03-15\"")
+    if (!has_skills) fail("Make sure to add skills with at least 3 values: employee$skills <- c(\"Skill1\", \"Skill2\", \"Skill3\")")
+    if (!has_salary_update) fail("Make sure to update salary: employee$salary <- 72000")
+    if (!has_contact_list) fail("Make sure to add a contact list with email and phone elements")
+    if (!has_id_removal) fail("Make sure to remove the id element: employee$id <- NULL")
+  }
+})
+```
+
+## List Functions and Operations
+
+R provides several useful functions for working with lists:
+
+### Length and Names
+
+```{r list-func-demo1, echo=TRUE}
+# Create a list
+student <- list(
+  name = "John Smith",
+  age = 22,
+  grades = c(85, 92, 78, 90),
+  passed = TRUE
+)
+
+# Get the length (number of elements)
+length(student)
+
+# Get the names of elements
+names(student)
+
+# Change names
+names(student)[4] <- "status"
+student
+```
+
+### Checking and Subsetting
+
+```{r list-func-demo2, echo=TRUE}
+# Check if an object is a list
+is.list(student)
+
+# Convert to list
+v <- c(1, 2, 3)
+v_list <- as.list(v)
+v_list
+
+# Unlist (convert list to vector)
+unlist(student)  # Note: This forces all elements to a common type
+```
+
+### Combining Lists
+
+```{r list-func-demo3, echo=TRUE}
+# Create two lists
+personal_info <- list(name = "John Smith", age = 22)
+academic_info <- list(major = "Computer Science", gpa = 3.7)
+
+# Combine lists
+student_info <- c(personal_info, academic_info)
+student_info
+```
+
+### Apply Functions to Lists
+
+```{r list-func-demo4, echo=TRUE}
+# Create a list of vectors
+num_list <- list(a = 1:5, b = 6:10, c = 11:15)
+
+# Apply a function to each element
+lapply(num_list, sum)
+lapply(num_list, mean)
+
+# Apply with our own function
+lapply(num_list, function(x) x * 2)
+```
+
+### Exercise 4: List Functions
+
+Using this list:
+
+```
+survey_results <- list(
+  respondent_1 = list(age = 25, income = 45000, satisfaction = 8),
+  respondent_2 = list(age = 42, income = 72000, satisfaction = 6),
+  respondent_3 = list(age = 31, income = 58000, satisfaction = 7),
+  respondent_4 = list(age = 55, income = 81000, satisfaction = 9)
+)
+```
+
+Complete the following tasks:
+1. Find the number of respondents in the survey (store as `num_respondents`)
+2. Get the names of all respondents (store as `respondent_names`)
+3. Extract just the satisfaction scores from all respondents into a vector (store as `satisfaction_scores`)
+4. Calculate the average age of all respondents (store as `avg_age`)
+5. Calculate the average income of all respondents (store as `avg_income`)
+
+```{r ex4, exercise=TRUE}
+# Create the survey_results list
+survey_results <- list(
+  respondent_1 = list(age = 25, income = 45000, satisfaction = 8),
+  respondent_2 = list(age = 42, income = 72000, satisfaction = 6),
+  respondent_3 = list(age = 31, income = 58000, satisfaction = 7),
+  respondent_4 = list(age = 55, income = 81000, satisfaction = 9)
+)
+
+# Write your code here
+
+```
+
+```{r ex4-solution}
+# Create the survey_results list
+survey_results <- list(
+  respondent_1 = list(age = 25, income = 45000, satisfaction = 8),
+  respondent_2 = list(age = 42, income = 72000, satisfaction = 6),
+  respondent_3 = list(age = 31, income = 58000, satisfaction = 7),
+  respondent_4 = list(age = 55, income = 81000, satisfaction = 9)
+)
+
+# 1. Number of respondents
+num_respondents <- length(survey_results)
+
+# 2. Names of respondents
+respondent_names <- names(survey_results)
+
+# 3. Extract satisfaction scores
+# Method 1: Using lapply and unlist
+satisfaction_scores <- unlist(lapply(survey_results, function(x) x$satisfaction))
+
+# Method 2: Direct extraction with sapply (alternative)
+# satisfaction_scores <- sapply(survey_results, function(x) x$satisfaction)
+
+# 4. Average age
+# Extract ages, then calculate mean
+ages <- unlist(lapply(survey_results, function(x) x$age))
+avg_age <- mean(ages)
+
+# 5. Average income
+# Extract incomes, then calculate mean
+incomes <- unlist(lapply(survey_results, function(x) x$income))
+avg_income <- mean(incomes)
+
+# Display results
+num_respondents
+respondent_names
+satisfaction_scores
+avg_age
+avg_income
+```
+
+```{r ex4-check}
+grade_this({
+  # Check for correct code patterns
+  has_num_respondents <- grepl("num_respondents\\s*<-\\s*length\\s*\\(\\s*survey_results\\s*\\)", .user_code)
+  
+  has_respondent_names <- grepl("respondent_names\\s*<-\\s*names\\s*\\(\\s*survey_results\\s*\\)", .user_code)
+  
+  has_satisfaction_scores <- grepl("satisfaction_scores\\s*<-\\s*(unlist\\s*\\(\\s*lapply\\s*\\(|sapply\\s*\\()", .user_code) && 
+                            grepl("\\$satisfaction", .user_code)
+  
+  has_avg_age <- grepl("avg_age\\s*<-\\s*mean\\s*\\(", .user_code) && 
+               grepl("\\$age", .user_code)
+  
+  has_avg_income <- grepl("avg_income\\s*<-\\s*mean\\s*\\(", .user_code) && 
+                  grepl("\\$income", .user_code)
+  
+  # If variables exist, also check their values
+  if (exists("num_respondents", envir = environment()) && 
+      exists("respondent_names", envir = environment()) && 
+      exists("satisfaction_scores", envir = environment()) && 
+      exists("avg_age", envir = environment()) && 
+      exists("avg_income", envir = environment())) {
+    
+    nr_correct <- num_respondents == 4
+    rn_correct <- identical(respondent_names, c("respondent_1", "respondent_2", "respondent_3", "respondent_4"))
+    ss_correct <- identical(satisfaction_scores, c(8, 6, 7, 9)) || 
+                 (length(satisfaction_scores) == 4 && all(sort(satisfaction_scores) == c(6, 7, 8, 9)))
+    
+    expected_avg_age <- (25 + 42 + 31 + 55) / 4
+    aa_correct <- abs(avg_age - expected_avg_age) < 0.0001
+    
+    expected_avg_income <- (45000 + 72000 + 58000 + 81000) / 4
+    ai_correct <- abs(avg_income - expected_avg_income) < 0.0001
+    
+    if (nr_correct && rn_correct && ss_correct && aa_correct && ai_correct) {
+      pass("Excellent! All your list function operations are correct.")
+    } else {
+      if (!nr_correct) fail("num_respondents should be 4.")
+      if (!rn_correct) fail("respondent_names should contain all the respondent IDs.")
+      if (!ss_correct) fail("satisfaction_scores should contain all satisfaction values: 8, 6, 7, 9.")
+      if (!aa_correct) fail("avg_age should be the mean of all ages: (25+42+31+55)/4.")
+      if (!ai_correct) fail("avg_income should be the mean of all incomes: (45000+72000+58000+81000)/4.")
+    }
+  } else if (has_num_respondents && has_respondent_names && has_satisfaction_scores && 
+            has_avg_age && has_avg_income) {
+    pass("Excellent! All your list function operations are correct.")
+  } else {
+    if (!has_num_respondents) fail("Make sure to get the number of respondents: num_respondents <- length(survey_results)")
+    if (!has_respondent_names) fail("Make sure to get respondent names: respondent_names <- names(survey_results)")
+    if (!has_satisfaction_scores) fail("Make sure to extract satisfaction scores using lapply/sapply and accessing the $satisfaction field")
+    if (!has_avg_age) fail("Make sure to calculate average age using the mean of all ages")
+    if (!has_avg_income) fail("Make sure to calculate average income using the mean of all incomes")
+  }
+})
+```
+
+## Practical List Applications
+
+Lists are extremely useful in many practical scenarios, such as:
+
+### Complex Data Storage
+
+```{r practical-demo1, echo=TRUE}
+# Student database example
+students <- list(
+  student_001 = list(
+    name = "Alice Smith",
+    courses = c("Math", "Physics", "Chemistry"),
+    grades = list(
+      Math = c(88, 92, 95),
+      Physics = c(85, 80, 89),
+      Chemistry = c(92, 94, 91)
+    ),
+    contact = list(
+      email = "alice.smith@email.com",
+      phone = "555-123-4567"
+    )
+  ),
+  student_002 = list(
+    name = "Bob Johnson",
+    courses = c("History", "English", "Art"),
+    grades = list(
+      History = c(90, 88, 94),
+      English = c(85, 87, 90),
+      Art = c(98, 95, 99)
+    ),
+    contact = list(
+      email = "bob.johnson@email.com",
+      phone = "555-234-5678"
+    )
+  )
+)
+
+# Access nested data
+students$student_001$grades$Math[2]  # Alice's second Math grade
+```
+
+### Function Return Values
+
+```{r practical-demo2, echo=TRUE}
+# Function that returns multiple values in a list
+calculate_statistics <- function(numbers) {
+  if (length(numbers) == 0) {
+    return
+    (NULL)
+  }
+  
+  list(
+    mean = mean(numbers),
+    median = median(numbers),
+    sd = sd(numbers),
+    min = min(numbers),
+    max = max(numbers),
+    n = length(numbers)
+  )
+}
+
+# Use the function
+numbers <- c(12, 15, 18, 22, 30, 35, 40)
+stats <- calculate_statistics(numbers)
+
+# Access the results
+stats$mean
+stats$sd
+```
+
+### Exercise 5: Practical List Application
+
+Create a function called `book_summary` that takes these parameters:
+- `title` (a character string)
+- `author` (a character string)
+- `year` (a numeric value)
+- `ratings` (a numeric vector of ratings from 1-5)
+
+The function should return a list with the following elements:
+- `book_info`: A list containing the title, author, and year
+- `avg_rating`: The average (mean) of the ratings
+- `num_ratings`: The number of ratings
+- `top_rated`: TRUE if the average rating is 4 or higher, FALSE otherwise
+
+Then call the function with:
+- Title: "The R Book"
+- Author: "R. Programmer"
+- Year: 2023
+- Ratings: c(5, 4, 5, 4, 5, 3, 5, 4)
+
+Store the result in a variable called `book_stats`.
+
+```{r ex5, exercise=TRUE}
+# Write your book_summary function here
+
+
+# Call the function with the provided information
+
+```
+
+```{r ex5-solution}
+# Create the book_summary function
+book_summary <- function(title, author, year, ratings) {
+  # Create book info sublist
+  book_info <- list(
+    title = title,
+    author = author,
+    year = year
+  )
+  
+  # Calculate statistics
+  avg_rating <- mean(ratings)
+  num_ratings <- length(ratings)
+  top_rated <- avg_rating >= 4
+  
+  # Return as a list
+  list(
+    book_info = book_info,
+    avg_rating = avg_rating,
+    num_ratings = num_ratings,
+    top_rated = top_rated
+  )
+}
+
+# Call the function with the provided data
+book_stats <- book_summary(
+  title = "The R Book",
+  author = "R. Programmer",
+  year = 2023,
+  ratings = c(5, 4, 5, 4, 5, 3, 5, 4)
+)
+
+# Display the result
+book_stats
+```
+
+```{r ex5-check}
+grade_this({
+  # Check if function exists
+  has_function <- grepl("book_summary\\s*<-\\s*function", .user_code)
+  
+  # Check if function call exists
+  has_call <- grepl("book_stats\\s*<-\\s*book_summary", .user_code)
+  
+  # Check for the test data
+  has_test_data <- grepl('"The R Book"', .user_code) && 
+                  grepl('"R. Programmer"', .user_code) && 
+                  grepl('2023', .user_code) && 
+                  grepl('c\\(5,\\s*4,\\s*5,\\s*4,\\s*5,\\s*3,\\s*5,\\s*4\\)', .user_code)
+  
+  # If variables exist, check content
+  if (exists("book_summary") && is.function(book_summary) && 
+      exists("book_stats") && is.list(book_stats)) {
+    
+    # Check book_stats structure
+    has_book_info <- !is.null(book_stats$book_info) && is.list(book_stats$book_info)
+    has_avg_rating <- !is.null(book_stats$avg_rating) && is.numeric(book_stats$avg_rating)
+    has_num_ratings <- !is.null(book_stats$num_ratings) && is.numeric(book_stats$num_ratings)
+    has_top_rated <- !is.null(book_stats$top_rated) && is.logical(book_stats$top_rated)
+    
+    # Check values
+    correct_title <- book_stats$book_info$title == "The R Book"
+    correct_author <- book_stats$book_info$author == "R. Programmer"
+    correct_year <- book_stats$book_info$year == 2023
+    correct_avg <- abs(book_stats$avg_rating - 4.375) < 0.001
+    correct_num <- book_stats$num_ratings == 8
+    correct_top <- book_stats$top_rated == TRUE
+    
+    if (has_book_info && has_avg_rating && has_num_ratings && has_top_rated &&
+        correct_title && correct_author && correct_year && 
+        correct_avg && correct_num && correct_top) {
+      pass("Excellent! Your book summary function works perfectly.")
+    } else {
+      if (!has_book_info) {
+        fail("Your result should include a 'book_info' list.")
+      } else if (!correct_title || !correct_author || !correct_year) {
+        fail("The book_info element should contain the title, author, and year as provided.")
+      } else if (!has_avg_rating || !correct_avg) {
+        fail("Your result should include the correct average rating (4.375).")
+      } else if (!has_num_ratings || !correct_num) {
+        fail("Your result should include the correct number of ratings (8).")
+      } else if (!has_top_rated || !correct_top) {
+        fail("Your result should include 'top_rated' as TRUE (since the average is ≥ 4).")
+      } else {
+        fail("Check the structure and values in your result.")
+      }
+    }
+  } else if (has_function && has_call && has_test_data) {
+    pass("Your book summary function looks good.")
+  } else if (!has_function) {
+    fail("Make sure to create a function named 'book_summary'.")
+  } else if (!has_call) {
+    fail("Make sure to call your function and store the result as 'book_stats'.")
+  } else {
+    fail("Make sure to use the provided test data in your function call.")
+  }
+})
+```
+
+
+## Summary
+
+In this module, you've learned about lists in R, including:
+
+1. Creating simple and nested lists using the `list()` function
+2. Accessing list elements using `[ ]`, `[[ ]]`, and `$` operators
+3. Modifying lists by adding, updating, and removing elements
+4. Using list functions like `length()`, `names()`, and `lapply()`
+5. Applying lists to practical scenarios like complex data storage and function returns
+
+Lists are one of the most versatile data structures in R, allowing you to organize and manipulate heterogeneous data efficiently. Understanding how to work with lists is essential for effective data management and programming in R.
+
+In the next module, we'll explore data frames, which are list-like structures specifically designed for handling tabular data in R.

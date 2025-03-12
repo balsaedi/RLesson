@@ -1,0 +1,26 @@
+file_conn <- file(".gitignore", "w")
+writeLines(c(
+  "# Ignore everything by default",
+  "*",
+  "",
+  "# Track only these specific files/directories",
+  "!R/",
+  "!R/*.R",
+  "!inst/",
+  "!inst/tutorials/",
+  "!inst/tutorials/*/",
+  "!inst/tutorials/*/*.Rmd",
+  "!DESCRIPTION",
+  "!NAMESPACE",
+  "!LICENSE",
+  "!README.md",
+  "!man/",
+  "!.gitignore"
+), file_conn)
+close(file_conn)
+.Rproj.user
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto

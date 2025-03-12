@@ -1,0 +1,495 @@
+---
+title: "Module 3: Numeric, Character, and Logical Data Types"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Learn about the basic data types in R: numeric, character, and logical"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+## Introduction to Data Types in R
+
+Every value in R has a specific data type that determines how it behaves in operations and what functions can be applied to it. Understanding data types is crucial for working effectively with R.
+
+R has several basic data types:
+
+1. **Numeric**: Numbers (both integers and decimal values)
+2. **Character**: Text values (strings)
+3. **Logical**: Boolean values (TRUE or FALSE)
+4. **Integer**: Whole numbers (a specific type of numeric)
+5. **Complex**: Complex numbers with real and imaginary parts
+
+This module focuses on the three most commonly used data types: numeric, character, and logical.
+
+## Numeric Data Type
+
+Numeric values in R include both integers and floating-point (decimal) numbers. By default, numbers in R are stored as double-precision floating-point numbers.
+
+```{r numeric-demo, echo=TRUE}
+# Creating numeric variables
+a <- 10        # Integer-like numeric
+b <- 3.14      # Decimal numeric
+c <- 2.5e6     # Scientific notation (2.5 million)
+
+# Checking the class
+class(a)
+class(b)
+class(c)
+
+# Basic numeric operations
+a + b
+a * b
+a / b
+a ^ 2  # Exponentiation
+```
+
+### Exercise 1: Working with Numeric Data
+
+Create three numeric variables:
+- `length` with a value of 5.8
+- `width` with a value of 3.2
+- `area` that calculates the area by multiplying length and width
+
+Then display all three variables.
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+length <- 5.8
+width <- 3.2
+area <- length * width
+
+# Display variables
+length
+width
+area
+```
+
+```{r ex1-check}
+grade_this({
+  # Check for the correct code patterns
+  has_length_assign <- grepl("length\\s*<-\\s*5\\.8", .user_code)
+  has_width_assign <- grepl("width\\s*<-\\s*3\\.2", .user_code)
+  has_area_calc <- grepl("area\\s*<-\\s*length\\s*\\*\\s*width|area\\s*<-\\s*width\\s*\\*\\s*length", .user_code)
+  
+  # Check if the final result is correct
+  area_value_correct <- FALSE
+  if (exists("area", envir = .GlobalEnv)) {
+    area_val <- get("area", envir = .GlobalEnv)
+    area_value_correct <- is.numeric(area_val) && abs(area_val - 18.56) < 0.0001
+  } else if (!is.null(.result) && is.numeric(.result) && abs(.result - 18.56) < 0.0001) {
+    area_value_correct <- TRUE
+  }
+  
+  if (has_length_assign && has_width_assign && has_area_calc) {
+    pass("Excellent! You've correctly created all variables and calculated the area.")
+  } else if (!has_length_assign) {
+    fail("Make sure to create the length variable with a value of 5.8.")
+  } else if (!has_width_assign) {
+    fail("Make sure to create the width variable with a value of 3.2.")
+  } else if (!has_area_calc) {
+    fail("Make sure to calculate area by multiplying length and width.")
+  } else {
+    fail("Check your code - make sure length is 5.8, width is 3.2, and area is length * width.")
+  }
+})
+```
+
+## Character Data Type
+
+Character data (also called strings) represents text in R. Character values must be enclosed in quotes (either single or double quotes).
+
+```{r character-demo, echo=TRUE}
+# Creating character variables
+first_name <- "John"
+last_name <- 'Doe'  # Single quotes work too
+greeting <- "Hello, World!"
+
+# Checking the class
+class(first_name)
+
+# Combining character strings
+full_name <- paste(first_name, last_name)
+full_name
+
+# Getting the length of a string (number of characters)
+nchar(greeting)
+
+# Converting to uppercase/lowercase
+toupper(greeting)
+tolower(greeting)
+```
+
+### Exercise 2: Working with Character Data
+
+Create the following variables:
+- `city` with a value of "New York" 
+- `country` with a value of "USA"
+- `location` that combines the city and country with a comma and space between them
+
+Then calculate and print the number of characters in the `location` variable.
+
+```{r ex2, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex2-solution}
+city <- "New York"
+country <- "USA"
+location <- paste(city, country, sep = ", ")
+
+# Number of characters in location
+nchar(location)
+```
+
+```{r ex2-check}
+grade_this({
+  # Check for the correct code patterns
+  has_city_assign <- grepl('city\\s*<-\\s*"New\\s*York"|city\\s*<-\\s*\'New\\s*York\'', .user_code)
+  has_country_assign <- grepl('country\\s*<-\\s*"USA"|country\\s*<-\\s*\'USA\'', .user_code)
+  has_location_paste <- grepl('location\\s*<-\\s*paste\\s*\\(\\s*city\\s*,\\s*country\\s*,\\s*sep\\s*=\\s*["\'], ["\']\\s*\\)', .user_code)
+  has_nchar_calc <- grepl('nchar\\s*\\(\\s*location\\s*\\)', .user_code)
+  
+  # Check if the result is 12 characters
+  correct_result <- !is.null(.result) && (identical(.result, 12) || identical(.result, nchar("New York, USA")))
+  
+  if (has_city_assign && has_country_assign && has_location_paste && has_nchar_calc && correct_result) {
+    pass("Perfect! You've created all the variables correctly and found the character count.")
+  } else if (!has_city_assign) {
+    fail("Make sure to create the city variable with the value \"New York\".")
+  } else if (!has_country_assign) {
+    fail("Make sure to create the country variable with the value \"USA\".")
+  } else if (!has_location_paste) {
+    fail("Make sure to use paste() with city, country, and sep = \", \" to create the location.")
+  } else if (!has_nchar_calc) {
+    fail("Make sure to use nchar() to count the characters in the location variable.")
+  } else if (!correct_result) {
+    fail("Make sure the final result displays the number of characters (12) in the location.")
+  } else {
+    fail("Check your code carefully. Make sure city is 'New York', country is 'USA', location combines them with a comma and space, and you're displaying the character count.")
+  }
+})
+```
+
+## Logical Data Type
+
+Logical (Boolean) values in R are either `TRUE` or `FALSE` (note that they are all uppercase). They are the result of comparisons and are used in conditional operations.
+
+```{r logical-demo, echo=TRUE}
+# Creating logical variables
+x <- TRUE
+y <- FALSE
+
+# Checking the class
+class(x)
+
+# Logical operators
+# AND: &
+x & y
+
+# OR: |
+x | y
+
+# NOT: !
+!x
+
+# Comparisons produce logical results
+a <- 10
+b <- 20
+a < b
+a == b  # Equality test
+a != b  # Inequality test
+```
+
+### Exercise 3: Working with Logical Data
+
+Create variables for two test scores: 
+- `test1` with a value of 85
+- `test2` with a value of 92
+
+Then create logical variables that:
+- `passed_both` that is TRUE if both scores are greater than or equal to 60
+- `scored_above_90` that is TRUE if at least one of the scores is above 90
+- `improvement` that is TRUE if test2 is higher than test1
+
+```{r ex3, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex3-solution}
+test1 <- 85
+test2 <- 92
+
+passed_both <- test1 >= 60 & test2 >= 60
+scored_above_90 <- test1 > 90 | test2 > 90
+improvement <- test2 > test1
+
+# Display results
+passed_both
+scored_above_90
+improvement
+```
+
+```{r ex3-check}
+grade_this({
+  # Check for the correct code patterns
+  has_test1_assign <- grepl("test1\\s*<-\\s*85", .user_code)
+  has_test2_assign <- grepl("test2\\s*<-\\s*92", .user_code)
+  has_passed_both <- grepl("passed_both\\s*<-\\s*test1\\s*>=\\s*60\\s*&\\s*test2\\s*>=\\s*60", .user_code)
+  has_scored_above <- grepl("scored_above_90\\s*<-\\s*test1\\s*>\\s*90\\s*\\|\\s*test2\\s*>\\s*90", .user_code)
+  has_improvement <- grepl("improvement\\s*<-\\s*test2\\s*>\\s*test1", .user_code)
+  
+  if (has_test1_assign && has_test2_assign && has_passed_both && has_scored_above && has_improvement) {
+    pass("Great job! All your logical variables are calculated correctly.")
+  } else if (!has_test1_assign) {
+    fail("Make sure to create the test1 variable with a value of 85.")
+  } else if (!has_test2_assign) {
+    fail("Make sure to create the test2 variable with a value of 92.")
+  } else if (!has_passed_both) {
+    fail("Make sure to create passed_both as: test1 >= 60 & test2 >= 60")
+  } else if (!has_scored_above) {
+    fail("Make sure to create scored_above_90 as: test1 > 90 | test2 > 90")
+  } else if (!has_improvement) {
+    fail("Make sure to create improvement as: test2 > test1")
+  } else {
+    fail("Check your logical operations. passed_both should check if both scores are >= 60, scored_above_90 should check if either score is > 90, and improvement should check if test2 > test1.")
+  }
+})
+```
+
+## Data Type Conversion
+
+You can convert between data types in R using various functions:
+
+- `as.numeric()`: Convert to numeric
+- `as.character()`: Convert to character
+- `as.logical()`: Convert to logical
+
+```{r conversion-demo, echo=TRUE}
+# Numeric to character
+num <- 42
+num_as_char <- as.character(num)
+class(num_as_char)
+
+# Character to numeric (if possible)
+char <- "123"
+char_as_num <- as.numeric(char)
+class(char_as_num)
+
+# What happens when we try to convert an invalid character to numeric
+invalid_char <- "abc"
+as.numeric(invalid_char)  # Results in NA with a warning
+
+# Numeric to logical
+# Note: 0 becomes FALSE, any other number becomes TRUE
+zero <- 0
+nonzero <- 5
+as.logical(zero)
+as.logical(nonzero)
+
+# Character to logical
+# Only "TRUE", "True", "true", "T", "FALSE", etc. are converted correctly
+as.logical("TRUE")
+as.logical("false")
+as.logical("hello")  # Not a valid logical string, becomes NA
+```
+
+### Exercise 4: Data Type Conversion
+
+Convert the following variables to different data types:
+- Convert `num_score <- 75` to a character
+- Convert `str_year <- "2023"` to a numeric
+- Convert `zero_val <- 0` to a logical
+- Try to convert `text <- "hello"` to a numeric and observe the result
+
+```{r ex4, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex4-solution}
+num_score <- 75
+score_as_char <- as.character(num_score)
+
+str_year <- "2023"
+year_as_num <- as.numeric(str_year)
+
+zero_val <- 0
+zero_as_logical <- as.logical(zero_val)
+
+text <- "hello"
+text_as_num <- as.numeric(text)
+
+# Display results
+score_as_char
+class(score_as_char)
+year_as_num
+class(year_as_num)
+zero_as_logical
+class(zero_as_logical)
+text_as_num  # Should be NA
+```
+
+```{r ex4-check}
+grade_this({
+  # Check for the correct code patterns
+  has_num_score <- grepl("num_score\\s*<-\\s*75", .user_code)
+  has_char_convert <- grepl("score_as_char\\s*<-\\s*as\\.character\\s*\\(\\s*num_score\\s*\\)", .user_code)
+  
+  has_str_year <- grepl('str_year\\s*<-\\s*"2023"', .user_code)
+  has_num_convert <- grepl("year_as_num\\s*<-\\s*as\\.numeric\\s*\\(\\s*str_year\\s*\\)", .user_code)
+  
+  has_zero_val <- grepl("zero_val\\s*<-\\s*0", .user_code)
+  has_logical_convert <- grepl("zero_as_logical\\s*<-\\s*as\\.logical\\s*\\(\\s*zero_val\\s*\\)", .user_code)
+  
+  has_text <- grepl('text\\s*<-\\s*"hello"', .user_code)
+  has_text_convert <- grepl("text_as_num\\s*<-\\s*as\\.numeric\\s*\\(\\s*text\\s*\\)", .user_code)
+  
+  if (has_num_score && has_char_convert && has_str_year && has_num_convert && 
+      has_zero_val && has_logical_convert && has_text && has_text_convert) {
+    pass("Great job! You've correctly converted all variables to different data types.")
+  } else if (!has_num_score || !has_char_convert) {
+    fail("Make sure to create num_score = 75 and convert it to a character with as.character().")
+  } else if (!has_str_year || !has_num_convert) {
+    fail("Make sure to create str_year = \"2023\" and convert it to a numeric with as.numeric().")
+  } else if (!has_zero_val || !has_logical_convert) {
+    fail("Make sure to create zero_val = 0 and convert it to a logical with as.logical().")
+  } else if (!has_text || !has_text_convert) {
+    fail("Make sure to create text = \"hello\" and try to convert it to a numeric with as.numeric().")
+  } else {
+    fail("Check your code to ensure you've created and converted all the variables correctly.")
+  }
+})
+```
+
+## Checking Data Types
+
+It's often useful to check the data type of a variable, especially when working with data from external sources. R provides several functions to check data types:
+
+- `class()`: Returns the object's class
+- `typeof()`: Returns the object's internal storage type
+- `is.*()` functions: Check if an object is of a specific type (e.g., `is.numeric()`, `is.character()`)
+
+```{r checking-demo, echo=TRUE}
+# Create variables of different types
+num_var <- 42
+char_var <- "hello"
+logic_var <- TRUE
+
+# Using class()
+class(num_var)
+class(char_var)
+class(logic_var)
+
+# Using typeof() - reveals internal representation
+typeof(num_var)
+typeof(char_var)
+typeof(logic_var)
+
+# Using is.*() functions
+is.numeric(num_var)
+is.character(num_var)
+is.character(char_var)
+is.logical(logic_var)
+```
+
+### Exercise 5: Checking and Validating Data Types
+
+Create three variables of different types, then write code to check their types using both `class()` and the appropriate `is.*()` functions. Finally, write a logical expression that checks if each variable is of the expected type.
+
+```{r ex5, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex5-solution}
+# Create variables
+temperature <- 22.5
+day <- "Monday"
+is_sunny <- TRUE
+
+# Check classes
+class(temperature)
+class(day)
+class(is_sunny)
+
+# Check types with is.*() functions
+is.numeric(temperature)
+is.character(day)
+is.logical(is_sunny)
+
+# Validate expected types
+temperature_valid <- is.numeric(temperature)
+day_valid <- is.character(day)
+is_sunny_valid <- is.logical(is_sunny)
+
+# Check if all are valid
+all_valid <- temperature_valid & day_valid & is_sunny_valid
+all_valid
+```
+
+```{r ex5-check}
+grade_this({
+  # Check for variable creation patterns
+  has_numeric_var <- grepl("\\w+\\s*<-\\s*[0-9]+\\.?[0-9]*", .user_code)
+  has_character_var <- grepl("\\w+\\s*<-\\s*[\"'].*[\"']", .user_code)
+  has_logical_var <- grepl("\\w+\\s*<-\\s*(TRUE|FALSE)", .user_code)
+  
+  # Check for class() usage
+  has_class_check <- grepl("class\\s*\\(", .user_code)
+  
+  # Check for is.*() functions
+  has_is_numeric <- grepl("is\\.numeric\\s*\\(", .user_code)
+  has_is_character <- grepl("is\\.character\\s*\\(", .user_code)
+  has_is_logical <- grepl("is\\.logical\\s*\\(", .user_code)
+  
+  # Check for validation logic
+  has_validation <- grepl("\\w+_valid\\s*<-", .user_code) || grepl("all\\(.*\\)", .user_code) || grepl("&|\\|", .user_code)
+  
+  if (has_numeric_var && has_character_var && has_logical_var && 
+      has_class_check && (has_is_numeric || has_is_character || has_is_logical) && has_validation) {
+    pass("Excellent! You've created variables of different types and correctly checked them.")
+  } else if (!has_numeric_var) {
+    fail("Make sure to create a numeric variable (e.g., x <- 10.5).")
+  } else if (!has_character_var) {
+    fail("Make sure to create a character variable (e.g., name <- \"John\").")
+  } else if (!has_logical_var) {
+    fail("Make sure to create a logical variable (e.g., is_valid <- TRUE).")
+  } else if (!has_class_check) {
+    fail("Make sure to use the class() function to check the types of your variables.")
+  } else if (!has_is_numeric && !has_is_character && !has_is_logical) {
+    fail("Make sure to use at least one is.*() function (is.numeric(), is.character(), or is.logical()).")
+  } else if (!has_validation) {
+    fail("Make sure to create validation checks for your variables (e.g., x_valid <- is.numeric(x)).")
+  } else {
+    fail("Check your code to ensure you've created variables of three different types, checked their types with class() and is.*() functions, and validated the types.")
+  }
+})
+```
+
+## Summary
+
+In this module, you've learned about the three basic data types in R:
+
+1. **Numeric**: For storing numbers (both integers and decimals)
+2. **Character**: For storing text data
+3. **Logical**: For storing Boolean values (TRUE or FALSE)
+
+You've also learned how to:
+- Perform operations specific to each data type
+- Convert between different data types
+- Check and validate the data type of a variable
+
+In the next module, we'll explore vectors, which are one-dimensional collections of elements of the same data type.

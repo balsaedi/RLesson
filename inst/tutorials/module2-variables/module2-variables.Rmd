@@ -1,0 +1,418 @@
+---
+title: "Module 2: Creating Variables in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Learn how to create and work with variables in R"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+
+```{r setup-options, echo=FALSE}
+knitr::opts_chunk$set(
+  exercise.cap = "Code",
+  exercise.eval = FALSE,
+  exercise.timelimit = 60,
+  exercise.lines = 8,
+  exercise.reveal_solution = TRUE,  # Explicitly enable solution button
+  exercise.completion = TRUE
+)
+```
+
+## Introduction to Variables in R
+
+Variables are fundamental building blocks in programming. They allow you to store values (such as numbers, text, or more complex data structures) and refer to them by name. In R, creating variables is straightforward and flexible.
+
+### How Variables Work in R
+
+In R, you can think of variables as containers that hold data. Each variable has:
+
+1. A name (identifier)
+2. A value (the data it contains)
+3. A data type (e.g., numeric, character, logical)
+
+Variables allow you to:
+- Store results for later use
+- Make your code more readable
+- Avoid repeating the same calculations
+- Build more complex operations step by step
+
+Let's explore how to create and work with variables in R!
+
+## Creating Variables in R
+
+In R, you can create a variable using the assignment operator `<-`. While you can also use `=` for assignment, `<-` is the preferred style in R programming.
+
+```{r assignment-demo, echo=TRUE}
+# Creating a variable named 'x' with a value of 10
+x <- 10
+
+# Displaying the value of x
+x
+
+# Creating another variable
+message <- "Hello, R!"
+message
+```
+
+### Exercise 1: Basic Variable Assignment
+
+Create two variables: 
+- A variable named `age` with a value of 25
+- A variable named `name` with your name as a text value
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+age <- 25
+name <- "Your Name"  # Replace with any name
+```
+
+```{r ex1-check}
+grade_this({
+  # Check for age assignment in code
+  has_age_assign <- grepl("age\\s*<-\\s*25", .user_code)
+  
+  # Check for name assignment in code (more flexible)
+  has_name_assign <- grepl("name\\s*<-\\s*[\"\']", .user_code)
+  
+  if (has_age_assign && has_name_assign) {
+    pass("Great job! You've created both variables with the correct types.")
+  } else if (!has_age_assign) {
+    fail("Make sure to create a variable named 'age' with a value of 25.")
+  } else if (!has_name_assign) {
+    fail("Make sure to create a variable named 'name' with a text value in quotes.")
+  } else {
+    fail("Check that you've created both 'age' as a number and 'name' as text in quotes.")
+  }
+})
+```
+
+## Variable Naming Rules and Conventions
+
+In R, variable names must follow certain rules:
+
+1. Names can contain letters, numbers, dots (`.`), and underscores (`_`)
+2. Names must start with a letter or a dot not followed by a number
+3. Names are case-sensitive (`value` and `Value` are different variables)
+4. Names cannot contain spaces or special characters like `$`, `@`, `#`, etc.
+5. Names cannot be reserved words (e.g., `if`, `else`, `function`)
+
+Common naming conventions include:
+
+- Use descriptive names that explain what the variable represents
+- Use lowercase letters for simple variables
+- Use snake_case (words separated by underscores) or camelCase (second and subsequent words capitalized)
+
+```{r naming-demo, echo=TRUE}
+# Good variable names
+first_name <- "John"
+lastName <- "Doe"
+age_in_years <- 30
+max_value <- 100
+
+# Valid but not recommended (not descriptive)
+x <- 10
+y <- "hello"
+
+# Not valid (will cause errors if uncommented)
+# 1st_value <- 5        # Cannot start with a number
+# user name <- "John"   # Cannot contain spaces
+# if <- 10              # Cannot use reserved words
+```
+
+### Exercise 2: Valid Variable Names
+
+Identify which of the following variable names are valid in R by creating them with any value. For invalid names, create a corrected version.
+
+```{r ex2, exercise=TRUE}
+# Test these variable names
+# my_var <- 1
+# 2nd_place <- "Silver"
+# user.name <- "admin"
+# first-name <- "John"
+# max_value <- 100
+# if <- "condition"
+
+# Write your code here with corrections for invalid names
+```
+
+```{r ex2-solution}
+# Valid names
+my_var <- 1
+user.name <- "admin"
+max_value <- 100
+
+# Corrected invalid names
+place_2nd <- "Silver"  # or second_place
+first_name <- "John"   # replaced dash with underscore
+condition <- "if"      # renamed reserved word
+```
+
+```{r ex2-check}
+grade_this({
+  # Check for valid variable assignments in code
+  has_my_var <- grepl("my_var\\s*<-", .user_code)
+  has_user_name <- grepl("user\\.name\\s*<-", .user_code)
+  has_max_value <- grepl("max_value\\s*<-", .user_code)
+  
+  # Check for corrected variable assignments in code
+  has_place_correction <- grepl("(place_2nd|second_place)\\s*<-", .user_code)
+  has_firstname_correction <- grepl("first_name\\s*<-", .user_code)
+  has_if_correction <- grepl("(condition|if_condition|if_var)\\s*<-", .user_code)
+  
+  valid_count <- sum(has_my_var, has_user_name, has_max_value)
+  corrected_count <- sum(has_place_correction, has_firstname_correction, has_if_correction)
+  
+  if (valid_count >= 2 && corrected_count >= 2) {
+    pass("Good job identifying valid variable names and correcting invalid ones!")
+  } else if (valid_count < 2) {
+    fail("Make sure to create at least two of the valid variable names: my_var, user.name, and max_value.")
+  } else if (corrected_count < 2) {
+    fail("Make sure to create corrected versions for at least two of the invalid names.")
+  } else {
+    fail("Make sure to create valid variable names and corrected versions of the invalid ones.")
+  }
+})
+```
+
+## Using and Modifying Variables
+
+Once you've created a variable, you can use it in calculations, update its value, or use it to create new variables.
+
+```{r modify-demo, echo=TRUE}
+# Create initial variables
+count <- 5
+price <- 9.99
+
+# Use variables in calculations
+total_cost <- count * price
+total_cost
+
+# Update a variable's value
+count <- count + 3
+count
+
+# Use updated value in a new calculation
+new_total <- count * price
+new_total
+```
+
+### Exercise 3: Working with Variables
+
+Create a variable `base_price` with a value of 50. Then create a variable `discount_percentage` with a value of 20. Finally, calculate the `final_price` after applying the discount.
+
+```{r ex3, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex3-solution}
+base_price <- 50
+discount_percentage <- 20
+final_price <- base_price * (1 - discount_percentage/100)
+final_price
+```
+
+```{r ex3-check}
+grade_this({
+  # Check for variable assignments in code
+  has_base_price <- grepl("base_price\\s*<-\\s*50", .user_code)
+  has_discount <- grepl("discount_percentage\\s*<-\\s*20", .user_code)
+  has_final_price <- grepl("final_price\\s*<-", .user_code)
+  
+  # Check if the result is 40 (correct discount calculation)
+  correct_result <- identical(.result, 40) || (is.numeric(.result) && abs(.result - 40) < 0.0001)
+  
+  if (has_base_price && has_discount && has_final_price && correct_result) {
+    pass("Perfect! You've correctly calculated the final price after applying the discount.")
+  } else if (!has_base_price) {
+    fail("Make sure to create a variable base_price with a value of 50.")
+  } else if (!has_discount) {
+    fail("Make sure to create a variable discount_percentage with a value of 20.")
+  } else if (!has_final_price) {
+    fail("Make sure to create a variable final_price for the discounted price.")
+  } else if (!correct_result) {
+    fail("The final price should be 40. Calculate it as: base_price * (1 - discount_percentage/100)")
+  } else {
+    fail("Make sure to create all three variables with the correct values and display the final_price.")
+  }
+})
+```
+
+## Checking and Removing Variables
+
+R provides functions to check the type and structure of variables, as well as to remove them from the workspace.
+
+```{r check-remove-demo, echo=TRUE}
+# Create some variables
+a <- 10
+b <- "hello"
+c <- TRUE
+
+# Check if variables exist
+exists("a")
+exists("d")  # Should return FALSE as we haven't created 'd'
+
+# Check variable type
+class(a)
+class(b)
+class(c)
+
+# List all variables in the workspace
+ls()
+
+# Remove a variable
+rm(b)
+ls()  # b is now gone
+```
+
+### Exercise 4: Checking Variable Existence and Types
+
+Create a variable `temperature` with a value of 72.5. Then write code to:
+1. Check if the variable exists
+2. Check its data type
+3. Check if a variable named `humidity` exists
+
+```{r ex4, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex4-solution}
+temperature <- 72.5
+exists("temperature")
+class(temperature)
+exists("humidity")
+```
+
+```{r ex4-check}
+grade_this({
+  # Check for temperature assignment in the code
+  has_temp_assign <- grepl("temperature\\s*<-\\s*72\\.5", .user_code)
+  
+  # Check for the required function calls
+  has_exists_temp <- grepl("exists\\([\"']temperature[\"']\\)", .user_code)
+  has_class_temp <- grepl("class\\(temperature\\)", .user_code)
+  has_exists_humidity <- grepl("exists\\([\"']humidity[\"']\\)", .user_code)
+  
+  # Count correct elements
+  correct_elements <- sum(has_temp_assign, has_exists_temp, has_class_temp, has_exists_humidity)
+  
+  if (correct_elements == 4) {
+    pass("Excellent! You've successfully created the variable and checked its existence and type.")
+  } else if (!has_temp_assign) {
+    fail("Make sure to create a variable named 'temperature' with a value of 72.5.")
+  } else {
+    missing_checks <- c()
+    if (!has_exists_temp) missing_checks <- c(missing_checks, "exists(\"temperature\")")
+    if (!has_class_temp) missing_checks <- c(missing_checks, "class(temperature)")
+    if (!has_exists_humidity) missing_checks <- c(missing_checks, "exists(\"humidity\")")
+    
+    fail(paste("You need to include these function calls:", paste(missing_checks, collapse=", ")))
+  }
+})
+```
+
+## Variable Scope and Environment
+
+Variables in R have different scopes, which determine where they can be accessed:
+
+1. **Global Environment**: Variables created in the main workspace
+2. **Local Environment**: Variables created inside functions
+
+Variables created outside any function are available throughout your R session, while variables created inside functions are only available within that function.
+
+```{r scope-demo, echo=TRUE}
+# Global variable
+global_var <- 100
+
+# Create a function with a local variable
+my_function <- function() {
+  local_var <- 50
+  # Both global_var and local_var are accessible here
+  return(global_var + local_var)
+}
+
+# Call the function
+my_function()
+
+# global_var is still accessible
+global_var
+
+# Trying to access local_var would result in an error
+# Uncomment to see the error:
+# local_var
+```
+
+### Exercise 5: Working with Variable Scope
+
+Create a global variable `x` with a value of 5. Then create a function called `double_x` that doubles the value of `x` and returns it. Call the function and store the result in a variable called `result`.
+
+```{r ex5, exercise=TRUE}
+# Write your code here
+
+```
+
+
+```{r ex5-solution}
+x <- 5
+double_x <- function() {
+  return(x * 2)
+}
+result <- double_x()
+result
+```
+
+```{r ex5-check}
+grade_this({
+  # Use .user_code to check patterns in the submitted code
+  has_x_assign <- grepl("x\\s*<-\\s*5", .user_code)
+  has_function_def <- grepl("double_x\\s*<-\\s*function\\s*\\(\\)", .user_code)
+  has_double_logic <- grepl("x\\s*\\*\\s*2|2\\s*\\*\\s*x", .user_code)
+  has_result_assign <- grepl("result\\s*<-\\s*double_x\\s*\\(\\)", .user_code)
+  has_result_display <- grepl("result$|print\\(result\\)", .user_code)
+  
+  # Use .result to check the output of the code
+  correct_result <- identical(.result, 10) || (is.numeric(.result) && abs(.result - 10) < 0.0001)
+  
+  # Check if all parts are correct
+  if (has_x_assign && has_function_def && has_double_logic && has_result_assign && correct_result) {
+    pass("Great job! You've successfully demonstrated understanding of variable scope in R.")
+  } else if (!has_x_assign) {
+    fail("Make sure to create a global variable 'x' with a value of 5.")
+  } else if (!has_function_def) {
+    fail("Make sure to create a function called 'double_x'.")
+  } else if (!has_double_logic) {
+    fail("Your function should double the value of x (multiply by 2).")
+  } else if (!has_result_assign) {
+    fail("Make sure to call the function and store the result in a variable called 'result'.")
+  } else if (!correct_result) {
+    fail("The final result should be 10. Make sure to display the result at the end.")
+  } else {
+    fail("Check your code to ensure x is 5, double_x is a function that doubles x, and result stores the function's output.")
+  }
+})
+```
+
+## Summary
+
+In this module, you've learned:
+
+1. How to create variables using the assignment operator (`<-`)
+2. Rules and conventions for naming variables
+3. How to use and modify variables
+4. How to check variable types and existence
+5. The concept of variable scope in R
+
+In the next module, we'll explore different data types in R including numeric, character, and logical data.

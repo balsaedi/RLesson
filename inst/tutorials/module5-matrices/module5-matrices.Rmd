@@ -1,0 +1,821 @@
+---
+title: "Module 5: Matrices in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Learn how to create and manipulate matrices in R"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+## Introduction to Matrices in R
+
+A matrix in R is a two-dimensional data structure where all elements must be of the same data type (usually numeric). Matrices are essential for many statistical and mathematical operations, especially those involving linear algebra.
+
+Key characteristics of matrices:
+1. They are rectangular arrangements of elements with a specific number of rows and columns
+2. All elements must be of the same data type
+3. They can be created from vectors
+4. They are useful for operations like matrix multiplication, inversion, and decomposition
+
+Matrices are commonly used in:
+- Linear algebra calculations
+- Storing tabular data
+- Image processing
+- Statistical modeling
+
+Let's explore how to create, manipulate, and perform operations on matrices in R!
+
+## Creating Matrices
+
+There are several ways to create matrices in R:
+
+### Using the `matrix()` Function
+
+The primary way to create a matrix is with the `matrix()` function.
+
+```{r matrix-demo, echo=TRUE}
+# Basic matrix creation
+# By default, matrix is filled by column
+m1 <- matrix(1:12, nrow = 3, ncol = 4)
+m1
+
+# Fill by row instead
+m2 <- matrix(1:12, nrow = 3, ncol = 4, byrow = TRUE)
+m2
+
+# Using a specific vector
+values <- c(10, 20, 30, 40, 50, 60)
+m3 <- matrix(values, nrow = 2, ncol = 3)
+m3
+```
+
+### By Combining Vectors
+
+You can create matrices by combining vectors using `rbind()` (row bind) or `cbind()` (column bind).
+
+```{r bind-demo, echo=TRUE}
+# Create vectors
+row1 <- c(1, 2, 3)
+row2 <- c(4, 5, 6)
+row3 <- c(7, 8, 9)
+
+# Combine vectors as rows
+mat_rows <- rbind(row1, row2, row3)
+mat_rows
+
+# Combine vectors as columns
+col1 <- c(1, 4, 7)
+col2 <- c(2, 5, 8)
+col3 <- c(3, 6, 9)
+
+mat_cols <- cbind(col1, col2, col3)
+mat_cols
+```
+
+### Exercise 1: Creating Matrices
+
+Create the following matrices:
+
+1. A 3×4 matrix called `mat1` using the values 5, 10, 15, ..., 60 (filled by column)
+2. A 4×3 matrix called `mat2` using the values 1 through 12 (filled by row)
+3. A 2×3 matrix called `mat3` by combining the following row vectors:
+   - `row_a <- c(10, 20, 30)`
+   - `row_b <- c(40, 50, 60)`
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+# Matrix 1: 3×4 matrix filled by column with values 5, 10, 15, ..., 60
+mat1 <- matrix(seq(5, 60, by = 5), nrow = 3, ncol = 4)
+
+# Matrix 2: 4×3 matrix filled by row with values 1 through 12
+mat2 <- matrix(1:12, nrow = 4, ncol = 3, byrow = TRUE)
+
+# Matrix 3: 2×3 matrix by combining row vectors
+row_a <- c(10, 20, 30)
+row_b <- c(40, 50, 60)
+mat3 <- rbind(row_a, row_b)
+
+# Display matrices
+mat1
+mat2
+mat3
+```
+
+```{r ex1-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_mat1 <- grepl("mat1\\s*<-\\s*matrix\\s*\\(\\s*(seq\\s*\\(\\s*5\\s*,\\s*60\\s*,\\s*by\\s*=\\s*5\\s*\\)|c\\s*\\(\\s*5\\s*,\\s*10\\s*,.*60\\s*\\))", .user_code) && 
+              grepl("nrow\\s*=\\s*3", .user_code) && 
+              grepl("ncol\\s*=\\s*4", .user_code)
+              
+  has_mat2 <- grepl("mat2\\s*<-\\s*matrix\\s*\\(\\s*(1\\s*:\\s*12|c\\s*\\(\\s*1\\s*,.*12\\s*\\))", .user_code) && 
+              grepl("nrow\\s*=\\s*4", .user_code) && 
+              grepl("ncol\\s*=\\s*3", .user_code) &&
+              grepl("byrow\\s*=\\s*(TRUE|T)", .user_code)
+              
+  has_row_vectors <- grepl("row_a\\s*<-\\s*c\\s*\\(\\s*10\\s*,\\s*20\\s*,\\s*30\\s*\\)", .user_code) && 
+                     grepl("row_b\\s*<-\\s*c\\s*\\(\\s*40\\s*,\\s*50\\s*,\\s*60\\s*\\)", .user_code)
+              
+  has_mat3 <- grepl("mat3\\s*<-\\s*rbind\\s*\\(\\s*row_a\\s*,\\s*row_b\\s*\\)", .user_code)
+  
+  # Check the actual matrices if they exist
+  if (exists("mat1") && exists("mat2") && exists("mat3")) {
+    correct_mat1 <- matrix(seq(5, 60, by = 5), nrow = 3, ncol = 4)
+    correct_mat2 <- matrix(1:12, nrow = 4, ncol = 3, byrow = TRUE)
+    
+    if (exists("row_a") && exists("row_b")) {
+      row_a_correct <- identical(row_a, c(10, 20, 30))
+      row_b_correct <- identical(row_b, c(40, 50, 60))
+      correct_mat3 <- rbind(c(10, 20, 30), c(40, 50, 60))
+      
+      mat1_correct <- identical(mat1, correct_mat1) || all(mat1 == correct_mat1)
+      mat2_correct <- identical(mat2, correct_mat2) || all(mat2 == correct_mat2)
+      mat3_correct <- identical(mat3, correct_mat3) || all(mat3 == correct_mat3)
+      
+      if (mat1_correct && mat2_correct && mat3_correct) {
+        pass("Great job! All matrices are created correctly.")
+      } else if (!mat1_correct) {
+        fail("Check mat1. It should be a 3×4 matrix with values 5, 10, 15, ..., 60 filled by column.")
+      } else if (!mat2_correct) {
+        fail("Check mat2. It should be a 4×3 matrix with values 1 through 12 filled by row.")
+      } else {
+        fail("Check mat3. It should be a 2×3 matrix created by row-binding row_a and row_b.")
+      }
+    } else {
+      fail("Make sure to create both row_a and row_b vectors before creating mat3.")
+    }
+  } else if (has_mat1 && has_mat2 && has_row_vectors && has_mat3) {
+    pass("Great job! All matrices are created correctly.")
+  } else if (!has_mat1) {
+    fail("Check your code for mat1. It should be a 3×4 matrix with values 5, 10, 15, ..., 60.")
+  } else if (!has_mat2) {
+    fail("Check your code for mat2. It should be a 4×3 matrix with values 1 through 12, filled by row.")
+  } else if (!has_row_vectors) {
+    fail("Make sure to create both row_a and row_b vectors with the correct values.")
+  } else if (!has_mat3) {
+    fail("Make sure to create mat3 by using rbind() on row_a and row_b.")
+  } else {
+    fail("Make sure to create all three matrices with the correct specifications.")
+  }
+})
+```
+
+## Matrix Attributes and Information
+
+R provides several functions to get information about matrices:
+
+```{r info-demo, echo=TRUE}
+# Create a matrix
+m <- matrix(1:12, nrow = 3, ncol = 4)
+
+# Dimensions
+dim(m)         # Returns number of rows and columns
+nrow(m)        # Number of rows
+ncol(m)        # Number of columns
+
+# Size
+length(m)      # Total number of elements
+
+# Structure
+str(m)         # Display structure
+class(m)       # Class of the object
+typeof(m)      # Internal storage type
+```
+
+### Adding Row and Column Names
+
+You can add row and column names to a matrix for better readability and identification.
+
+```{r names-demo, echo=TRUE}
+# Create a matrix
+sales <- matrix(c(10, 15, 12, 18, 20, 22), nrow = 2, ncol = 3)
+
+# Add row and column names
+rownames(sales) <- c("Product A", "Product B")
+colnames(sales) <- c("Jan", "Feb", "Mar")
+
+# Display the matrix
+sales
+
+# Access the names
+rownames(sales)
+colnames(sales)
+```
+
+### Exercise 2: Matrix Attributes
+
+Using this 3×4 matrix of quarterly sales for three products:
+
+```
+quarterly_sales <- matrix(c(
+  120, 110, 140, 125,  # Product X
+  85, 95, 80, 100,     # Product Y
+  40, 45, 50, 55       # Product Z
+), nrow = 3, byrow = TRUE)
+```
+
+Complete the following tasks:
+1. Add appropriate row names ("Product X", "Product Y", "Product Z")
+2. Add appropriate column names ("Q1", "Q2", "Q3", "Q4")
+3. Store the dimensions of the matrix in a variable called `sales_dim`
+4. Calculate and store the total number of sales values in a variable called `num_values`
+
+```{r ex2, exercise=TRUE}
+# Create the quarterly_sales matrix
+quarterly_sales <- matrix(c(
+  120, 110, 140, 125,  # Product X
+  85, 95, 80, 100,     # Product Y
+  40, 45, 50, 55       # Product Z
+), nrow = 3, byrow = TRUE)
+
+# Write your code here
+
+```
+
+```{r ex2-solution}
+# Create the quarterly_sales matrix
+quarterly_sales <- matrix(c(
+  120, 110, 140, 125,  # Product X
+  85, 95, 80, 100,     # Product Y
+  40, 45, 50, 55       # Product Z
+), nrow = 3, byrow = TRUE)
+
+# Add row names
+rownames(quarterly_sales) <- c("Product X", "Product Y", "Product Z")
+
+# Add column names
+colnames(quarterly_sales) <- c("Q1", "Q2", "Q3", "Q4")
+
+# Get dimensions
+sales_dim <- dim(quarterly_sales)
+
+# Get total number of values
+num_values <- length(quarterly_sales)
+
+# Display results
+quarterly_sales
+sales_dim
+num_values
+```
+
+```{r ex2-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_rownames <- grepl("rownames\\s*\\(\\s*quarterly_sales\\s*\\)\\s*<-\\s*c\\s*\\(\\s*[\"']Product X[\"']\\s*,\\s*[\"']Product Y[\"']\\s*,\\s*[\"']Product Z[\"']\\s*\\)", .user_code)
+  
+  has_colnames <- grepl("colnames\\s*\\(\\s*quarterly_sales\\s*\\)\\s*<-\\s*c\\s*\\(\\s*[\"']Q1[\"']\\s*,\\s*[\"']Q2[\"']\\s*,\\s*[\"']Q3[\"']\\s*,\\s*[\"']Q4[\"']\\s*\\)", .user_code)
+  
+  has_sales_dim <- grepl("sales_dim\\s*<-\\s*dim\\s*\\(\\s*quarterly_sales\\s*\\)", .user_code)
+  
+  has_num_values <- grepl("num_values\\s*<-\\s*length\\s*\\(\\s*quarterly_sales\\s*\\)", .user_code)
+  
+  # Check the actual values if variables exist
+  if (exists("quarterly_sales") && exists("sales_dim") && exists("num_values")) {
+    has_correct_rownames <- identical(rownames(quarterly_sales), c("Product X", "Product Y", "Product Z"))
+    has_correct_colnames <- identical(colnames(quarterly_sales), c("Q1", "Q2", "Q3", "Q4"))
+    has_correct_dim <- identical(sales_dim, c(3, 4))
+    has_correct_length <- num_values == 12
+    
+    if (has_correct_rownames && has_correct_colnames && has_correct_dim && has_correct_length) {
+      pass("Excellent! You've successfully worked with matrix attributes.")
+    } else if (!has_correct_rownames) {
+      fail("Make sure you've set the row names to exactly 'Product X', 'Product Y', and 'Product Z'.")
+    } else if (!has_correct_colnames) {
+      fail("Make sure you've set the column names to exactly 'Q1', 'Q2', 'Q3', and 'Q4'.")
+    } else if (!has_correct_dim) {
+      fail("Make sure sales_dim contains the dimensions of the matrix (should be c(3, 4)).")
+    } else if (!has_correct_length) {
+      fail("Make sure num_values contains the total number of elements in the matrix (should be 12).")
+    }
+  } else if (has_rownames && has_colnames && has_sales_dim && has_num_values) {
+    pass("Excellent! You've successfully worked with matrix attributes.")
+  } else if (!has_rownames) {
+    fail("Make sure to add row names using: rownames(quarterly_sales) <- c(\"Product X\", \"Product Y\", \"Product Z\")")
+  } else if (!has_colnames) {
+    fail("Make sure to add column names using: colnames(quarterly_sales) <- c(\"Q1\", \"Q2\", \"Q3\", \"Q4\")")
+  } else if (!has_sales_dim) {
+    fail("Make sure to get the dimensions using: sales_dim <- dim(quarterly_sales)")
+  } else if (!has_num_values) {
+    fail("Make sure to get the total number of values using: num_values <- length(quarterly_sales)")
+  } else {
+    fail("Make sure to complete all four tasks as specified.")
+  }
+})
+```
+
+## Accessing Matrix Elements
+
+You can access elements, rows, or columns of a matrix using indexing.
+
+### Using Row and Column Indices
+
+```{r access-demo, echo=TRUE}
+# Create a matrix
+m <- matrix(1:12, nrow = 3, ncol = 4)
+m
+
+# Access a single element - format is [row, column]
+m[1, 2]      # Element at row 1, column 2
+
+# Access an entire row
+m[2, ]       # All elements in row 2
+
+# Access an entire column
+m[, 3]       # All elements in column 3
+
+# Access multiple rows or columns
+m[c(1, 3), ] # Rows 1 and 3
+m[, 2:4]     # Columns 2 through 4
+
+# Access a submatrix
+m[1:2, 2:3]  # Rows 1-2, columns 2-3
+```
+
+### Using Row and Column Names
+
+If your matrix has row and/or column names, you can use them for indexing.
+
+```{r names-access-demo, echo=TRUE}
+# Create a matrix with names
+sales <- matrix(c(10, 15, 12, 18, 20, 22), nrow = 2, ncol = 3)
+rownames(sales) <- c("Product A", "Product B")
+colnames(sales) <- c("Jan", "Feb", "Mar")
+sales
+
+# Access by names
+sales["Product A", "Feb"]
+sales["Product B", ]
+sales[, c("Jan", "Mar")]
+```
+
+### Exercise 3: Accessing Matrix Elements
+
+Using the `quarterly_sales` matrix from the previous exercise, extract the following:
+
+1. The Q3 sales for Product Y
+2. All quarterly sales for Product Z
+3. Q2 and Q4 sales for all products
+4. Create a submatrix called `q1_q2_sales` that contains Q1 and Q2 sales for Products X and Y
+
+```{r ex3, exercise=TRUE}
+# Create the quarterly_sales matrix
+quarterly_sales <- matrix(c(
+  120, 110, 140, 125,  # Product X
+  85, 95, 80, 100,     # Product Y
+  40, 45, 50, 55       # Product Z
+), nrow = 3, byrow = TRUE)
+
+# Add names
+rownames(quarterly_sales) <- c("Product X", "Product Y", "Product Z")
+colnames(quarterly_sales) <- c("Q1", "Q2", "Q3", "Q4")
+
+# Write your code here
+
+```
+
+```{r ex3-solution}
+# Create the quarterly_sales matrix
+quarterly_sales <- matrix(c(
+  120, 110, 140, 125,  # Product X
+  85, 95, 80, 100,     # Product Y
+  40, 45, 50, 55       # Product Z
+), nrow = 3, byrow = TRUE)
+
+# Add names
+rownames(quarterly_sales) <- c("Product X", "Product Y", "Product Z")
+colnames(quarterly_sales) <- c("Q1", "Q2", "Q3", "Q4")
+
+# 1. Q3 sales for Product Y
+product_y_q3 <- quarterly_sales["Product Y", "Q3"]
+
+# 2. All quarterly sales for Product Z
+product_z_sales <- quarterly_sales["Product Z", ]
+
+# 3. Q2 and Q4 sales for all products
+q2_q4_sales <- quarterly_sales[, c("Q2", "Q4")]
+
+# 4. Q1 and Q2 sales for Products X and Y
+q1_q2_sales <- quarterly_sales[c("Product X", "Product Y"), c("Q1", "Q2")]
+
+# Display results
+product_y_q3
+product_z_sales
+q2_q4_sales
+q1_q2_sales
+```
+
+```{r ex3-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_product_y_q3 <- grepl("product_y_q3\\s*<-\\s*quarterly_sales\\s*\\[\\s*[\"']Product Y[\"']\\s*,\\s*[\"']Q3[\"']\\s*\\]", .user_code)
+  
+  has_product_z_sales <- grepl("product_z_sales\\s*<-\\s*quarterly_sales\\s*\\[\\s*[\"']Product Z[\"']\\s*,\\s*\\]", .user_code)
+  
+  has_q2_q4_sales <- grepl("q2_q4_sales\\s*<-\\s*quarterly_sales\\s*\\[\\s*,\\s*c\\s*\\(\\s*[\"']Q2[\"']\\s*,\\s*[\"']Q4[\"']\\s*\\)\\s*\\]", .user_code)
+  
+  has_q1_q2_sales <- grepl("q1_q2_sales\\s*<-\\s*quarterly_sales\\s*\\[\\s*c\\s*\\(\\s*[\"']Product X[\"']\\s*,\\s*[\"']Product Y[\"']\\s*\\)\\s*,\\s*c\\s*\\(\\s*[\"']Q1[\"']\\s*,\\s*[\"']Q2[\"']\\s*\\)\\s*\\]", .user_code)
+  
+  # Check the actual values if variables exist
+  if (exists("product_y_q3") && exists("product_z_sales") && exists("q2_q4_sales") && exists("q1_q2_sales")) {
+    y_q3_correct <- product_y_q3 == 80
+    
+    z_sales_correct <- length(product_z_sales) == 4 && 
+                      all(product_z_sales == c(40, 45, 50, 55))
+    
+    q2_q4_correct <- identical(dim(q2_q4_sales), c(3L, 2L)) && 
+                    all(q2_q4_sales[,"Q2"] == c(110, 95, 45)) &&
+                    all(q2_q4_sales[,"Q4"] == c(125, 100, 55))
+    
+    q1_q2_correct <- identical(dim(q1_q2_sales), c(2L, 2L)) &&
+                   all(q1_q2_sales[,"Q1"] == c(120, 85)) &&
+                   all(q1_q2_sales[,"Q2"] == c(110, 95))
+    
+    if (y_q3_correct && z_sales_correct && q2_q4_correct && q1_q2_correct) {
+      pass("Perfect! You've correctly extracted all the required elements and submatrices.")
+    } else if (!y_q3_correct) {
+      fail("Your product_y_q3 doesn't contain the correct value. It should be 80.")
+    } else if (!z_sales_correct) {
+      fail("Your product_z_sales doesn't contain the correct values. It should be all values for Product Z.")
+    } else if (!q2_q4_correct) {
+      fail("Your q2_q4_sales doesn't contain the correct values. It should be all Q2 and Q4 values.")
+    } else if (!q1_q2_correct) {
+      fail("Your q1_q2_sales doesn't contain the correct values. It should be Q1 and Q2 values for Products X and Y.")
+    }
+  } else if (has_product_y_q3 && has_product_z_sales && has_q2_q4_sales && has_q1_q2_sales) {
+    pass("Perfect! You've correctly extracted all the required elements and submatrices.")
+  } else if (!has_product_y_q3) {
+    fail("Make sure to extract the Q3 sales for Product Y using: product_y_q3 <- quarterly_sales[\"Product Y\", \"Q3\"]")
+  } else if (!has_product_z_sales) {
+    fail("Make sure to extract all quarterly sales for Product Z using: product_z_sales <- quarterly_sales[\"Product Z\", ]")
+  } else if (!has_q2_q4_sales) {
+    fail("Make sure to extract Q2 and Q4 sales for all products using: q2_q4_sales <- quarterly_sales[, c(\"Q2\", \"Q4\")]")
+  } else if (!has_q1_q2_sales) {
+    fail("Make sure to create a submatrix for Q1 and Q2 sales for Products X and Y.")
+  } else {
+    fail("Make sure to complete all four extraction tasks as specified.")
+  }
+})
+```
+
+## Matrix Operations
+
+R provides a wide range of operations for matrices, including basic arithmetic and specialized matrix operations.
+
+### Element-wise Operations
+
+These operations are performed element by element.
+
+```{r element-ops-demo, echo=TRUE}
+# Create matrices
+A <- matrix(1:6, nrow = 2, ncol = 3)
+B <- matrix(7:12, nrow = 2, ncol = 3)
+
+# Element-wise addition
+A + B
+
+# Element-wise subtraction
+A - B
+
+# Element-wise multiplication
+A * B
+
+# Element-wise division
+A / B
+
+# Scalar operations
+A * 2
+A + 10
+```
+
+### Matrix-specific Operations
+
+These operations follow the rules of linear algebra.
+
+```{r matrix-ops-demo, echo=TRUE}
+# Create matrices
+A <- matrix(1:6, nrow = 2, ncol = 3)
+B <- matrix(1:6, nrow = 3, ncol = 2)
+
+# Matrix multiplication
+A %*% B
+
+# Transpose
+t(A)
+
+# Matrix inverse (requires a square matrix)
+C <- matrix(c(3, 1, 2, 4), nrow = 2)
+solve(C)
+
+# Determinant (for square matrices)
+det(C)
+
+# Diagonal elements
+diag(C)
+
+# Create a diagonal matrix
+diag(3)  # 3x3 identity matrix
+diag(c(1, 2, 3))  # Diagonal matrix with specified values
+```
+
+### Exercise 4: Matrix Operations
+
+Using these two matrices:
+
+```
+A <- matrix(c(4, 2, 8, 6), nrow = 2)  # 2x2 matrix
+B <- matrix(c(3, 1, 5, 7), nrow = 2)  # 2x2 matrix
+```
+
+Calculate:
+1. The sum of A and B
+2. The element-wise product of A and B
+3. The matrix product of A and B
+4. The transpose of A
+5. The inverse of A (if possible)
+
+```{r ex4, exercise=TRUE}
+# Create matrices
+A <- matrix(c(4, 2, 8, 6), nrow = 2)
+B <- matrix(c(3, 1, 5, 7), nrow = 2)
+
+# Write your code here
+
+```
+
+```{r ex4-solution}
+# Create matrices
+A <- matrix(c(4, 2, 8, 6), nrow = 2)
+B <- matrix(c(3, 1, 5, 7), nrow = 2)
+
+# 1. Sum of A and B
+sum_AB <- A + B
+
+# 2. Element-wise product
+elem_prod <- A * B
+
+# 3. Matrix product
+mat_prod <- A %*% B
+
+# 4. Transpose of A
+A_transpose <- t(A)
+
+# 5. Inverse of A (if possible)
+A_inverse <- solve(A)
+
+# Display results
+sum_AB
+elem_prod
+mat_prod
+A_transpose
+A_inverse
+```
+
+```{r ex4-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_sum_AB <- grepl("sum_AB\\s*<-\\s*A\\s*\\+\\s*B", .user_code)
+  
+  has_elem_prod <- grepl("elem_prod\\s*<-\\s*A\\s*\\*\\s*B", .user_code)
+  
+  has_mat_prod <- grepl("mat_prod\\s*<-\\s*A\\s*%\\*%\\s*B", .user_code)
+  
+  has_A_transpose <- grepl("A_transpose\\s*<-\\s*t\\s*\\(\\s*A\\s*\\)", .user_code)
+  
+  has_A_inverse <- grepl("A_inverse\\s*<-\\s*solve\\s*\\(\\s*A\\s*\\)", .user_code)
+  
+  # Check the actual values if variables exist
+  if (exists("sum_AB") && exists("elem_prod") && exists("mat_prod") && 
+      exists("A_transpose") && exists("A_inverse") && exists("A") && exists("B")) {
+    
+    sum_correct <- all(sum_AB == A + B)
+    elem_correct <- all(elem_prod == A * B)
+    mat_correct <- all(mat_prod == A %*% B)
+    transpose_correct <- all(A_transpose == t(A))
+    inverse_correct <- all(abs(A_inverse - solve(A)) < 1e-10)
+    
+    if (sum_correct && elem_correct && mat_correct && transpose_correct && inverse_correct) {
+      pass("Excellent! All your matrix operations are correct.")
+    } else if (!sum_correct) {
+      fail("Your sum_AB doesn't contain the correct values. It should be A + B.")
+    } else if (!elem_correct) {
+      fail("Your elem_prod doesn't contain the correct values. It should be A * B.")
+    } else if (!mat_correct) {
+      fail("Your mat_prod doesn't contain the correct values. It should be A %*% B.")
+    } else if (!transpose_correct) {
+      fail("Your A_transpose doesn't contain the correct values. It should be t(A).")
+    } else if (!inverse_correct) {
+      fail("Your A_inverse doesn't contain the correct values. It should be solve(A).")
+    }
+  } else if (has_sum_AB && has_elem_prod && has_mat_prod && has_A_transpose && has_A_inverse) {
+    pass("Excellent! All your matrix operations are correct.")
+  } else if (!has_sum_AB) {
+    fail("Make sure to calculate the sum of A and B using: sum_AB <- A + B")
+  } else if (!has_elem_prod) {
+    fail("Make sure to calculate the element-wise product using: elem_prod <- A * B")
+  } else if (!has_mat_prod) {
+    fail("Make sure to calculate the matrix product using: mat_prod <- A %*% B")
+  } else if (!has_A_transpose) {
+    fail("Make sure to calculate the transpose of A using: A_transpose <- t(A)")
+  } else if (!has_A_inverse) {
+    fail("Make sure to calculate the inverse of A using: A_inverse <- solve(A)")
+  } else {
+    fail("Make sure to complete all five matrix operations as specified.")
+  }
+})
+```
+
+## Matrix Applications
+
+Matrices have many practical applications in data analysis and statistics:
+
+### Row and Column Sums
+
+```{r sums-demo, echo=TRUE}
+# Create a matrix
+sales <- matrix(c(
+  120, 110, 140, 125,
+  85, 95, 80, 100,
+  40, 45, 50, 55
+), nrow = 3, byrow = TRUE)
+rownames(sales) <- c("Product X", "Product Y", "Product Z")
+colnames(sales) <- c("Q1", "Q2", "Q3", "Q4")
+sales
+
+# Row sums (total sales for each product)
+rowSums(sales)
+
+# Column sums (total sales for each quarter)
+colSums(sales)
+
+# Matrix total
+sum(sales)
+```
+
+### Matrix Transformations
+
+```{r transform-demo, echo=TRUE}
+# Create a matrix
+m <- matrix(1:9, nrow = 3)
+m
+
+# Scale each row
+m_scaled_rows <- scale(m, center = TRUE, scale = FALSE)  # Center rows
+m_scaled_rows
+
+# Scale to standard normal
+m_standardized <- scale(m)
+m_standardized
+```
+
+### Exercise 5: Matrix Applications
+
+Using this 3×4 matrix of sales data:
+
+```
+sales_data <- matrix(c(
+  45, 32, 47, 55,  # Store A
+  23, 42, 38, 40,
+  51, 30, 28, 25   # Store C
+), nrow = 3, byrow = TRUE)
+rownames(sales_data) <- c("Store A", "Store B", "Store C")
+colnames(sales_data) <- c("Q1", "Q2", "Q3", "Q4")
+```
+
+Complete the following tasks:
+1. Calculate the total annual sales for each store and save as `store_totals`
+2. Calculate the total sales across all stores for each quarter and save as `quarter_totals`
+3. Find which store had the highest total sales
+4. Find which quarter had the highest total sales
+5. Calculate the percentage of total sales that occurred in Q4
+
+```{r ex5, exercise=TRUE}
+# Create the sales_data matrix
+sales_data <- matrix(c(
+  45, 32, 47, 55,  # Store A
+  23, 42, 38, 40,  # Store B
+  51, 30, 28, 25   # Store C
+), nrow = 3, byrow = TRUE)
+rownames(sales_data) <- c("Store A", "Store B", "Store C")
+colnames(sales_data) <- c("Q1", "Q2", "Q3", "Q4")
+
+# Write your code here
+
+```
+
+```{r ex5-solution}
+# Create the sales_data matrix
+sales_data <- matrix(c(
+  45, 32, 47, 55,  # Store A
+  23, 42, 38, 40,  # Store B
+  51, 30, 28, 25   # Store C
+), nrow = 3, byrow = TRUE)
+rownames(sales_data) <- c("Store A", "Store B", "Store C")
+colnames(sales_data) <- c("Q1", "Q2", "Q3", "Q4")
+
+# 1. Calculate total annual sales for each store
+store_totals <- rowSums(sales_data)
+
+# 2. Calculate total sales for each quarter
+quarter_totals <- colSums(sales_data)
+
+# 3. Find which store had the highest total sales
+highest_store <- names(store_totals)[which.max(store_totals)]
+
+# 4. Find which quarter had the highest total sales
+highest_quarter <- names(quarter_totals)[which.max(quarter_totals)]
+
+# 5. Calculate the percentage of total sales that occurred in Q4
+q4_percentage <- sum(sales_data[, "Q4"]) / sum(sales_data) * 100
+
+# Display results
+sales_data
+store_totals
+quarter_totals
+highest_store
+highest_quarter
+q4_percentage
+```
+
+```{r ex5-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_store_totals <- grepl("store_totals\\s*<-\\s*rowSums\\s*\\(\\s*sales_data\\s*\\)", .user_code)
+  
+  has_quarter_totals <- grepl("quarter_totals\\s*<-\\s*colSums\\s*\\(\\s*sales_data\\s*\\)", .user_code)
+  
+  has_highest_store <- grepl("highest_store\\s*<-\\s*names\\s*\\(\\s*store_totals\\s*\\)\\s*\\[\\s*which\\.max\\s*\\(\\s*store_totals\\s*\\)\\s*\\]", .user_code)
+  
+  has_highest_quarter <- grepl("highest_quarter\\s*<-\\s*names\\s*\\(\\s*quarter_totals\\s*\\)\\s*\\[\\s*which\\.max\\s*\\(\\s*quarter_totals\\s*\\)\\s*\\]", .user_code)
+  
+  has_q4_percentage <- grepl("q4_percentage\\s*<-\\s*(sum\\s*\\(\\s*sales_data\\s*\\[\\s*,\\s*[\"']Q4[\"']\\s*\\]\\s*\\)|sum\\s*\\(\\s*sales_data\\s*\\[\\s*,\\s*4\\s*\\]\\s*\\))\\s*/\\s*sum\\s*\\(\\s*sales_data\\s*\\)\\s*\\*\\s*100", .user_code)
+  
+  # Check the actual values if variables exist
+  if (exists("store_totals") && exists("quarter_totals") && 
+      exists("highest_store") && exists("highest_quarter") && exists("q4_percentage")) {
+    
+    store_totals_correct <- all(store_totals == rowSums(sales_data))
+    quarter_totals_correct <- all(quarter_totals == colSums(sales_data))
+    highest_store_correct <- highest_store == names(rowSums(sales_data))[which.max(rowSums(sales_data))]
+    highest_quarter_correct <- highest_quarter == names(colSums(sales_data))[which.max(colSums(sales_data))]
+    
+    expected_q4_pct <- sum(sales_data[, "Q4"]) / sum(sales_data) * 100
+    q4_percentage_correct <- abs(q4_percentage - expected_q4_pct) < 0.0001
+    
+    if (store_totals_correct && quarter_totals_correct && highest_store_correct && 
+        highest_quarter_correct && q4_percentage_correct) {
+      pass("Excellent! All your matrix application tasks are completed correctly.")
+    } else if (!store_totals_correct) {
+      fail("Your store_totals doesn't contain the correct values. It should be rowSums(sales_data).")
+    } else if (!quarter_totals_correct) {
+      fail("Your quarter_totals doesn't contain the correct values. It should be colSums(sales_data).")
+    } else if (!highest_store_correct) {
+      fail("Your highest_store doesn't identify the correct store. Check your code.")
+    } else if (!highest_quarter_correct) {
+      fail("Your highest_quarter doesn't identify the correct quarter. Check your code.")
+    } else if (!q4_percentage_correct) {
+      fail("Your q4_percentage calculation is incorrect. It should be (sum of Q4 sales / total sales) * 100.")
+    }
+  } else if (has_store_totals && has_quarter_totals && has_highest_store && 
+             has_highest_quarter && has_q4_percentage) {
+    pass("Excellent! All your matrix application tasks are completed correctly.")
+  } else if (!has_store_totals) {
+    fail("Make sure to calculate store totals using: store_totals <- rowSums(sales_data)")
+  } else if (!has_quarter_totals) {
+    fail("Make sure to calculate quarter totals using: quarter_totals <- colSums(sales_data)")
+  } else if (!has_highest_store) {
+    fail("Make sure to find the highest store using: highest_store <- names(store_totals)[which.max(store_totals)]")
+  } else if (!has_highest_quarter) {
+    fail("Make sure to find the highest quarter using: highest_quarter <- names(quarter_totals)[which.max(quarter_totals)]")
+  } else if (!has_q4_percentage) {
+    fail("Make sure to calculate Q4 percentage correctly using: q4_percentage <- sum(sales_data[, \"Q4\"]) / sum(sales_data) * 100")
+  } else {
+    fail("Make sure to complete all five tasks as specified.")
+  }
+})
+```
+
+## Summary
+
+In this module, you've learned about matrices in R, including:
+
+1. Creating matrices using `matrix()`, `rbind()`, and `cbind()`
+2. Accessing matrix attributes like dimensions and names
+3. Indexing matrices to access elements, rows, columns, and submatrices
+4. Performing element-wise operations on matrices
+5. Performing matrix-specific operations like multiplication and transposition
+6. Applying matrices to solve practical problems
+
+Matrices are essential for many statistical and mathematical operations in R. Understanding how to create and manipulate them is a valuable skill for data analysis and mathematical modeling.
+
+In the next module, we'll explore lists, which allow you to store elements of different types in a single object.

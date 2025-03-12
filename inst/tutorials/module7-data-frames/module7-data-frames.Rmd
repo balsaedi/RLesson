@@ -1,0 +1,1093 @@
+---
+title: "Module 7: Data Frames in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Learn how to create and manipulate data frames in R"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+## Introduction to Data Frames in R
+
+Data frames are one of the most important and widely used data structures in R. They are designed specifically for storing and manipulating tabular data, similar to spreadsheets or database tables.
+
+Key characteristics of data frames:
+1. They are 2-dimensional with rows and columns (like a matrix)
+2. Columns can have different data types (unlike matrices)
+3. Each column must have the same number of rows
+4. Column names must be unique
+5. Row names are optional but must be unique if provided
+
+Data frames are essential for:
+- Data import and export
+- Data manipulation and cleaning
+- Statistical analysis
+- Data visualization
+- Machine learning
+
+Let's explore how to create, manipulate, and work with data frames in R!
+
+## Creating Data Frames
+
+There are multiple ways to create data frames in R:
+
+### Using the `data.frame()` Function
+
+The most common way to create a data frame is using the `data.frame()` function.
+
+```{r dataframe-demo, echo=TRUE}
+# Create a simple data frame
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David"),
+  age = c(22, 25, 21, 24),
+  gpa = c(3.8, 3.5, 3.7, 3.9),
+  graduate = c(FALSE, TRUE, FALSE, TRUE)
+)
+
+# View the data frame
+students
+
+# Check structure
+str(students)
+```
+
+### Converting from Other Data Structures
+
+You can create data frames from other existing data structures.
+
+```{r convert-demo, echo=TRUE}
+# Create a matrix
+mat <- matrix(1:12, nrow = 4, ncol = 3)
+colnames(mat) <- c("X", "Y", "Z")
+
+# Convert matrix to data frame
+df_from_mat <- as.data.frame(mat)
+df_from_mat
+
+# Create a list
+student_list <- list(
+  name = c("Alice", "Bob", "Charlie"),
+  score = c(88, 92, 85)
+)
+
+# Convert list to data frame
+df_from_list <- as.data.frame(student_list)
+df_from_list
+```
+
+### Exercise 1: Creating Data Frames
+
+Create the following data frames:
+
+1. A data frame called `employees` with the following columns:
+   - `employee_id`: 101, 102, 103, 104, 105
+   - `name`: "John", "Lisa", "Mike", "Sarah", "David"
+   - `department`: "Sales", "HR", "IT", "Marketing", "Finance"
+   - `salary`: 55000, 60000, 65000, 58000, 70000
+   - `hire_date`: "2020-05-15", "2019-10-22", "2021-01-10", "2020-08-30", "2018-12-05"
+
+2. A data frame called `products` by converting this list:
+```
+product_list <- list(
+  product_name = c("Laptop", "Tablet", "Phone", "Monitor"),
+  price = c(1200, 300, 800, 250),
+  in_stock = c(TRUE, FALSE, TRUE, TRUE)
+)
+```
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+# Create employees data frame
+employees <- data.frame(
+  employee_id = c(101, 102, 103, 104, 105),
+  name = c("John", "Lisa", "Mike", "Sarah", "David"),
+  department = c("Sales", "HR", "IT", "Marketing", "Finance"),
+  salary = c(55000, 60000, 65000, 58000, 70000),
+  hire_date = c("2020-05-15", "2019-10-22", "2021-01-10", "2020-08-30", "2018-12-05")
+)
+
+# Create product_list and convert to data frame
+product_list <- list(
+  product_name = c("Laptop", "Tablet", "Phone", "Monitor"),
+  price = c(1200, 300, 800, 250),
+  in_stock = c(TRUE, FALSE, TRUE, TRUE)
+)
+
+products <- as.data.frame(product_list)
+
+# Display data frames
+employees
+products
+```
+
+```{r ex1-check}
+grade_this({
+  # Check for correct code patterns
+  has_employees_df <- grepl("employees\\s*<-\\s*data\\.frame\\s*\\(", .user_code)
+  has_employee_id <- grepl("employee_id\\s*=\\s*c\\s*\\(\\s*101\\s*,", .user_code)
+  has_name <- grepl("name\\s*=\\s*c\\s*\\(\\s*[\"']John[\"']", .user_code)
+  has_department <- grepl("department\\s*=\\s*c\\s*\\(\\s*[\"']Sales[\"']", .user_code)
+  has_salary <- grepl("salary\\s*=\\s*c\\s*\\(\\s*55000", .user_code)
+  has_hire_date <- grepl("hire_date\\s*=\\s*c\\s*\\(\\s*[\"']2020-05-15[\"']", .user_code)
+  
+  has_product_list <- grepl("product_list\\s*<-\\s*list\\s*\\(", .user_code)
+  has_products_df <- grepl("products\\s*<-\\s*as\\.data\\.frame\\s*\\(\\s*product_list\\s*\\)", .user_code)
+  
+  # Check actual data frames if they exist
+  if (exists("employees") && exists("products")) {
+    employees_ok <- is.data.frame(employees) && 
+                  all(c("employee_id", "name", "department", "salary", "hire_date") %in% names(employees)) &&
+                  nrow(employees) == 5 && ncol(employees) == 5
+    
+    products_ok <- is.data.frame(products) && 
+                 all(c("product_name", "price", "in_stock") %in% names(products)) &&
+                 nrow(products) == 4 && ncol(products) == 3
+    
+    if (employees_ok && products_ok) {
+      pass("Great job! You've correctly created both data frames.")
+    } else if (!employees_ok) {
+      fail("Check your employees data frame. It should have the correct column names and 5 rows.")
+    } else {
+      fail("Check your products data frame. It should have 4 rows and 3 columns.")
+    }
+  } else if (has_employees_df && has_employee_id && has_name && has_department && has_salary && 
+            has_hire_date && has_product_list && has_products_df) {
+    pass("Great job! You've correctly created both data frames.")
+  } else if (!has_employees_df || !has_employee_id || !has_name || !has_department || 
+            !has_salary || !has_hire_date) {
+    fail("Check your employees data frame creation. Make sure it has all the specified columns.")
+  } else if (!has_product_list || !has_products_df) {
+    fail("Make sure to create product_list and convert it to a data frame called products.")
+  } else {
+    fail("Make sure to create both data frames as specified.")
+  }
+})
+```
+
+## Data Frame Attributes and Information
+
+R provides several functions to get information about data frames:
+
+```{r info-demo, echo=TRUE}
+# Create a data frame
+df <- data.frame(
+  id = 1:5,
+  name = c("Alice", "Bob", "Charlie", "David", "Eve"),
+  score = c(88, 92, 79, 85, 91)
+)
+
+# Basic information
+dim(df)         # Dimensions (rows x columns)
+nrow(df)        # Number of rows
+ncol(df)        # Number of columns
+names(df)       # Column names
+colnames(df)    # Column names (alternative)
+rownames(df)    # Row names
+
+# Summary information
+head(df, 2)     # First 2 rows
+tail(df, 2)     # Last 2 rows
+summary(df)     # Summary statistics
+```
+
+### Changing Column and Row Names
+
+```{r names-demo, echo=TRUE}
+# Create a data frame
+df <- data.frame(
+  id = 1:3,
+  name = c("Alice", "Bob", "Charlie"),
+  score = c(88, 92, 79)
+)
+
+# Change column names
+colnames(df) <- c("student_id", "student_name", "exam_score")
+df
+
+# Change specific column name
+names(df)[3] <- "final_score"
+df
+
+# Change row names
+rownames(df) <- c("row1", "row2", "row3")
+df
+```
+
+### Exercise 2: Working with Data Frame Attributes
+
+Using this data frame:
+
+```
+sales_data <- data.frame(
+  region = c("North", "South", "East", "West", "Central"),
+  q1 = c(15200, 18500, 12300, 14800, 16700),
+  q2 = c(14800, 19100, 10800, 15200, 15900),
+  q3 = c(16300, 20500, 11400, 16800, 17200),
+  q4 = c(18700, 22800, 13500, 19200, 19500)
+)
+```
+
+Complete the following tasks:
+1. Determine and store the dimensions of the data frame as `sales_dim`
+2. Change the column names from "q1", "q2", etc. to "Quarter_1", "Quarter_2", etc.
+3. Add row names that are the lowercase version of the region names
+4. Create a variable `q1_q2_data` that contains only the first two quarters
+5. Create a variable `sales_summary` with summary statistics of the data frame
+
+```{r ex2, exercise=TRUE}
+# Create the sales_data data frame
+sales_data <- data.frame(
+  region = c("North", "South", "East", "West", "Central"),
+  q1 = c(15200, 18500, 12300, 14800, 16700),
+  q2 = c(14800, 19100, 10800, 15200, 15900),
+  q3 = c(16300, 20500, 11400, 16800, 17200),
+  q4 = c(18700, 22800, 13500, 19200, 19500)
+)
+
+# Write your code here
+
+```
+
+```{r ex2-solution}
+# Create the sales_data data frame
+sales_data <- data.frame(
+  region = c("North", "South", "East", "West", "Central"),
+  q1 = c(15200, 18500, 12300, 14800, 16700),
+  q2 = c(14800, 19100, 10800, 15200, 15900),
+  q3 = c(16300, 20500, 11400, 16800, 17200),
+  q4 = c(18700, 22800, 13500, 19200, 19500)
+)
+
+# 1. Get dimensions
+sales_dim <- dim(sales_data)
+
+# 2. Change column names
+colnames(sales_data)[2:5] <- c("Quarter_1", "Quarter_2", "Quarter_3", "Quarter_4")
+
+# 3. Add row names (lowercase regions)
+rownames(sales_data) <- tolower(sales_data$region)
+
+# 4. Create q1_q2_data
+q1_q2_data <- sales_data[, c("region", "Quarter_1", "Quarter_2")]
+
+# 5. Create summary statistics
+sales_summary <- summary(sales_data)
+
+# Display results
+sales_dim
+sales_data
+q1_q2_data
+sales_summary
+```
+
+```{r ex2-check}
+grade_this({
+  # Check for code patterns
+  has_sales_dim <- grepl("sales_dim\\s*<-\\s*dim\\s*\\(\\s*sales_data\\s*\\)", .user_code)
+  
+  has_colnames <- grepl("colnames\\s*\\(\\s*sales_data\\s*\\)\\s*\\[\\s*2\\s*:\\s*5\\s*\\]\\s*<-", .user_code) &&
+                grepl("Quarter_1", .user_code) && grepl("Quarter_2", .user_code) &&
+                grepl("Quarter_3", .user_code) && grepl("Quarter_4", .user_code)
+  
+  has_rownames <- grepl("rownames\\s*\\(\\s*sales_data\\s*\\)\\s*<-\\s*tolower\\s*\\(\\s*sales_data\\$region\\s*\\)", .user_code)
+  
+  has_q1_q2 <- grepl("q1_q2_data\\s*<-\\s*sales_data\\s*\\[\\s*,\\s*c\\s*\\(", .user_code) &&
+              grepl("region", .user_code) && grepl("Quarter_1", .user_code) &&
+              grepl("Quarter_2", .user_code)
+  
+  has_summary <- grepl("sales_summary\\s*<-\\s*summary\\s*\\(\\s*sales_data\\s*\\)", .user_code)
+  
+  # Check actual variables if they exist
+  if (exists("sales_dim") && exists("sales_data") && exists("q1_q2_data") && exists("sales_summary")) {
+    # Check if dimensions are correct (5x5)
+    dim_ok <- identical(sales_dim, c(5L, 5L)) || all(sales_dim == c(5, 5))
+    
+    # Check if column names are changed
+    colnames_ok <- identical(colnames(sales_data)[2:5], c("Quarter_1", "Quarter_2", "Quarter_3", "Quarter_4"))
+    
+    # Check if row names are set to lowercase regions
+    rownames_ok <- identical(rownames(sales_data), tolower(c("North", "South", "East", "West", "Central")))
+    
+    # Check q1_q2_data
+    q1q2_ok <- is.data.frame(q1_q2_data) && ncol(q1_q2_data) == 3 &&
+              all(c("region", "Quarter_1", "Quarter_2") %in% names(q1_q2_data))
+    
+    # Check summary
+    summary_ok <- inherits(sales_summary, "table") || inherits(sales_summary, "matrix") || 
+                 inherits(sales_summary, "list") || inherits(sales_summary, "summaryDefault")
+    
+    if (dim_ok && colnames_ok && rownames_ok && q1q2_ok && summary_ok) {
+      pass("Excellent! You've successfully completed all the data frame attribute tasks.")
+    } else if (!dim_ok) {
+      fail("Make sure sales_dim contains the dimensions of the sales_data (should be c(5, 5)).")
+    } else if (!colnames_ok) {
+      fail("Make sure to change the column names to 'Quarter_1', 'Quarter_2', etc.")
+    } else if (!rownames_ok) {
+      fail("Make sure to set the row names to lowercase versions of the region names.")
+    } else if (!q1q2_ok) {
+      fail("Make sure q1_q2_data contains just the region, Quarter_1, and Quarter_2 columns.")
+    } else if (!summary_ok) {
+      fail("Make sure sales_summary contains the summary statistics of the data frame.")
+    }
+  } else if (has_sales_dim && has_colnames && has_rownames && has_q1_q2 && has_summary) {
+    pass("Excellent! You've successfully completed all the data frame attribute tasks.")
+  } else if (!has_sales_dim) {
+    fail("Make sure to get the dimensions with: sales_dim <- dim(sales_data)")
+  } else if (!has_colnames) {
+    fail("Make sure to change the column names to Quarter_1, Quarter_2, etc.")
+  } else if (!has_rownames) {
+    fail("Make sure to set the row names to lowercase versions of the region names.")
+  } else if (!has_q1_q2) {
+    fail("Make sure to create q1_q2_data with just the region, Quarter_1, and Quarter_2 columns.")
+  } else if (!has_summary) {
+    fail("Make sure to create sales_summary with the summary statistics.")
+  } else {
+    fail("Make sure to complete all five tasks as specified.")
+  }
+})
+```
+
+## Accessing Data Frame Elements
+
+You can access elements, rows, columns, or subsets of a data frame in several ways:
+
+### Using Indices
+
+```{r access-demo1, echo=TRUE}
+# Create a data frame
+df <- data.frame(
+  id = 1:5,
+  name = c("Alice", "Bob", "Charlie", "David", "Eve"),
+  score = c(88, 92, 79, 85, 91)
+)
+
+# Access a single value
+df[2, 3]       # Row 2, Column 3
+
+# Access an entire row
+df[3, ]        # Row 3, all columns
+
+# Access an entire column
+df[, 2]        # All rows, Column 2
+
+# Access multiple rows
+df[c(1, 3, 5), ]  # Rows 1, 3, and 5
+
+# Access multiple columns
+df[, c(1, 3)]     # All rows, Columns 1 and 3
+
+# Access a subset
+df[2:4, 2:3]      # Rows 2-4, Columns 2-3
+```
+
+### Using Column Names with `$` and `[[]]`
+
+```{r access-demo2, echo=TRUE}
+# Create a data frame
+df <- data.frame(
+  id = 1:5,
+  name = c("Alice", "Bob", "Charlie", "David", "Eve"),
+  score = c(88, 92, 79, 85, 91)
+)
+
+# Access a column with $
+df$name         # Returns the name column as a vector
+
+# Access a column with [[]]
+df[["score"]]   # Returns the score column as a vector
+
+# Access a column with column name in []
+df[, "id"]      # Returns the id column as a vector
+```
+
+### Using Logical Conditions
+
+```{r access-demo3, echo=TRUE}
+# Create a data frame
+df <- data.frame(
+  id = 1:5,
+  name = c("Alice", "Bob", "Charlie", "David", "Eve"),
+  score = c(88, 92, 79, 85, 91)
+)
+
+# Select rows based on a condition
+high_scorers <- df[df$score >= 85, ]
+high_scorers
+
+# Select rows based on multiple conditions
+filtered <- df[df$score >= 85 & df$id <= 3, ]
+filtered
+
+# Select specific columns for filtered rows
+result <- df[df$score >= 85, c("name", "score")]
+result
+```
+
+### Exercise 3: Accessing Data Frame Elements
+
+Using this data frame:
+
+```
+student_data <- data.frame(
+  student_id = 1:8,
+  name = c("Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Henry"),
+  gender = c("F", "M", "M", "M", "F", "M", "F", "M"),
+  age = c(19, 21, 20, 22, 19, 20, 21, 23),
+  math_score = c(88, 72, 93, 65, 78, 82, 91, 79),
+  english_score = c(92, 78, 81, 85, 94, 76, 89, 83)
+)
+```
+
+Complete the following tasks:
+1. Extract the math score of the student named "Eva"
+2. Extract all data for students who are 20 years old
+3. Extract the names and English scores of all female students
+4. Extract all data for students who scored at least 80 in both math and English
+5. Extract all data for students with IDs 3, 5, and 7
+
+```{r ex3, exercise=TRUE}
+# Create the student_data data frame
+student_data <- data.frame(
+  student_id = 1:8,
+  name = c("Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Henry"),
+  gender = c("F", "M", "M", "M", "F", "M", "F", "M"),
+  age = c(19, 21, 20, 22, 19, 20, 21, 23),
+  math_score = c(88, 72, 93, 65, 78, 82, 91, 79),
+  english_score = c(92, 78, 81, 85, 94, 76, 89, 83)
+)
+
+# Write your code here
+
+```
+
+```{r ex3-solution}
+# Create the student_data data frame
+student_data <- data.frame(
+  student_id = 1:8,
+  name = c("Alice", "Bob", "Charlie", "David", "Eva", "Frank", "Grace", "Henry"),
+  gender = c("F", "M", "M", "M", "F", "M", "F", "M"),
+  age = c(19, 21, 20, 22, 19, 20, 21, 23),
+  math_score = c(88, 72, 93, 65, 78, 82, 91, 79),
+  english_score = c(92, 78, 81, 85, 94, 76, 89, 83)
+)
+
+# 1. Eva's math score
+eva_math <- student_data$math_score[student_data$name == "Eva"]
+
+# 2. Students who are 20 years old
+age_20_students <- student_data[student_data$age == 20, ]
+
+# 3. Names and English scores of female students
+female_english <- student_data[student_data$gender == "F", c("name", "english_score")]
+
+# 4. Students who scored at least 80 in both math and English
+high_scorers <- student_data[student_data$math_score >= 80 & student_data$english_score >= 80, ]
+
+# 5. Students with IDs 3, 5, and 7
+selected_students <- student_data[student_data$student_id %in% c(3, 5, 7), ]
+
+# Display results
+eva_math
+age_20_students
+female_english
+high_scorers
+selected_students
+```
+
+```{r ex3-check}
+grade_this({
+  # Check for code patterns
+  has_eva_math <- grepl("eva_math\\s*<-\\s*student_data\\$math_score\\s*\\[\\s*student_data\\$name\\s*==\\s*[\"']Eva[\"']", .user_code)
+  
+  has_age_20 <- grepl("age_20_students\\s*<-\\s*student_data\\s*\\[\\s*student_data\\$age\\s*==\\s*20\\s*,", .user_code)
+  
+  has_female_english <- grepl("female_english\\s*<-\\s*student_data\\s*\\[\\s*student_data\\$gender\\s*==\\s*[\"']F[\"']\\s*,", .user_code) && 
+                        grepl("c\\s*\\(\\s*[\"']name[\"']\\s*,\\s*[\"']english_score[\"']\\s*\\)", .user_code)
+  
+  has_high_scorers <- grepl("high_scorers\\s*<-\\s*student_data\\s*\\[\\s*student_data\\$math_score\\s*>=\\s*80\\s*&", .user_code) && 
+                     grepl("student_data\\$english_score\\s*>=\\s*80", .user_code)
+  
+  has_selected <- grepl("selected_students\\s*<-\\s*student_data\\s*\\[\\s*student_data\\$student_id\\s*%in%\\s*c\\s*\\(\\s*3\\s*,\\s*5\\s*,\\s*7\\s*\\)", .user_code)
+  
+  # Check actual results if variables exist
+  if (exists("eva_math") && exists("age_20_students") && exists("female_english") &&
+      exists("high_scorers") && exists("selected_students")) {
+    
+    # Check Eva's math score
+    eva_math_ok <- eva_math == 78
+    
+    # Check age 20 students
+    age_20_ok <- is.data.frame(age_20_students) && 
+                nrow(age_20_students) == 2 &&
+                all(age_20_students$age == 20)
+    
+    # Check female English
+    female_english_ok <- is.data.frame(female_english) && 
+                        nrow(female_english) == 3 &&
+                        ncol(female_english) == 2 &&
+                        all(c("name", "english_score") %in% names(female_english))
+    
+    # Check high scorers
+    high_scorers_ok <- is.data.frame(high_scorers) &&
+                      all(high_scorers$math_score >= 80) &&
+                      all(high_scorers$english_score >= 80)
+    
+    # Check selected students
+    selected_ok <- is.data.frame(selected_students) &&
+                  nrow(selected_students) == 3 &&
+                  all(selected_students$student_id %in% c(3, 5, 7))
+    
+    if (eva_math_ok && age_20_ok && female_english_ok && high_scorers_ok && selected_ok) {
+      pass("Excellent! All your data frame extraction tasks are correct.")
+    } else if (!eva_math_ok) {
+      fail("Eva's math score should be 78. Check your code.")
+    } else if (!age_20_ok) {
+      fail("age_20_students should contain only students who are 20 years old.")
+    } else if (!female_english_ok) {
+      fail("female_english should contain name and english_score columns for female students.")
+    } else if (!high_scorers_ok) {
+      fail("high_scorers should contain students with both math and English scores of at least 80.")
+    } else if (!selected_ok) {
+      fail("selected_students should contain students with IDs 3, 5, and 7.")
+    }
+  } else if (has_eva_math && has_age_20 && has_female_english && has_high_scorers && has_selected) {
+    pass("Excellent! All your data frame extraction tasks are correct.")
+  } else if (!has_eva_math) {
+    fail("Make sure to extract Eva's math score correctly.")
+  } else if (!has_age_20) {
+    fail("Make sure to extract students who are 20 years old.")
+  } else if (!has_female_english) {
+    fail("Make sure to extract names and English scores of female students.")
+  } else if (!has_high_scorers) {
+    fail("Make sure to extract students who scored at least 80 in both math and English.")
+  } else if (!has_selected) {
+    fail("Make sure to extract students with IDs 3, 5, and 7.")
+  } else {
+    fail("Make sure to complete all five extraction tasks.")
+  }
+})
+```
+
+## Modifying Data Frames
+
+Data frames can be modified in various ways:
+
+### Adding Columns
+
+```{r modify-demo1, echo=TRUE}
+# Create a data frame
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David"),
+  math = c(88, 92, 75, 85)
+)
+
+# Add a new column
+students$science <- c(90, 85, 88, 92)
+
+# Alternative way to add a column
+students[["english"]] <- c(85, 90, 82, 88)
+
+# Add a calculated column
+students$average <- (students$math + students$science + students$english) / 3
+
+# View the updated data frame
+students
+```
+
+### Adding Rows
+
+```{r modify-demo2, echo=TRUE}
+# Create a data frame
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie"),
+  math = c(88, 92, 75),
+  science = c(90, 85, 88)
+)
+
+# Create a new row as a data frame
+new_student <- data.frame(
+  name = "David",
+  math = 85,
+  science = 92
+)
+
+# Combine rows using rbind()
+all_students <- rbind(students, new_student)
+all_students
+```
+
+### Modifying Values
+
+```{r modify-demo3, echo=TRUE}
+# Create a data frame
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David"),
+  math = c(88, 92, 75, 85),
+  science = c(90, 85, 88, 92)
+)
+
+# Change a single value
+students$math[3] <- 80  # Change Charlie's math score
+
+# Change multiple values based on a condition
+students$science[students$science < 90] <- 89
+
+# View the updated data frame
+students
+```
+
+### Removing Columns and Rows
+
+```{r modify-demo4, echo=TRUE}
+# Create a data frame
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David"),
+  math = c(88, 92, 75, 85),
+  science = c(90, 85, 88, 92),
+  english = c(85, 90, 82, 88)
+)
+
+# Remove a column
+students$english <- NULL
+
+# Alternative way to remove a column
+students <- students[, -which(names(students) == "science")]
+
+# Remove rows
+students <- students[-3, ]  # Remove the third row
+
+# View the updated data frame
+students
+```
+
+### Exercise 4: Modifying Data Frames
+
+Start with this data frame:
+
+```
+products <- data.frame(
+  product_id = c(101, 102, 103, 104, 105),
+  name = c("Laptop", "Phone", "Tablet", "Monitor", "Keyboard"),
+  price = c(1200, 800, 300, 250, 80),
+  stock = c(15, 25, 10, 30, 45)
+)
+```
+
+Complete the following tasks:
+1. Add a column `category` with values "Electronics" for all products
+2. Add a column `discount` that is 10% of the price
+3. Add a column `sale_price` that is the price minus the discount
+4. Increase the stock of all products priced over 500 by 5 units
+5. Add a new product: product_id = 106, name = "Mouse", price = 25, stock = 50, with appropriate values for the other columns
+6. Remove the original `price` column
+
+```{r ex4, exercise=TRUE}
+# Create the products data frame
+products <- data.frame(
+  product_id = c(101, 102, 103, 104, 105),
+  name = c("Laptop", "Phone", "Tablet", "Monitor", "Keyboard"),
+  price = c(1200, 800, 300, 250, 80),
+  stock = c(15, 25, 10, 30, 45)
+)
+
+# Write your code here
+
+```
+
+```{r ex4-solution}
+# Create the products data frame
+products <- data.frame(
+  product_id = c(101, 102, 103, 104, 105),
+  name = c("Laptop", "Phone", "Tablet", "Monitor", "Keyboard"),
+  price = c(1200, 800, 300, 250, 80),
+  stock = c(15, 25, 10, 30, 45)
+)
+
+# 1. Add category column
+products$category <- "Electronics"
+
+# 2. Add discount column
+products$discount <- products$price * 0.1
+
+# 3. Add sale_price column
+products$sale_price <- products$price - products$discount
+
+# 4. Increase stock for expensive products
+products$stock[products$price > 500] <- products$stock[products$price > 500] + 5
+
+# 5. Add new product
+new_product <- data.frame(
+  product_id = 106,
+  name = "Mouse",
+  price = 25,
+  stock = 50,
+  category = "Electronics",
+  discount = 2.5,  # 10% of 25
+  sale_price = 22.5  # 25 - 2.5
+)
+
+products <- rbind(products, new_product)
+
+# 6. Remove price column
+products$price <- NULL
+
+# Display the updated data frame
+products
+```
+
+```{r ex4-check}
+grade_this({
+  # Check for code patterns
+  has_category <- grepl("products\\$category\\s*<-\\s*[\"']Electronics[\"']", .user_code)
+  
+  has_discount <- grepl("products\\$discount\\s*<-\\s*products\\$price\\s*\\*\\s*0\\.1", .user_code)
+  
+  has_sale_price <- grepl("products\\$sale_price\\s*<-\\s*products\\$price\\s*-\\s*products\\$discount", .user_code)
+  
+  has_stock_increase <- grepl("products\\$stock\\s*\\[\\s*products\\$price\\s*>\\s*500\\s*\\]\\s*<-", .user_code) && 
+                       grepl("\\+\\s*5", .user_code)
+  
+  has_new_product <- grepl("new_product\\s*<-\\s*data\\.frame", .user_code) && 
+                    grepl("product_id\\s*=\\s*106", .user_code) && 
+                    grepl("name\\s*=\\s*[\"']Mouse[\"']", .user_code)
+  
+  has_rbind <- grepl("products\\s*<-\\s*rbind\\s*\\(\\s*products\\s*,\\s*new_product\\s*\\)", .user_code)
+  
+  has_remove_price <- grepl("products\\$price\\s*<-\\s*NULL", .user_code)
+  
+  # Check actual results if products exists
+  if (exists("products")) {
+    # Check required columns
+    has_required_cols <- all(c("product_id", "name", "stock", "category", "discount", "sale_price") %in% names(products))
+    missing_price <- !"price" %in% names(products)
+    
+    # Check number of rows (should be 6 after adding Mouse)
+    right_rows <- nrow(products) == 6
+    
+    # Check if all categories are "Electronics"
+    all_electronics <- all(products$category == "Electronics")
+    
+    # Check if Mouse was added
+    has_mouse <- "Mouse" %in% products$name
+    
+    # Check stock increase for expensive products
+    if (has_required_cols && right_rows && all_electronics && has_mouse && missing_price) {
+      # This check is a bit more complex since price column is removed
+      # We can check if Laptop and Phone (which would be expensive) have higher stock
+      laptop_stock <- products$stock[products$name == "Laptop"]
+      phone_stock <- products$stock[products$name == "Phone"]
+      
+      stock_increased <- laptop_stock >= 15 && phone_stock >= 25
+      
+      if (stock_increased) {
+        pass("Excellent! All your data frame modifications are correct.")
+      } else {
+        fail("Make sure you increase the stock by 5 units for products priced over 500 (Laptop and Phone).")
+      }
+    } else if (!has_required_cols || !missing_price) {
+      fail("Check your columns. You should have product_id, name, stock, category, discount, sale_price, but not price.")
+    } else if (!right_rows || !has_mouse) {
+      fail("Make sure to add the new Mouse product correctly. The data frame should have 6 rows.")
+    } else if (!all_electronics) {
+      fail("Make sure all products have the category 'Electronics'.")
+    }
+  } else if (has_category && has_discount && has_sale_price && has_stock_increase && 
+            has_new_product && has_rbind && has_remove_price) {
+    pass("Excellent! All your data frame modifications are correct.")
+  } else if (!has_category) {
+    fail("Make sure to add the category column with 'Electronics' for all products.")
+  } else if (!has_discount) {
+    fail("Make sure to add the discount column as 10% of the price.")
+  } else if (!has_sale_price) {
+    fail("Make sure to add the sale_price column as price minus discount.")
+  } else if (!has_stock_increase) {
+    fail("Make sure to increase the stock by 5 units for products priced over 500.")
+  } else if (!has_new_product || !has_rbind) {
+    fail("Make sure to create and add the new Mouse product correctly.")
+  } else if (!has_remove_price) {
+    fail("Make sure to remove the price column with products$price <- NULL.")
+  } else {
+    fail("Make sure to complete all six modification tasks.")
+  }
+})
+```
+
+## Data Frame Operations
+
+Data frames support various operations that are useful for data manipulation and analysis:
+
+### Sorting Data Frames
+
+```{r sort-demo, echo=TRUE}
+# Create a data frame
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David", "Eva"),
+  math = c(88, 92, 75, 85, 91),
+  science = c(90, 85, 88, 92, 78)
+)
+
+# Sort by math scores (ascending)
+sorted_math <- students[order(students$math), ]
+sorted_math
+
+# Sort by math scores (descending)
+sorted_math_desc <- students[order(-students$math), ]
+sorted_math_desc
+
+# Sort by multiple columns (science ascending, then math descending)
+sorted_multiple <- students[order(students$science, -students$math), ]
+sorted_multiple
+```
+
+### Merging Data Frames
+
+```{r merge-demo, echo=TRUE}
+# Create two data frames
+students <- data.frame(
+  student_id = c(1, 2, 3, 4, 5),
+  name = c("Alice", "Bob", "Charlie", "David", "Eva")
+)
+
+scores <- data.frame(
+  student_id = c(1, 2, 3, 5, 6),
+  math = c(88, 92, 75, 91, 85),
+  science = c(90, 85, 88, 78, 95)
+)
+
+# Inner join (only matching rows in both data frames)
+inner_join <- merge(students, scores, by = "student_id")
+inner_join
+
+# Left join (all rows from students, matching rows from scores)
+left_join <- merge(students, scores, by = "student_id", all.x = TRUE)
+left_join
+
+# Right join (all rows from scores, matching rows from students)
+right_join <- merge(students, scores, by = "student_id", all.y = TRUE)
+right_join
+
+# Full join (all rows from both data frames)
+full_join <- merge(students, scores, by = "student_id", all = TRUE)
+full_join
+```
+
+### Aggregating Data
+
+```{r aggregate-demo, echo=TRUE}
+# Create a data frame
+students <- data.frame(
+  name = c("Alice", "Bob", "Charlie", "David", "Eva", "Frank"),
+  gender = c("F", "M", "M", "M", "F", "M"),
+  grade = c("A", "B", "A", "C", "B", "A"),
+  score = c(92, 84, 91, 78, 85, 90)
+)
+
+# Aggregate by gender (average score by gender)
+avg_by_gender <- aggregate(score ~ gender, data = students, FUN = mean)
+avg_by_gender
+
+# Aggregate by grade (average score by grade)
+avg_by_grade <- aggregate(score ~ grade, data = students, FUN = mean)
+avg_by_grade
+
+# Multiple aggregations
+summary_stats <- aggregate(score ~ gender + grade, data = students, 
+                          FUN = function(x) c(mean = mean(x), count = length(x)))
+summary_stats
+```
+
+### Exercise 5: Data Frame Operations
+
+Using these data frames:
+
+```
+# Sales data
+sales <- data.frame(
+  order_id = c(1001, 1002, 1003, 1004, 1005, 1006, 1007),
+  customer_id = c(101, 103, 102, 101, 104, 103, 105),
+  amount = c(250, 180, 320, 410, 150, 280, 195),
+  date = c("2023-01-15", "2023-01-20", "2023-01-25", "2023-02-05", 
+           "2023-02-10", "2023-02-15", "2023-02-20")
+)
+
+# Customer data
+customers <- data.frame(
+  customer_id = c(101, 102, 103, 104, 105, 106),
+  name = c("John Smith", "Mary Johnson", "Robert Brown", "Lisa Davis", 
+           "Michael Wilson", "Sarah Martinez"),
+  city = c("New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia")
+)
+```
+
+Complete the following tasks:
+1. Sort the sales data by amount in descending order and store as `sorted_sales`
+2. Calculate the total sales amount for each customer and store as `sales_by_customer`
+3. Merge the sales and customer data to show customer names with their orders (inner join) and store as `sales_with_names`
+4. Merge the sales and customer data to include all customers, even those without orders (right join) and store as `all_customers_sales`
+5. Calculate the average order amount by city and store as `sales_by_city`
+
+```{r ex5, exercise=TRUE}
+# Create the data frames
+# Sales data
+sales <- data.frame(
+  order_id = c(1001, 1002, 1003, 1004, 1005, 1006, 1007),
+  customer_id = c(101, 103, 102, 101, 104, 103, 105),
+  amount = c(250, 180, 320, 410, 150, 280, 195),
+  date = c("2023-01-15", "2023-01-20", "2023-01-25", "2023-02-05", 
+           "2023-02-10", "2023-02-15", "2023-02-20")
+)
+
+# Customer data
+customers <- data.frame(
+  customer_id = c(101, 102, 103, 104, 105, 106),
+  name = c("John Smith", "Mary Johnson", "Robert Brown", "Lisa Davis", 
+           "Michael Wilson", "Sarah Martinez"),
+  city = c("New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia")
+)
+
+# Write your code here
+
+```
+
+```{r ex5-solution}
+# Create the data frames
+# Sales data
+sales <- data.frame(
+  order_id = c(1001, 1002, 1003, 1004, 1005, 1006, 1007),
+  customer_id = c(101, 103, 102, 101, 104, 103, 105),
+  amount = c(250, 180, 320, 410, 150, 280, 195),
+  date = c("2023-01-15", "2023-01-20", "2023-01-25", "2023-02-05", 
+           "2023-02-10", "2023-02-15", "2023-02-20")
+)
+
+# Customer data
+customers <- data.frame(
+  customer_id = c(101, 102, 103, 104, 105, 106),
+  name = c("John Smith", "Mary Johnson", "Robert Brown", "Lisa Davis", 
+           "Michael Wilson", "Sarah Martinez"),
+  city = c("New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia")
+)
+
+# 1. Sort sales by amount in descending order
+sorted_sales <- sales[order(-sales$amount), ]
+
+# 2. Calculate total sales by customer
+sales_by_customer <- aggregate(amount ~ customer_id, data = sales, FUN = sum)
+
+# 3. Merge sales and customers (inner join)
+sales_with_names <- merge(sales, customers, by = "customer_id")
+
+# 4. Merge including all customers (right join)
+all_customers_sales <- merge(sales, customers, by = "customer_id", all.y = TRUE)
+
+# 5. Calculate average order amount by city
+# First join the data
+sales_customers <- merge(sales, customers, by = "customer_id")
+# Then aggregate
+sales_by_city <- aggregate(amount ~ city, data = sales_customers, FUN = mean)
+
+# Display results
+sorted_sales
+sales_by_customer
+sales_with_names
+all_customers_sales
+sales_by_city
+```
+
+```{r ex5-check}
+grade_this({
+  # Check for code patterns
+  has_sorted <- grepl("sorted_sales\\s*<-\\s*sales\\s*\\[\\s*order\\s*\\(\\s*-\\s*sales\\$amount\\s*\\)", .user_code)
+  
+  has_by_customer <- grepl("sales_by_customer\\s*<-\\s*aggregate\\s*\\(\\s*amount\\s*~\\s*customer_id", .user_code)
+  
+  # Fix the pattern matching for sales_with_names to be more flexible
+  has_with_names <- grepl("sales_with_names\\s*<-\\s*merge\\s*\\(.*sales.*,.*customers.*by\\s*=\\s*[\"']?customer_id[\"']?", .user_code) || 
+                   grepl("sales_with_names\\s*<-\\s*merge\\s*\\(.*customers.*,.*sales.*by\\s*=\\s*[\"']?customer_id[\"']?", .user_code)
+  
+  has_all_customers <- grepl("all_customers_sales\\s*<-\\s*merge\\s*\\(.*sales.*,.*customers.*all\\.y\\s*=\\s*TRUE", .user_code)
+  
+  has_by_city <- grepl("sales_by_city\\s*<-\\s*aggregate\\s*\\(\\s*amount\\s*~\\s*city", .user_code)
+  
+  # Check actual results if variables exist
+  if (exists("sorted_sales") && exists("sales_by_customer") && exists("sales_with_names") && 
+      exists("all_customers_sales") && exists("sales_by_city")) {
+    
+    # Check if sorted correctly
+    is_sorted <- all(diff(sorted_sales$amount) <= 0)
+    
+    # Check sales by customer
+    by_customer_ok <- is.data.frame(sales_by_customer) && 
+                     "customer_id" %in% names(sales_by_customer) && 
+                     "amount" %in% names(sales_by_customer)
+    
+    # Check merged with names
+    with_names_ok <- is.data.frame(sales_with_names) && 
+                    "name" %in% names(sales_with_names) && 
+                    nrow(sales_with_names) >= 1
+    
+    # Check all customers
+    all_customers_ok <- is.data.frame(all_customers_sales) && 
+                       nrow(all_customers_sales) >= nrow(customers)
+    
+    # Check by city
+    by_city_ok <- is.data.frame(sales_by_city) && 
+                 "city" %in% names(sales_by_city) && 
+                 "amount" %in% names(sales_by_city)
+    
+    if (is_sorted && by_customer_ok && with_names_ok && all_customers_ok && by_city_ok) {
+      pass("Excellent! All your data frame operations are correct.")
+    } else if (!is_sorted) {
+      fail("Make sure sorted_sales is sorted by amount in descending order.")
+    } else if (!by_customer_ok) {
+      fail("Make sure sales_by_customer aggregates amount by customer_id.")
+    } else if (!with_names_ok) {
+      fail("Make sure sales_with_names merges sales and customers data correctly.")
+    } else if (!all_customers_ok) {
+      fail("Make sure all_customers_sales includes all customers, even those without orders.")
+    } else if (!by_city_ok) {
+      fail("Make sure sales_by_city calculates the average amount by city.")
+    }
+  } else if (has_sorted && has_by_customer && has_with_names && has_all_customers && has_by_city) {
+    pass("Excellent! All your data frame operations are correct.")
+  } else if (!has_sorted) {
+    fail("Make sure to sort sales by amount in descending order: sorted_sales <- sales[order(-sales$amount), ]")
+  } else if (!has_by_customer) {
+    fail("Make sure to aggregate sales by customer: sales_by_customer <- aggregate(amount ~ customer_id, data = sales, FUN = sum)")
+  } else if (!has_with_names) {
+    fail("Make sure to merge sales and customers: sales_with_names <- merge(sales, customers, by = \"customer_id\")")
+  } else if (!has_all_customers) {
+    fail("Make sure to include all customers: all_customers_sales <- merge(sales, customers, by = \"customer_id\", all.y = TRUE)")
+  } else if (!has_by_city) {
+    fail("Make sure to calculate average by city: sales_by_city <- aggregate(amount ~ city, data = sales_customers, FUN = mean)")
+  } else {
+    fail("Make sure to complete all five operations correctly.")
+  }
+})
+```
+
+
+## Summary
+
+In this module, you've learned about data frames in R, including:
+
+1. Creating data frames using `data.frame()` and by converting other data structures
+2. Accessing data frame attributes like dimensions, column names, and summary statistics
+3. Extracting elements, rows, columns, and subsets of data frames
+4. Modifying data frames by adding, updating, and removing columns and rows
+5. Working with data frame operations like sorting, merging, and aggregating
+
+Data frames are the workhorse of data manipulation in R and are central to many data analysis tasks. Understanding how to work effectively with data frames is essential for data manipulation, exploration, and analysis in R.
+
+In the next module, we'll explore factors, which are used to represent categorical data in R.

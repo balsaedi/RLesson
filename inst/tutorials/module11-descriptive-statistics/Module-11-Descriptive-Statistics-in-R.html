@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Module: Descriptive Statistics in R</title>
+
+<!-- HEAD_CONTENT -->
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="section-header">
+
+
+
+<h1 class="title toc-ignore">Module: Descriptive Statistics in R</h1>
+
+</div>
+
+
+<div id="section-introduction-to-descriptive-statistics"
+class="section level2">
+<h2>Introduction to Descriptive Statistics</h2>
+<p>Descriptive statistics help us understand and summarize data by
+identifying patterns, central values, and the spread of our data. They
+form the foundation of data analysis and are essential for:</p>
+<ul>
+<li>Summarizing large datasets</li>
+<li>Understanding the distribution of variables</li>
+<li>Detecting outliers and anomalies</li>
+<li>Comparing different groups or samples</li>
+<li>Identifying relationships between variables</li>
+</ul>
+<p>In this module, we’ll explore the following aspects of descriptive
+statistics in R:</p>
+<ol style="list-style-type: decimal">
+<li>Measures of Central Tendency (mean, median, mode)</li>
+<li>Measures of Variability (range, variance, standard deviation,
+IQR)</li>
+<li>Skewness and Kurtosis</li>
+<li>Summary Functions</li>
+<li>Correlation Analysis</li>
+</ol>
+<p>Let’s start by creating some sample data that we’ll use throughout
+this module:</p>
+<pre class="r"><code># Set seed for reproducibility
+set.seed(123)
+
+# Create sample data
+exam_scores &lt;- c(65, 72, 83, 90, 78, 85, 65, 92, 76, 71, 88, 95, 70, 80, 75)
+income &lt;- c(42000, 48000, 52000, 61000, 55000, 72000, 69000, 44000, 
+           58000, 120000, 53000, 60000, 68000, 51000, 49000)
+age &lt;- c(22, 25, 31, 29, 35, 42, 40, 23, 33, 38, 28, 35, 30, 26, 29)
+
+# Create a data frame
+student_data &lt;- data.frame(
+  Age = age,
+  Score = exam_scores,
+  Income = income
+)
+
+# Display the first few rows
+head(student_data)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Age"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Score"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Income"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"22","2":"65","3":"42000","_rn_":"1"},{"1":"25","2":"72","3":"48000","_rn_":"2"},{"1":"31","2":"83","3":"52000","_rn_":"3"},{"1":"29","2":"90","3":"61000","_rn_":"4"},{"1":"35","2":"78","3":"55000","_rn_":"5"},{"1":"42","2":"85","3":"72000","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="section-measures-of-central-tendency" class="section level2">
+<h2>Measures of Central Tendency</h2>
+<p>Measures of central tendency describe the “middle” or “center” of a
+dataset. The three main measures are:</p>
+<div id="section-mean-average" class="section level3">
+<h3>Mean (Average)</h3>
+<p>The mean is the sum of all values divided by the number of
+values:</p>
+<pre class="r"><code># Calculate mean of exam scores
+mean(exam_scores)</code></pre>
+<pre><code>## [1] 79</code></pre>
+<pre class="r"><code># Calculate mean of income
+mean(income)</code></pre>
+<pre><code>## [1] 60133.33</code></pre>
+<pre class="r"><code># Calculate mean of age
+mean(age)</code></pre>
+<pre><code>## [1] 31.06667</code></pre>
+<pre class="r"><code># Calculate means for all numeric columns in the data frame
+sapply(student_data, mean)</code></pre>
+<pre><code>##         Age       Score      Income 
+##    31.06667    79.00000 60133.33333</code></pre>
+</div>
+<div id="section-median" class="section level3">
+<h3>Median</h3>
+<p>The median is the middle value when data is arranged in order:</p>
+<pre class="r"><code># Calculate median of exam scores
+median(exam_scores)</code></pre>
+<pre><code>## [1] 78</code></pre>
+<pre class="r"><code># Calculate median of income (notice how it&#39;s less affected by the outlier of 120000)
+median(income)</code></pre>
+<pre><code>## [1] 55000</code></pre>
+<pre class="r"><code># Calculate median of age
+median(age)</code></pre>
+<pre><code>## [1] 30</code></pre>
+<pre class="r"><code># Calculate medians for all numeric columns
+sapply(student_data, median)</code></pre>
+<pre><code>##    Age  Score Income 
+##     30     78  55000</code></pre>
+</div>
+<div id="section-mode" class="section level3">
+<h3>Mode</h3>
+<p>R doesn’t have a built-in function for the mode (most frequently
+occurring value), but we can create our own:</p>
+<pre class="r"><code># Function to find the mode
+find_mode &lt;- function(x) {
+  ux &lt;- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Find mode of exam scores
+find_mode(exam_scores)</code></pre>
+<pre><code>## [1] 65</code></pre>
+<pre class="r"><code># Find mode of age
+find_mode(age)</code></pre>
+<pre><code>## [1] 29</code></pre>
+<pre class="r"><code># We can also examine frequency tables
+table(exam_scores)</code></pre>
+<pre><code>## exam_scores
+## 65 70 71 72 75 76 78 80 83 85 88 90 92 95 
+##  2  1  1  1  1  1  1  1  1  1  1  1  1  1</code></pre>
+</div>
+<div id="section-comparing-central-tendency-measures"
+class="section level3">
+<h3>Comparing Central Tendency Measures</h3>
+<p>Different measures of central tendency can tell us different things
+about our data:</p>
+<pre class="r"><code># Create a data frame with all measures for comparison
+central_measures &lt;- data.frame(
+  Variable = c(&quot;Exam Scores&quot;, &quot;Income&quot;, &quot;Age&quot;),
+  Mean = c(mean(exam_scores), mean(income), mean(age)),
+  Median = c(median(exam_scores), median(income), median(age)),
+  Mode = c(find_mode(exam_scores), find_mode(income), find_mode(age))
+)
+
+# Display the comparison
+central_measures</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Variable"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Mean"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Median"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Mode"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Exam Scores","2":"79.00000","3":"78","4":"65"},{"1":"Income","2":"60133.33333","3":"55000","4":"42000"},{"1":"Age","2":"31.06667","3":"30","4":"29"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="section-exercise-1-measures-of-central-tendency"
+class="section level3">
+<h3>Exercise 1: Measures of Central Tendency</h3>
+<p>Using the following dataset about house prices and sizes:</p>
+<pre class="r"><code># House data
+sq_feet &lt;- c(1800, 2200, 1600, 2100, 1950, 1850, 2350, 1750, 1900, 2500, 2150, 1700, 2300, 2050, 1850)
+price &lt;- c(210000, 265000, 185000, 245000, 230000, 220000, 280000, 200000, 
+          225000, 295000, 255000, 190000, 275000, 240000, 215000)
+bedrooms &lt;- c(3, 4, 2, 4, 3, 3, 4, 3, 3, 5, 4, 3, 4, 3, 3)</code></pre>
+<p>Complete the following tasks:</p>
+<ol style="list-style-type: decimal">
+<li>Create a data frame called <code>house_data</code> that includes all
+three variables</li>
+<li>Calculate the mean, median, and mode for each variable</li>
+<li>Create a function called <code>describe_central</code> that takes a
+numeric vector and returns a named list containing the mean, median, and
+mode of the data</li>
+<li>Apply your function to the price data</li>
+<li>Find which bedroom count is most common (the mode)</li>
+</ol>
+<div class="tutorial-exercise" data-label="ex1" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0"
+data-pipe="|&gt;">
+<pre class="text"><code># Write your code here</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":true,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="ex1-solution"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0" data-pipe="|&gt;">
+<pre class="text"><code># 1. Create the data frame
+house_data &lt;- data.frame(
+  SqFeet = sq_feet,
+  Price = price,
+  Bedrooms = bedrooms
+)
+
+# 2. Calculate mean, median, mode for each variable
+# Means
+mean_sqft &lt;- mean(sq_feet)
+mean_price &lt;- mean(price)
+mean_bedrooms &lt;- mean(bedrooms)
+
+# Medians
+median_sqft &lt;- median(sq_feet)
+median_price &lt;- median(price)
+median_bedrooms &lt;- median(bedrooms)
+
+# Function to find the mode
+find_mode &lt;- function(x) {
+  ux &lt;- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Modes
+mode_sqft &lt;- find_mode(sq_feet)
+mode_price &lt;- find_mode(price)
+mode_bedrooms &lt;- find_mode(bedrooms)
+
+# 3. Create the describe_central function
+describe_central &lt;- function(x) {
+  result &lt;- list(
+    mean = mean(x),
+    median = median(x),
+    mode = find_mode(x)
+  )
+  return(result)
+}
+
+# 4. Apply function to price data
+price_stats &lt;- describe_central(price)
+
+# 5. Find the most common bedroom count
+most_common_bedrooms &lt;- find_mode(bedrooms)
+
+# Display results
+cat(&quot;Mean, Median, Mode of Square Feet:&quot;, mean_sqft, median_sqft, mode_sqft, &quot;\n&quot;)
+cat(&quot;Mean, Median, Mode of Price:&quot;, mean_price, median_price, mode_price, &quot;\n&quot;)
+cat(&quot;Mean, Median, Mode of Bedrooms:&quot;, mean_bedrooms, median_bedrooms, mode_bedrooms, &quot;\n&quot;)
+cat(&quot;Price Statistics:&quot;, toString(price_stats), &quot;\n&quot;)
+cat(&quot;Most common number of bedrooms:&quot;, most_common_bedrooms)</code></pre>
+</div>
+</div>
+</div>
+<div id="section-measures-of-variability" class="section level2">
+<h2>Measures of Variability</h2>
+<p>Measures of variability describe the spread or dispersion of data
+points. They tell us how much the data varies from the central
+values.</p>
+<div id="section-range" class="section level3">
+<h3>Range</h3>
+<p>The range is the difference between the maximum and minimum
+values:</p>
+<pre class="r"><code># Calculate range for exam scores
+range_scores &lt;- range(exam_scores)
+score_range &lt;- max(exam_scores) - min(exam_scores)
+
+# Calculate range for income
+range_income &lt;- range(income)
+income_range &lt;- max(income) - min(income)
+
+# Display
+cat(&quot;Exam Scores Range:&quot;, range_scores, &quot;- Difference:&quot;, score_range, &quot;\n&quot;)</code></pre>
+<pre><code>## Exam Scores Range: 65 95 - Difference: 30</code></pre>
+<pre class="r"><code>cat(&quot;Income Range:&quot;, range_income, &quot;- Difference:&quot;, income_range)</code></pre>
+<pre><code>## Income Range: 42000 120000 - Difference: 78000</code></pre>
+</div>
+<div id="section-variance" class="section level3">
+<h3>Variance</h3>
+<p>Variance measures the average squared deviation from the mean:</p>
+<pre class="r"><code># Calculate variance for exam scores
+var_scores &lt;- var(exam_scores)
+
+# Calculate variance for income
+var_income &lt;- var(income)
+
+# Calculate variance for age
+var_age &lt;- var(age)
+
+# Display
+cat(&quot;Variance of Exam Scores:&quot;, var_scores, &quot;\n&quot;)</code></pre>
+<pre><code>## Variance of Exam Scores: 92.28571</code></pre>
+<pre class="r"><code>cat(&quot;Variance of Income:&quot;, var_income, &quot;\n&quot;)</code></pre>
+<pre><code>## Variance of Income: 354123810</code></pre>
+<pre class="r"><code>cat(&quot;Variance of Age:&quot;, var_age)</code></pre>
+<pre><code>## Variance of Age: 36.49524</code></pre>
+</div>
+<div id="section-standard-deviation" class="section level3">
+<h3>Standard Deviation</h3>
+<p>Standard deviation is the square root of variance and is in the same
+units as the original data:</p>
+<pre class="r"><code># Calculate standard deviation for exam scores
+sd_scores &lt;- sd(exam_scores)
+
+# Calculate standard deviation for income
+sd_income &lt;- sd(income)
+
+# Calculate standard deviation for age
+sd_age &lt;- sd(age)
+
+# Display
+cat(&quot;Standard Deviation of Exam Scores:&quot;, sd_scores, &quot;\n&quot;)</code></pre>
+<pre><code>## Standard Deviation of Exam Scores: 9.606545</code></pre>
+<pre class="r"><code>cat(&quot;Standard Deviation of Income:&quot;, sd_income, &quot;\n&quot;)</code></pre>
+<pre><code>## Standard Deviation of Income: 18818.18</code></pre>
+<pre class="r"><code>cat(&quot;Standard Deviation of Age:&quot;, sd_age, &quot;\n&quot;)</code></pre>
+<pre><code>## Standard Deviation of Age: 6.041129</code></pre>
+<pre class="r"><code># Calculate for all variables in the data frame
+sapply(student_data, sd)</code></pre>
+<pre><code>##          Age        Score       Income 
+##     6.041129     9.606545 18818.177636</code></pre>
+</div>
+<div id="section-interquartile-range-iqr" class="section level3">
+<h3>Interquartile Range (IQR)</h3>
+<p>The interquartile range is the difference between the 75th and 25th
+percentiles:</p>
+<pre class="r"><code># Calculate IQR for exam scores
+iqr_scores &lt;- IQR(exam_scores)
+
+# Calculate IQR for income
+iqr_income &lt;- IQR(income)
+
+# Calculate quartiles for income
+quartiles_income &lt;- quantile(income)
+
+# Display
+cat(&quot;IQR of Exam Scores:&quot;, iqr_scores, &quot;\n&quot;)</code></pre>
+<pre><code>## IQR of Exam Scores: 15</code></pre>
+<pre class="r"><code>cat(&quot;IQR of Income:&quot;, iqr_income, &quot;\n&quot;)</code></pre>
+<pre><code>## IQR of Income: 14500</code></pre>
+<pre class="r"><code>cat(&quot;Quartiles of Income:&quot;, &quot;\n&quot;)</code></pre>
+<pre><code>## Quartiles of Income:</code></pre>
+<pre class="r"><code>quartiles_income</code></pre>
+<pre><code>##     0%    25%    50%    75%   100% 
+##  42000  50000  55000  64500 120000</code></pre>
+</div>
+<div id="section-visualizing-variability" class="section level3">
+<h3>Visualizing Variability</h3>
+<p>Boxplots and histograms help visualize the spread of data:</p>
+<pre class="r"><code># Set up a 1x2 plotting area
+par(mfrow = c(1, 2))
+
+# Create boxplot of exam scores
+boxplot(exam_scores, main = &quot;Boxplot of Exam Scores&quot;, ylab = &quot;Score&quot;)
+
+# Create histogram of exam scores
+hist(exam_scores, main = &quot;Histogram of Exam Scores&quot;, xlab = &quot;Score&quot;, 
+     col = &quot;lightblue&quot;, breaks = 8)</code></pre>
+<p><img src="Module-11-Descriptive-Statistics-in-R_files/figure-html/variability-viz-1.png" width="960" /></p>
+<pre class="r"><code># Reset plotting area
+par(mfrow = c(1, 1))</code></pre>
+</div>
+<div id="section-exercise-2-measures-of-variability"
+class="section level3">
+<h3>Exercise 2: Measures of Variability</h3>
+<p>Using the house data from Exercise 1, complete the following
+tasks:</p>
+<ol style="list-style-type: decimal">
+<li>Calculate the range (min, max, and difference) for each numeric
+variable</li>
+<li>Calculate the variance and standard deviation of each variable</li>
+<li>Calculate the interquartile range (IQR) for each variable</li>
+<li>Create a function called <code>describe_variability</code> that
+takes a numeric vector and returns a named list containing:
+<ul>
+<li>min, max, range</li>
+<li>variance, standard deviation</li>
+<li>IQR</li>
+<li>quartiles (as a vector)</li>
+</ul></li>
+<li>Apply this function to the house prices</li>
+<li>Create a boxplot of the house prices to visualize the
+variability</li>
+</ol>
+<div class="tutorial-exercise" data-label="ex2" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0"
+data-pipe="|&gt;">
+<pre class="text"><code># Write your code here</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":true,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="ex2-solution"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0" data-pipe="|&gt;">
+<pre class="text"><code># Get the house data
+sq_feet &lt;- c(1800, 2200, 1600, 2100, 1950, 1850, 2350, 1750, 1900, 2500, 2150, 1700, 2300, 2050, 1850)
+price &lt;- c(210000, 265000, 185000, 245000, 230000, 220000, 280000, 200000, 
+          225000, 295000, 255000, 190000, 275000, 240000, 215000)
+bedrooms &lt;- c(3, 4, 2, 4, 3, 3, 4, 3, 3, 5, 4, 3, 4, 3, 3)
+
+# 1. Calculate range for each variable
+# Square feet
+min_sqft &lt;- min(sq_feet)
+max_sqft &lt;- max(sq_feet)
+range_sqft &lt;- max_sqft - min_sqft
+
+# Price
+min_price &lt;- min(price)
+max_price &lt;- max(price)
+range_price &lt;- max_price - min_price
+
+# Bedrooms
+min_beds &lt;- min(bedrooms)
+max_beds &lt;- max(bedrooms)
+range_beds &lt;- max_beds - min_beds
+
+# 2. Calculate variance and standard deviation
+# Square feet
+var_sqft &lt;- var(sq_feet)
+sd_sqft &lt;- sd(sq_feet)
+
+# Price
+var_price &lt;- var(price)
+sd_price &lt;- sd(price)
+
+# Bedrooms
+var_beds &lt;- var(bedrooms)
+sd_beds &lt;- sd(bedrooms)
+
+# 3. Calculate IQR
+iqr_sqft &lt;- IQR(sq_feet)
+iqr_price &lt;- IQR(price)
+iqr_beds &lt;- IQR(bedrooms)
+
+# 4. Create the describe_variability function
+describe_variability &lt;- function(x) {
+  result &lt;- list(
+    min = min(x),
+    max = max(x),
+    range = max(x) - min(x),
+    variance = var(x),
+    sd = sd(x),
+    IQR = IQR(x),
+    quartiles = quantile(x)
+  )
+  return(result)
+}
+
+# 5. Apply function to price data
+price_variability &lt;- describe_variability(price)
+
+# 6. Create boxplot of house prices
+boxplot(price, main = &quot;Distribution of House Prices&quot;, ylab = &quot;Price ($)&quot;)
+
+# Display results
+cat(&quot;Range (min, max, difference) of Square Feet:&quot;, min_sqft, max_sqft, range_sqft, &quot;\n&quot;)
+cat(&quot;Range (min, max, difference) of Price:&quot;, min_price, max_price, range_price, &quot;\n&quot;)
+cat(&quot;Range (min, max, difference) of Bedrooms:&quot;, min_beds, max_beds, range_beds, &quot;\n\n&quot;)
+
+cat(&quot;Variance and SD of Square Feet:&quot;, var_sqft, sd_sqft, &quot;\n&quot;)
+cat(&quot;Variance and SD of Price:&quot;, var_price, sd_price, &quot;\n&quot;)
+cat(&quot;Variance and SD of Bedrooms:&quot;, var_beds, sd_beds, &quot;\n\n&quot;)
+
+cat(&quot;IQR of Square Feet:&quot;, iqr_sqft, &quot;\n&quot;)
+cat(&quot;IQR of Price:&quot;, iqr_price, &quot;\n&quot;)
+cat(&quot;IQR of Bedrooms:&quot;, iqr_beds, &quot;\n\n&quot;)
+
+print(price_variability)</code></pre>
+</div>
+</div>
+</div>
+<div id="section-skewness-and-kurtosis" class="section level2">
+<h2>Skewness and Kurtosis</h2>
+<p>Skewness and kurtosis describe the shape of a data distribution.</p>
+<div id="section-skewness" class="section level3">
+<h3>Skewness</h3>
+<p>Skewness measures the asymmetry of a distribution: - Positive skew:
+right tail is longer (mean &gt; median) - Negative skew: left tail is
+longer (mean &lt; median) - Zero skew: symmetric distribution (mean ≈
+median)</p>
+<pre class="r"><code># Load the moments package for skewness calculations
+library(moments)
+
+# Calculate skewness of exam scores
+skew_scores &lt;- skewness(exam_scores)
+
+# Calculate skewness of income (expected to be positive due to the high outlier)
+skew_income &lt;- skewness(income)
+
+# Display
+cat(&quot;Skewness of Exam Scores:&quot;, skew_scores, &quot;\n&quot;)</code></pre>
+<pre><code>## Skewness of Exam Scores: 0.122594</code></pre>
+<pre class="r"><code>cat(&quot;Skewness of Income:&quot;, skew_income, &quot;\n&quot;)</code></pre>
+<pre><code>## Skewness of Income: 2.244295</code></pre>
+<pre class="r"><code># Create datasets with known skewness for comparison
+negative_skew &lt;- c(50, 55, 60, 65, 70, 75, 80, 85, 90, 90, 90, 90, 95, 95, 95)
+symmetric_data &lt;- c(50, 55, 60, 65, 70, 75, 80, 80, 80, 80, 85, 90, 95, 100, 105)
+positive_skew &lt;- c(5, 5, 5, 10, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 95)
+
+# Calculate and display skewness
+cat(&quot;Skewness of Negative Skew Data:&quot;, skewness(negative_skew), &quot;\n&quot;)</code></pre>
+<pre><code>## Skewness of Negative Skew Data: -0.612076</code></pre>
+<pre class="r"><code>cat(&quot;Skewness of Symmetric Data:&quot;, skewness(symmetric_data), &quot;\n&quot;)</code></pre>
+<pre><code>## Skewness of Symmetric Data: -0.0961491</code></pre>
+<pre class="r"><code>cat(&quot;Skewness of Positive Skew Data:&quot;, skewness(positive_skew))</code></pre>
+<pre><code>## Skewness of Positive Skew Data: 1.180105</code></pre>
+</div>
+<div id="section-kurtosis" class="section level3">
+<h3>Kurtosis</h3>
+<p>Kurtosis measures the “tailedness” of a distribution: - High
+kurtosis: heavy tails, more outliers (leptokurtic) - Low kurtosis: light
+tails, fewer outliers (platykurtic) - Normal distribution has kurtosis
+of 3 (mesokurtic)</p>
+<p>The <code>kurtosis()</code> function in R returns the raw kurtosis
+value. Excess kurtosis (kurtosis - 3) is sometimes used to compare
+against the normal distribution:</p>
+<pre class="r"><code># Calculate kurtosis of exam scores
+kurt_scores &lt;- kurtosis(exam_scores)
+excess_kurt_scores &lt;- kurt_scores - 3
+
+# Calculate kurtosis of income
+kurt_income &lt;- kurtosis(income)
+excess_kurt_income &lt;- kurt_income - 3
+
+# Display
+cat(&quot;Kurtosis of Exam Scores:&quot;, kurt_scores, &quot;- Excess Kurtosis:&quot;, excess_kurt_scores, &quot;\n&quot;)</code></pre>
+<pre><code>## Kurtosis of Exam Scores: 1.86082 - Excess Kurtosis: -1.13918</code></pre>
+<pre class="r"><code>cat(&quot;Kurtosis of Income:&quot;, kurt_income, &quot;- Excess Kurtosis:&quot;, excess_kurt_income, &quot;\n&quot;)</code></pre>
+<pre><code>## Kurtosis of Income: 7.996158 - Excess Kurtosis: 4.996158</code></pre>
+<pre class="r"><code># Create datasets with different kurtosis levels
+high_kurtosis &lt;- c(45, 45, 45, 45, 50, 50, 50, 50, 50, 50, 50, 50, 55, 55, 55, 55, 100)
+low_kurtosis &lt;- c(40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60)
+
+# Calculate and display kurtosis
+cat(&quot;Kurtosis of High Kurtosis Data:&quot;, kurtosis(high_kurtosis), &quot;\n&quot;)</code></pre>
+<pre><code>## Kurtosis of High Kurtosis Data: 12.83504</code></pre>
+<pre class="r"><code>cat(&quot;Kurtosis of Low Kurtosis Data:&quot;, kurtosis(low_kurtosis))</code></pre>
+<pre><code>## Kurtosis of Low Kurtosis Data: 1.78</code></pre>
+</div>
+<div id="section-visualizing-skewness-and-kurtosis"
+class="section level3">
+<h3>Visualizing Skewness and Kurtosis</h3>
+<p>Histograms help visualize these characteristics:</p>
+<pre class="r"><code># Set up a 2x2 plotting area
+par(mfrow = c(2, 2))
+
+# Plot histograms 
+hist(negative_skew, main = &quot;Negative Skew&quot;, xlab = &quot;Value&quot;, col = &quot;lightblue&quot;)
+hist(positive_skew, main = &quot;Positive Skew&quot;, xlab = &quot;Value&quot;, col = &quot;lightgreen&quot;)
+hist(high_kurtosis, main = &quot;High Kurtosis&quot;, xlab = &quot;Value&quot;, col = &quot;lightpink&quot;)
+hist(low_kurtosis, main = &quot;Low Kurtosis&quot;, xlab = &quot;Value&quot;, col = &quot;lightyellow&quot;)</code></pre>
+<p><img src="Module-11-Descriptive-Statistics-in-R_files/figure-html/skew-kurt-viz-1.png" width="1152" /></p>
+<pre class="r"><code># Reset plotting area
+par(mfrow = c(1, 1))</code></pre>
+</div>
+<div id="section-exercise-3-skewness-and-kurtosis"
+class="section level3">
+<h3>Exercise 3: Skewness and Kurtosis</h3>
+<p>For this exercise, we’ll work with a dataset that has different
+distributions. Complete the following tasks:</p>
+<ol style="list-style-type: decimal">
+<li><p>Create the following datasets:</p>
+<ul>
+<li><code>dataset_a</code>:
+<code>c(20, 21, 22, 23, 25, 30, 32, 40, 41, 41, 45, 49, 50, 60, 99)</code></li>
+<li><code>dataset_b</code>:
+<code>c(10, 10, 15, 30, 35, 37, 40, 40, 41, 45, 50, 52, 55, 60, 70, 90, 95)</code></li>
+<li><code>dataset_c</code>:
+<code>c(60, 70, 71, 72, 73, 74, 74, 75, 75, 76, 77, 78, 80, 81, 84, 84, 85, 87, 90)</code></li>
+</ul></li>
+<li><p>For each dataset, calculate and store:</p>
+<ul>
+<li>Mean and median</li>
+<li>Skewness</li>
+<li>Kurtosis and excess kurtosis</li>
+</ul></li>
+<li><p>Create a function called <code>describe_shape</code> that takes a
+numeric vector and returns a data frame with:</p>
+<ul>
+<li>N (sample size)</li>
+<li>Mean</li>
+<li>Median</li>
+<li>Skewness</li>
+<li>Kurtosis</li>
+<li>A text description of skewness (“Approximately Symmetric”,
+“Positively Skewed”, or “Negatively Skewed”)</li>
+</ul></li>
+<li><p>Apply this function to all three datasets</p></li>
+<li><p>Create histograms of all three datasets to visualize the
+differences in their distributions</p></li>
+</ol>
+<div class="tutorial-exercise" data-label="ex3" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0"
+data-pipe="|&gt;">
+<pre class="text"><code># Write your code here</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":true,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="ex3-solution"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0" data-pipe="|&gt;">
+<pre class="text"><code># Load the moments package
+library(moments)
+
+# 1. Create the datasets
+dataset_a &lt;- c(20, 21, 22, 23, 25, 30, 32, 40, 41, 41, 45, 49, 50, 60, 99)
+dataset_b &lt;- c(10, 10, 15, 30, 35, 37, 40, 40, 41, 45, 50, 52, 55, 60, 70, 90, 95)
+dataset_c &lt;- c(60, 70, 71, 72, 73, 74, 74, 75, 75, 76, 77, 78, 80, 81, 84, 84, 85, 87, 90)
+
+# 2. Calculate statistics for each dataset
+# Dataset A
+mean_a &lt;- mean(dataset_a)
+median_a &lt;- median(dataset_a)
+skew_a &lt;- skewness(dataset_a)
+kurt_a &lt;- kurtosis(dataset_a)
+excess_kurt_a &lt;- kurt_a - 3
+
+# Dataset B
+mean_b &lt;- mean(dataset_b)
+median_b &lt;- median(dataset_b)
+skew_b &lt;- skewness(dataset_b)
+kurt_b &lt;- kurtosis(dataset_b)
+excess_kurt_b &lt;- kurt_b - 3
+
+# Dataset C
+mean_c &lt;- mean(dataset_c)
+median_c &lt;- median(dataset_c)
+skew_c &lt;- skewness(dataset_c)
+kurt_c &lt;- kurtosis(dataset_c)
+excess_kurt_c &lt;- kurt_c - 3
+
+# 3. Create the describe_shape function
+describe_shape &lt;- function(x) {
+  n &lt;- length(x)
+  mean_val &lt;- mean(x)
+  median_val &lt;- median(x)
+  skew_val &lt;- skewness(x)
+  kurt_val &lt;- kurtosis(x)
+  
+  # Determine skewness description
+  if (abs(skew_val) &lt; 0.5) {
+    skew_desc &lt;- &quot;Approximately Symmetric&quot;
+  } else if (skew_val &gt;= 0.5) {
+    skew_desc &lt;- &quot;Positively Skewed&quot;
+  } else {
+    skew_desc &lt;- &quot;Negatively Skewed&quot;
+  }
+  
+  # Create a data frame with the results
+  result &lt;- data.frame(
+    N = n,
+    Mean = mean_val,
+    Median = median_val,
+    Skewness = skew_val,
+    Kurtosis = kurt_val,
+    ExcessKurtosis = kurt_val - 3,
+    SkewnessDescription = skew_desc
+  )
+  
+  return(result)
+}
+
+# 4. Apply the function to all three datasets
+result_a &lt;- describe_shape(dataset_a)
+result_b &lt;- describe_shape(dataset_b)
+result_c &lt;- describe_shape(dataset_c)
+
+# Combine results
+all_results &lt;- rbind(
+  cbind(Dataset = &quot;A&quot;, result_a),
+  cbind(Dataset = &quot;B&quot;, result_b),
+  cbind(Dataset = &quot;C&quot;, result_c)
+)
+
+# 5. Create histograms
+par(mfrow = c(1, 3))
+hist(dataset_a, main = &quot;Dataset A&quot;, xlab = &quot;Value&quot;, col = &quot;lightblue&quot;)
+hist(dataset_b, main = &quot;Dataset B&quot;, xlab = &quot;Value&quot;, col = &quot;lightgreen&quot;)
+hist(dataset_c, main = &quot;Dataset C&quot;, xlab = &quot;Value&quot;, col = &quot;lightpink&quot;)
+par(mfrow = c(1, 1))
+
+# Display the results
+print(all_results)</code></pre>
+</div>
+</div>
+</div>
+<div id="section-summary-functions-in-r" class="section level2">
+<h2>Summary Functions in R</h2>
+<p>R provides several functions to get comprehensive summaries of data
+quickly.</p>
+<div id="section-the-summary-function" class="section level3">
+<h3>The <code>summary()</code> Function</h3>
+<p>The most basic summary function in R:</p>
+<pre class="r"><code># Summary of individual variables
+summary(exam_scores)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    65.0    71.5    78.0    79.0    86.5    95.0</code></pre>
+<pre class="r"><code>summary(income)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   42000   50000   55000   60133   64500  120000</code></pre>
+<pre class="r"><code># Summary of entire data frame
+summary(student_data)</code></pre>
+<pre><code>##       Age            Score          Income      
+##  Min.   :22.00   Min.   :65.0   Min.   : 42000  
+##  1st Qu.:27.00   1st Qu.:71.5   1st Qu.: 50000  
+##  Median :30.00   Median :78.0   Median : 55000  
+##  Mean   :31.07   Mean   :79.0   Mean   : 60133  
+##  3rd Qu.:35.00   3rd Qu.:86.5   3rd Qu.: 64500  
+##  Max.   :42.00   Max.   :95.0   Max.   :120000</code></pre>
+</div>
+<div id="section-the-describe-function-from-psych-package"
+class="section level3">
+<h3>The <code>describe()</code> Function from <code>psych</code>
+Package</h3>
+<p>The <code>psych</code> package’s <code>describe()</code> function
+provides more detailed statistics:</p>
+<pre class="r"><code># Load psych package
+library(psych)
+
+# Describe individual variables
+describe(exam_scores)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["vars"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["mean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["trimmed"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["min"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["max"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["range"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[13],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"15","3":"79","4":"9.606545","5":"78","6":"78.84615","7":"10.3782","8":"65","9":"95","10":"30","11":"0.1105412","12":"-1.379019","13":"2.480399","_rn_":"X1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code># Describe entire data frame
+describe(student_data)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["vars"],"name":[1],"type":["int"],"align":["right"]},{"label":["n"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["mean"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["median"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["trimmed"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["mad"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["min"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["max"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["range"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["skew"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["kurtosis"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["se"],"name":[13],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"15","3":"31.06667","4":"6.041129","5":"30","6":"30.92308","7":"7.4130","8":"22","9":"42","10":"20","11":"0.2451732","12":"-1.168376","13":"1.559813","_rn_":"Age"},{"1":"2","2":"15","3":"79.00000","4":"9.606545","5":"78","6":"78.84615","7":"10.3782","8":"65","9":"95","10":"30","11":"0.1105412","12":"-1.379019","13":"2.480399","_rn_":"Score"},{"1":"3","2":"15","3":"60133.33333","4":"18818.177636","5":"55000","6":"56923.07692","7":"8895.6000","8":"42000","9":"120000","10":"78000","11":"2.0236489","12":"3.965542","13":"4858.832573","_rn_":"Income"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="section-custom-summary-functions" class="section level3">
+<h3>Custom Summary Functions</h3>
+<p>We can create our own summary functions for specific needs:</p>
+<pre class="r"><code># Create a comprehensive summary function
+comprehensive_summary &lt;- function(x) {
+  if (!is.numeric(x)) stop(&quot;Input must be numeric&quot;)
+  
+  result &lt;- c(
+    N = length(x),
+    Missing = sum(is.na(x)),
+    Mean = mean(x, na.rm = TRUE),
+    SD = sd(x, na.rm = TRUE),
+    Median = median(x, na.rm = TRUE),
+    Min = min(x, na.rm = TRUE),
+    Max = max(x, na.rm = TRUE),
+    Range = max(x, na.rm = TRUE) - min(x, na.rm = TRUE),
+    Q1 = quantile(x, 0.25, na.rm = TRUE),
+    Q3 = quantile(x, 0.75, na.rm = TRUE),
+    IQR = IQR(x, na.rm = TRUE),
+    Skewness = skewness(x, na.rm = TRUE),
+    Kurtosis = kurtosis(x, na.rm = TRUE)
+  )
+  
+  return(result)
+}
+
+# Apply to income data
+comprehensive_summary(income)</code></pre>
+<pre><code>##            N      Missing         Mean           SD       Median          Min 
+## 1.500000e+01 0.000000e+00 6.013333e+04 1.881818e+04 5.500000e+04 4.200000e+04 
+##          Max        Range       Q1.25%       Q3.75%          IQR     Skewness 
+## 1.200000e+05 7.800000e+04 5.000000e+04 6.450000e+04 1.450000e+04 2.244295e+00 
+##     Kurtosis 
+## 7.996158e+00</code></pre>
+</div>
+<div id="section-summarizing-grouped-data" class="section level3">
+<h3>Summarizing Grouped Data</h3>
+<p>We can summarize data by groups using various approaches:</p>
+<pre class="r"><code># Create grouped data
+set.seed(123)
+survey_data &lt;- data.frame(
+  Gender = rep(c(&quot;Male&quot;, &quot;Female&quot;), each = 10),
+  Age = c(runif(10, 20, 40), runif(10, 25, 45)),
+  Income = c(rnorm(10, 50000, 10000), rnorm(10, 55000, 12000)),
+  Satisfaction = c(sample(1:5, 10, replace = TRUE), sample(2:5, 10, replace = TRUE))
+)
+
+# Summarize by gender using aggregate
+aggregate(Age ~ Gender, data = survey_data, FUN = mean)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Gender"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Age"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Female","2":"35.46739"},{"1":"Male","2":"31.56495"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>aggregate(cbind(Age, Income) ~ Gender, data = survey_data, FUN = mean)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Gender"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Age"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Income"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"Female","2":"35.46739","3":"49905.29"},{"1":"Male","2":"31.56495","3":"52086.22"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code># Multiple summary statistics
+aggregate(Income ~ Gender, data = survey_data, 
+          FUN = function(x) c(Mean = mean(x), Median = median(x), SD = sd(x)))</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Gender"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Income"],"name":[2],"type":["dbl[,3]"],"align":["right"]}],"data":[{"1":"Female","2.Mean":"49905.29","2.Median":"46876.42","2.SD":"11169.71"},{"1":"Male","2.Mean":"52086.22","2.Median":"53802.93","2.SD":"10380.73"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code># Using tapply
+tapply(survey_data$Income, survey_data$Gender, mean)</code></pre>
+<pre><code>##   Female     Male 
+## 49905.29 52086.22</code></pre>
+<pre class="r"><code>tapply(survey_data$Income, survey_data$Gender, summary)</code></pre>
+<pre><code>## $Female
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   34760   42312   46876   49905   55726   70046 
+## 
+## $Male
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   30334   46731   53803   52086   56505   67869</code></pre>
+<pre class="r"><code># Using by function
+by(survey_data[,c(&quot;Age&quot;, &quot;Income&quot;)], survey_data$Gender, summary)</code></pre>
+<pre><code>## survey_data$Gender: Female
+##       Age            Income     
+##  Min.   :25.84   Min.   :34760  
+##  1st Qu.:30.33   1st Qu.:42312  
+##  Median :35.26   Median :46876  
+##  Mean   :35.47   Mean   :49905  
+##  3rd Qu.:41.89   3rd Qu.:55726  
+##  Max.   :44.14   Max.   :70046  
+## ------------------------------------------------------------ 
+## survey_data$Gender: Male
+##       Age            Income     
+##  Min.   :20.91   Min.   :30334  
+##  1st Qu.:28.42   1st Qu.:46731  
+##  Median :30.80   Median :53803  
+##  Mean   :31.56   Mean   :52086  
+##  3rd Qu.:37.19   3rd Qu.:56505  
+##  Max.   :38.81   Max.   :67869</code></pre>
+</div>
+<div id="section-exercise-4-summary-functions" class="section level3">
+<h3>Exercise 4: Summary Functions</h3>
+<p>Using the <code>mtcars</code> dataset built into R, complete the
+following tasks:</p>
+<ol style="list-style-type: decimal">
+<li>Get a basic summary of the entire dataset using
+<code>summary()</code></li>
+<li>Use the <code>psych</code> package’s <code>describe()</code>
+function to get more detailed statistics</li>
+<li>Create a custom function called <code>car_summary</code> that:
+<ul>
+<li>Takes a data frame as input</li>
+<li>Returns the mean, median, standard deviation, min, and max for each
+numeric variable</li>
+<li>Formats the output as a clean data frame with variables as rows</li>
+</ul></li>
+<li>Apply your function to the <code>mtcars</code> dataset</li>
+<li>Summarize the average mpg, hp, and wt by number of cylinders using
+<code>aggregate()</code></li>
+<li>Create a boxplot of mpg grouped by number of cylinders to visualize
+the differences</li>
+</ol>
+<div class="tutorial-exercise" data-label="ex4" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0"
+data-pipe="|&gt;">
+<pre class="text"><code># Write your code here</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":true,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="ex4-solution"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0" data-pipe="|&gt;">
+<pre class="text"><code># Load the required packages
+library(psych)
+
+# 1. Basic summary of mtcars
+mtcars_summary &lt;- summary(mtcars)
+print(mtcars_summary)
+
+# 2. More detailed statistics using describe()
+mtcars_describe &lt;- describe(mtcars)
+print(mtcars_describe)
+
+# 3. Create custom summary function
+car_summary &lt;- function(data) {
+  # Initialize an empty data frame for results
+  result &lt;- data.frame(
+    Variable = character(),
+    Mean = numeric(),
+    Median = numeric(),
+    StdDev = numeric(),
+    Min = numeric(),
+    Max = numeric(),
+    stringsAsFactors = FALSE
+  )
+  
+  # Process each numeric variable
+  for (var in names(data)) {
+    if (is.numeric(data[[var]])) {
+      row &lt;- data.frame(
+        Variable = var,
+        Mean = mean(data[[var]]),
+        Median = median(data[[var]]),
+        StdDev = sd(data[[var]]),
+        Min = min(data[[var]]),
+        Max = max(data[[var]]),
+        stringsAsFactors = FALSE
+      )
+      result &lt;- rbind(result, row)
+    }
+  }
+  
+  return(result)
+}
+
+# 4. Apply the function to mtcars
+custom_summary &lt;- car_summary(mtcars)
+print(custom_summary)
+
+# 5. Summarize by number of cylinders
+cyl_summary &lt;- aggregate(cbind(mpg, hp, wt) ~ cyl, data = mtcars, FUN = mean)
+print(cyl_summary)
+
+# 6. Create boxplot of mpg by cylinders
+boxplot(mpg ~ cyl, data = mtcars, 
+        main = &quot;MPG by Number of Cylinders&quot;,
+        xlab = &quot;Number of Cylinders&quot;,
+        ylab = &quot;Miles Per Gallon&quot;,
+        col = c(&quot;lightblue&quot;, &quot;lightgreen&quot;, &quot;lightpink&quot;))</code></pre>
+</div>
+</div>
+</div>
+<div id="section-correlation-analysis" class="section level2">
+<h2>Correlation Analysis</h2>
+<p>Correlation measures the strength and direction of the linear
+relationship between two variables.</p>
+<div id="section-correlation-coefficient" class="section level3">
+<h3>Correlation Coefficient</h3>
+<p>The most common correlation measure is Pearson’s r, which ranges from
+-1 (perfect negative correlation) to 1 (perfect positive
+correlation):</p>
+<pre class="r"><code># Calculate correlation between exam scores and income
+cor_score_income &lt;- cor(exam_scores, income)
+
+# Calculate correlation between exam scores and age
+cor_score_age &lt;- cor(exam_scores, age)
+
+# Calculate correlation between income and age
+cor_income_age &lt;- cor(income, age)
+
+# Display
+cat(&quot;Correlation between Exam Scores and Income:&quot;, cor_score_income, &quot;\n&quot;)</code></pre>
+<pre><code>## Correlation between Exam Scores and Income: -0.2038811</code></pre>
+<pre class="r"><code>cat(&quot;Correlation between Exam Scores and Age:&quot;, cor_score_age, &quot;\n&quot;)</code></pre>
+<pre><code>## Correlation between Exam Scores and Age: -0.04307791</code></pre>
+<pre class="r"><code>cat(&quot;Correlation between Income and Age:&quot;, cor_income_age, &quot;\n&quot;)</code></pre>
+<pre><code>## Correlation between Income and Age: 0.6590169</code></pre>
+<pre class="r"><code># Correlation matrix for all variables in the data frame
+cor_matrix &lt;- cor(student_data)
+print(cor_matrix)</code></pre>
+<pre><code>##                Age       Score     Income
+## Age     1.00000000 -0.04307791  0.6590169
+## Score  -0.04307791  1.00000000 -0.2038811
+## Income  0.65901695 -0.20388105  1.0000000</code></pre>
+</div>
+<div id="section-types-of-correlation" class="section level3">
+<h3>Types of Correlation</h3>
+<p>R supports different correlation methods:</p>
+<pre class="r"><code># Create data with a non-linear relationship
+x &lt;- 1:20
+y &lt;- x^2 + rnorm(20, 0, 10)
+
+# Compare correlation types
+cat(&quot;Pearson correlation:&quot;, cor(x, y, method = &quot;pearson&quot;), &quot;\n&quot;)</code></pre>
+<pre><code>## Pearson correlation: 0.9698081</code></pre>
+<pre class="r"><code>cat(&quot;Spearman correlation:&quot;, cor(x, y, method = &quot;spearman&quot;), &quot;\n&quot;)</code></pre>
+<pre><code>## Spearman correlation: 0.9849624</code></pre>
+<pre class="r"><code>cat(&quot;Kendall correlation:&quot;, cor(x, y, method = &quot;kendall&quot;), &quot;\n&quot;)</code></pre>
+<pre><code>## Kendall correlation: 0.9368421</code></pre>
+</div>
+<div id="section-testing-correlation-significance"
+class="section level3">
+<h3>Testing Correlation Significance</h3>
+<p>The <code>cor.test()</code> function tests whether a correlation is
+significantly different from zero:</p>
+<pre class="r"><code># Test correlation between exam scores and income
+cor_test_result &lt;- cor.test(exam_scores, income)
+print(cor_test_result)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  exam_scores and income
+## t = -0.75088, df = 13, p-value = 0.4661
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  -0.6484222  0.3443455
+## sample estimates:
+##        cor 
+## -0.2038811</code></pre>
+<pre class="r"><code># Test correlation between income and age
+cor_test_age_income &lt;- cor.test(income, age)
+print(cor_test_age_income)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s product-moment correlation
+## 
+## data:  income and age
+## t = 3.1592, df = 13, p-value = 0.007537
+## alternative hypothesis: true correlation is not equal to 0
+## 95 percent confidence interval:
+##  0.2215457 0.8756644
+## sample estimates:
+##       cor 
+## 0.6590169</code></pre>
+</div>
+<div id="section-visualizing-correlations" class="section level3">
+<h3>Visualizing Correlations</h3>
+<div id="section-scatter-plots" class="section level4">
+<h4>Scatter Plots</h4>
+<pre class="r"><code># Set up a 1x2 plotting area
+par(mfrow = c(1, 2))
+
+# Create scatter plot of exam scores vs. income
+plot(exam_scores, income, 
+     main = &quot;Exam Scores vs. Income&quot;,
+     xlab = &quot;Exam Score&quot;, 
+     ylab = &quot;Income&quot;,
+     pch = 19,
+     col = &quot;blue&quot;)
+abline(lm(income ~ exam_scores), col = &quot;red&quot;)
+
+# Create scatter plot of age vs. income
+plot(age, income, 
+     main = &quot;Age vs. Income&quot;,
+     xlab = &quot;Age&quot;, 
+     ylab = &quot;Income&quot;,
+     pch = 19,
+     col = &quot;green&quot;)
+abline(lm(income ~ age), col = &quot;red&quot;)</code></pre>
+<p><img src="Module-11-Descriptive-Statistics-in-R_files/figure-html/scatter-demo-1.png" width="960" /></p>
+<pre class="r"><code># Reset plotting area
+par(mfrow = c(1, 1))</code></pre>
+</div>
+<div id="section-correlation-matrix-visualization"
+class="section level4">
+<h4>Correlation Matrix Visualization</h4>
+<pre class="r"><code># Load corrplot package
+library(corrplot)
+
+# Create a correlation matrix
+corr_matrix &lt;- cor(student_data)
+
+# Visualize the correlation matrix
+corrplot(corr_matrix, method = &quot;circle&quot;, type = &quot;upper&quot;, 
+         tl.col = &quot;black&quot;, tl.srt = 45, 
+         addCoef.col = &quot;black&quot;, number.cex = 0.7)</code></pre>
+<p><img src="Module-11-Descriptive-Statistics-in-R_files/figure-html/corr-matrix-viz-1.png" width="768" /></p>
+</div>
+</div>
+<div id="section-exercise-5-correlation-analysis"
+class="section level3">
+<h3>Exercise 5: Correlation Analysis</h3>
+<p>Using the built-in <code>mtcars</code> dataset, complete the
+following tasks:</p>
+<ol style="list-style-type: decimal">
+<li><p>Calculate the correlation between:</p>
+<ul>
+<li>mpg (miles per gallon) and wt (weight)</li>
+<li>mpg and hp (horsepower)</li>
+<li>hp and qsec (quarter mile time)</li>
+</ul></li>
+<li><p>Test whether these correlations are statistically significant
+using <code>cor.test()</code></p></li>
+<li><p>Create a function called <code>interpret_correlation</code>
+that:</p>
+<ul>
+<li>Takes a correlation coefficient as input</li>
+<li>Returns a interpretation based on the following rules:
+<ul>
+<li>|r| &lt; 0.3: “Weak correlation”</li>
+<li>0.3 ≤ |r| &lt; 0.5: “Moderate correlation”</li>
+<li>0.5 ≤ |r| &lt; 0.7: “Strong correlation”</li>
+<li>|r| ≥ 0.7: “Very strong correlation”</li>
+<li>Should also indicate if it’s positive or negative</li>
+</ul></li>
+</ul></li>
+<li><p>Apply your function to the three correlations you
+calculated</p></li>
+<li><p>Create a scatter plot matrix of mpg, wt, hp, and qsec using
+<code>pairs()</code></p></li>
+<li><p>Create a correlation matrix visualization of all numeric
+variables in mtcars using corrplot</p></li>
+</ol>
+<div class="tutorial-exercise" data-label="ex5" data-completion="1"
+data-diagnostics="1" data-startover="1" data-lines="0"
+data-pipe="|&gt;">
+<pre class="text"><code># Write your code here</code></pre>
+<script type="application/json" data-ui-opts="1">{"engine":"r","has_checker":true,"caption":"<span data-i18n=\"text.enginecap\" data-i18n-opts=\"{&quot;engine&quot;:&quot;R&quot;}\">R Code<\/span>"}</script>
+</div>
+<div class="tutorial-exercise-support" data-label="ex5-solution"
+data-completion="1" data-diagnostics="1" data-startover="1"
+data-lines="0" data-pipe="|&gt;">
+<pre class="text"><code># Load required packages
+library(corrplot)
+
+# 1. Calculate correlations
+cor_mpg_wt &lt;- cor(mtcars$mpg, mtcars$wt)
+cor_mpg_hp &lt;- cor(mtcars$mpg, mtcars$hp)
+cor_hp_qsec &lt;- cor(mtcars$hp, mtcars$qsec)
+
+# Display correlations
+cat(&quot;Correlation between mpg and wt:&quot;, cor_mpg_wt, &quot;\n&quot;)
+cat(&quot;Correlation between mpg and hp:&quot;, cor_mpg_hp, &quot;\n&quot;)
+cat(&quot;Correlation between hp and qsec:&quot;, cor_hp_qsec, &quot;\n\n&quot;)
+
+# 2. Test statistical significance
+cor_test_mpg_wt &lt;- cor.test(mtcars$mpg, mtcars$wt)
+cor_test_mpg_hp &lt;- cor.test(mtcars$mpg, mtcars$hp)
+cor_test_hp_qsec &lt;- cor.test(mtcars$hp, mtcars$qsec)
+
+# Display test results
+cat(&quot;Test for mpg vs wt: p-value =&quot;, cor_test_mpg_wt$p.value, &quot;\n&quot;)
+cat(&quot;Test for mpg vs hp: p-value =&quot;, cor_test_mpg_hp$p.value, &quot;\n&quot;)
+cat(&quot;Test for hp vs qsec: p-value =&quot;, cor_test_hp_qsec$p.value, &quot;\n\n&quot;)
+
+# 3. Create the interpret_correlation function
+interpret_correlation &lt;- function(r) {
+  # Calculate absolute value of r
+  abs_r &lt;- abs(r)
+  
+  # Determine strength
+  if (abs_r &lt; 0.3) {
+    strength &lt;- &quot;weak&quot;
+  } else if (abs_r &lt; 0.5) {
+    strength &lt;- &quot;moderate&quot;
+  } else if (abs_r &lt; 0.7) {
+    strength &lt;- &quot;strong&quot;
+  } else {
+    strength &lt;- &quot;very strong&quot;
+  }
+  
+  # Determine direction
+  direction &lt;- ifelse(r &gt; 0, &quot;positive&quot;, &quot;negative&quot;)
+  
+  # Return interpretation
+  return(paste(&quot;This is a&quot;, strength, direction, &quot;correlation (r =&quot;, round(r, 3), &quot;)&quot;))
+}
+
+# 4. Apply the function to the three correlations
+interpretation_mpg_wt &lt;- interpret_correlation(cor_mpg_wt)
+interpretation_mpg_hp &lt;- interpret_correlation(cor_mpg_hp)
+interpretation_hp_qsec &lt;- interpret_correlation(cor_hp_qsec)
+
+# Display interpretations
+cat(&quot;mpg and wt:&quot;, interpretation_mpg_wt, &quot;\n&quot;)
+cat(&quot;mpg and hp:&quot;, interpretation_mpg_hp, &quot;\n&quot;)
+cat(&quot;hp and qsec:&quot;, interpretation_hp_qsec, &quot;\n\n&quot;)
+
+# 5. Create a scatter plot matrix
+pairs(mtcars[, c(&quot;mpg&quot;, &quot;wt&quot;, &quot;hp&quot;, &quot;qsec&quot;)], 
+      main = &quot;Scatter Plot Matrix&quot;,
+      pch = 19,
+      col = &quot;blue&quot;)
+
+# 6. Create a correlation matrix visualization
+car_cor &lt;- cor(mtcars)
+corrplot(car_cor, method = &quot;circle&quot;, type = &quot;upper&quot;, 
+         tl.col = &quot;black&quot;, tl.srt = 45,
+         addCoef.col = &quot;black&quot;, number.cex = 0.7)</code></pre>
+</div>
+</div>
+</div>
+<div id="section-summary" class="section level2">
+<h2>Summary</h2>
+<p>In this module, you’ve learned about descriptive statistics in R,
+covering:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Measures of Central Tendency</strong>:
+<ul>
+<li>Mean, median, and mode for describing the center of a
+distribution</li>
+<li>How to compare and interpret different measures of central
+tendency</li>
+</ul></li>
+<li><strong>Measures of Variability</strong>:
+<ul>
+<li>Range, variance, standard deviation, and IQR for measuring data
+spread</li>
+<li>How to visualize and interpret data variability</li>
+</ul></li>
+<li><strong>Skewness and Kurtosis</strong>:
+<ul>
+<li>How to measure and interpret the shape of distributions</li>
+<li>Recognizing different types of data distributions</li>
+</ul></li>
+<li><strong>Summary Functions</strong>:
+<ul>
+<li>Using built-in functions like <code>summary()</code> and
+<code>describe()</code></li>
+<li>Creating custom summary functions for specific needs</li>
+<li>Summarizing data by groups</li>
+</ul></li>
+<li><strong>Correlation Analysis</strong>:
+<ul>
+<li>Calculating and interpreting correlation coefficients</li>
+<li>Testing correlation significance</li>
+<li>Visualizing relationships between variables</li>
+</ul></li>
+</ol>
+<p>These skills provide a solid foundation for understanding your data
+before proceeding to more advanced statistical analysis or modeling.
+Descriptive statistics are an essential first step in any data analysis
+project, helping you identify patterns, anomalies, and relationships in
+your data.</p>
+</div>
+<div id="section-additional-resources" class="section level2">
+<h2>Additional Resources</h2>
+<ul>
+<li><a href="https://r4ds.had.co.nz/">R for Data Science</a> - A
+comprehensive guide to data science with R</li>
+<li><a
+href="https://www.datacamp.com/courses/introduction-to-statistics-in-r">Descriptive
+Statistics in R (DataCamp)</a></li>
+<li><a
+href="https://cran.r-project.org/web/packages/psych/index.html">psych
+Package Documentation</a></li>
+<li><a
+href="https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html">The
+corrplot Package Documentation</a></li>
+<li><a
+href="https://www.coursera.org/specializations/statistics">Statistics
+with R (Duke University on Coursera)</a> 
+<script type="application/shiny-prerendered" data-context="server-start">
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+# Load additional packages
+library(psych)
+library(moments)
+library(ggplot2)
+library(corrplot)
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::register_http_handlers(session, metadata = NULL)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::prepare_tutorial_state(session)
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::i18n_observe_tutorial_language(input, session)
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+session$onSessionEnded(function() {
+        learnr:::event_trigger(session, "session_stop")
+      })
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-ex1-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-ex1-code-editor`)), session)
+output$`tutorial-exercise-ex1-output` <- renderUI({
+  `tutorial-exercise-ex1-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "ex1", global_setup = structure(c("library(learnr)", 
+"library(gradethis)", "gradethis::gradethis_setup()", "# Load additional packages", 
+"library(psych)", "library(moments)", "library(ggplot2)", "library(corrplot)"
+), chunk_opts = list(label = "setup", include = FALSE)), setup = NULL, 
+    chunks = list(list(label = "ex1", code = "# Write your code here\n", 
+        opts = list(label = "\"ex1\"", exercise = "TRUE"), engine = "r")), 
+    code_check = NULL, error_check = NULL, check = structure(c("grade_this({", 
+    "  # Check the student's submitted code", "  user_code <- .user_code", 
+    "  ", "  # Check for required variable assignments and functions", 
+    "  has_house_data <- grepl(\"house_data\\\\s*<-\", user_code)", 
+    "  has_describe_central <- grepl(\"describe_central\\\\s*<-\\\\s*function\", user_code) ", 
+    "  uses_find_mode <- grepl(\"find_mode\\\\s*<-\\\\s*function|which\\\\.max\\\\(tabulate\\\\(match\\\\(\", user_code)", 
+    "  has_mean_calc <- grepl(\"mean\\\\(sq_feet\\\\)|mean\\\\(price\\\\)|mean\\\\(bedrooms\\\\)\", user_code)", 
+    "  has_median_calc <- grepl(\"median\\\\(sq_feet\\\\)|median\\\\(price\\\\)|median\\\\(bedrooms\\\\)\", user_code)", 
+    "  has_mode_calc <- grepl(\"find_mode\\\\(bedrooms\\\\)\", user_code)", 
+    "  ", "  # Check if all requirements are met", "  if (!has_house_data) {", 
+    "    fail(\"Make sure to create a data frame called 'house_data' with all three variables\")", 
+    "  } else if (!has_mean_calc || !has_median_calc) {", "    fail(\"Make sure to calculate the mean and median for each variable\")", 
+    "  } else if (!uses_find_mode) {", "    fail(\"Make sure to create or use a function to find the mode of the data\")", 
+    "  } else if (!has_describe_central) {", "    fail(\"Make sure to create a function called 'describe_central' that returns mean, median, and mode\")", 
+    "  } else if (!has_mode_calc) {", "    fail(\"Make sure to find which bedroom count is most common (the mode)\")", 
+    "  } else {", "    pass(\"Great job! You've correctly calculated various measures of central tendency for the house data.\")", 
+    "  }", "})"), chunk_opts = list(label = "ex1-check")), solution = structure(c("# 1. Create the data frame", 
+    "house_data <- data.frame(", "  SqFeet = sq_feet,", "  Price = price,", 
+    "  Bedrooms = bedrooms", ")", "", "# 2. Calculate mean, median, mode for each variable", 
+    "# Means", "mean_sqft <- mean(sq_feet)", "mean_price <- mean(price)", 
+    "mean_bedrooms <- mean(bedrooms)", "", "# Medians", "median_sqft <- median(sq_feet)", 
+    "median_price <- median(price)", "median_bedrooms <- median(bedrooms)", 
+    "", "# Function to find the mode", "find_mode <- function(x) {", 
+    "  ux <- unique(x)", "  ux[which.max(tabulate(match(x, ux)))]", 
+    "}", "", "# Modes", "mode_sqft <- find_mode(sq_feet)", "mode_price <- find_mode(price)", 
+    "mode_bedrooms <- find_mode(bedrooms)", "", "# 3. Create the describe_central function", 
+    "describe_central <- function(x) {", "  result <- list(", 
+    "    mean = mean(x),", "    median = median(x),", "    mode = find_mode(x)", 
+    "  )", "  return(result)", "}", "", "# 4. Apply function to price data", 
+    "price_stats <- describe_central(price)", "", "# 5. Find the most common bedroom count", 
+    "most_common_bedrooms <- find_mode(bedrooms)", "", "# Display results", 
+    "cat(\"Mean, Median, Mode of Square Feet:\", mean_sqft, median_sqft, mode_sqft, \"\\n\")", 
+    "cat(\"Mean, Median, Mode of Price:\", mean_price, median_price, mode_price, \"\\n\")", 
+    "cat(\"Mean, Median, Mode of Bedrooms:\", mean_bedrooms, median_bedrooms, mode_bedrooms, \"\\n\")", 
+    "cat(\"Price Statistics:\", toString(price_stats), \"\\n\")", 
+    "cat(\"Most common number of bedrooms:\", most_common_bedrooms)"
+    ), chunk_opts = list(label = "ex1-solution")), tests = NULL, 
+    options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
+        cache.path = "Module-11-Descriptive-Statistics-in-R_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "default", fig.path = "Module-11-Descriptive-Statistics-in-R_files/figure-html/", 
+        dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
+        fig.width = 7, fig.height = 5, fig.env = "figure", fig.cap = NULL, 
+        fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
+        fig.pos = "", out.width = 672, out.height = NULL, out.extra = NULL, 
+        fig.retina = 2, external = TRUE, sanitize = FALSE, interval = 1, 
+        aniopts = "controls,loop", warning = TRUE, error = FALSE, 
+        message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
+        engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
+        exercise.timelimit = 60, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        label = "ex1", exercise = TRUE, code = c("# Write your code here", 
+        ""), out.width.px = 672, out.height.px = 480, params.src = "ex1, exercise=TRUE", 
+        fig.num = 0, exercise.df_print = "paged"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-ex2-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-ex2-code-editor`)), session)
+output$`tutorial-exercise-ex2-output` <- renderUI({
+  `tutorial-exercise-ex2-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "ex2", global_setup = structure(c("library(learnr)", 
+"library(gradethis)", "gradethis::gradethis_setup()", "# Load additional packages", 
+"library(psych)", "library(moments)", "library(ggplot2)", "library(corrplot)"
+), chunk_opts = list(label = "setup", include = FALSE)), setup = NULL, 
+    chunks = list(list(label = "ex2", code = "# Write your code here\n", 
+        opts = list(label = "\"ex2\"", exercise = "TRUE"), engine = "r")), 
+    code_check = NULL, error_check = NULL, check = structure(c("grade_this({", 
+    "  # Check the student's submitted code", "  user_code <- .user_code", 
+    "  ", "  # Check for required functions and calculations", 
+    "  has_min_calcs <- grepl(\"min\\\\(sq_feet\\\\)|min\\\\(price\\\\)|min\\\\(bedrooms\\\\)\", user_code)", 
+    "  has_max_calcs <- grepl(\"max\\\\(sq_feet\\\\)|max\\\\(price\\\\)|max\\\\(bedrooms\\\\)\", user_code)", 
+    "  has_range_calcs <- grepl(\"max\\\\(.*\\\\)\\\\s*-\\\\s*min\\\\(\", user_code)", 
+    "  has_var_calcs <- grepl(\"var\\\\(sq_feet\\\\)|var\\\\(price\\\\)|var\\\\(bedrooms\\\\)\", user_code)", 
+    "  has_sd_calcs <- grepl(\"sd\\\\(sq_feet\\\\)|sd\\\\(price\\\\)|sd\\\\(bedrooms\\\\)\", user_code)", 
+    "  has_iqr_calcs <- grepl(\"IQR\\\\(sq_feet\\\\)|IQR\\\\(price\\\\)|IQR\\\\(bedrooms\\\\)\", user_code)", 
+    "  has_describe_function <- grepl(\"describe_variability\\\\s*<-\\\\s*function\", user_code)", 
+    "  has_function_elements <- grepl(\"min\\\\s*=|max\\\\s*=|range\\\\s*=|variance\\\\s*=|sd\\\\s*=|IQR\\\\s*=|quartiles\\\\s*=\", user_code)", 
+    "  uses_boxplot <- grepl(\"boxplot\\\\(price\", user_code)", 
+    "  ", "  # Check if all requirements are met", "  if (!has_min_calcs || !has_max_calcs || !has_range_calcs) {", 
+    "    fail(\"Make sure to calculate the range (min, max, and difference) for each variable\")", 
+    "  } else if (!has_var_calcs || !has_sd_calcs) {", "    fail(\"Make sure to calculate the variance and standard deviation for each variable\")", 
+    "  } else if (!has_iqr_calcs) {", "    fail(\"Make sure to calculate the IQR for each variable\")", 
+    "  } else if (!has_describe_function || !has_function_elements) {", 
+    "    fail(\"Make sure to create a function called 'describe_variability' that returns all the required elements\")", 
+    "  } else if (!uses_boxplot) {", "    fail(\"Make sure to create a boxplot of the house prices\")", 
+    "  } else {", "    pass(\"Great job! You've correctly calculated and visualized various measures of variability.\")", 
+    "  }", "})"), chunk_opts = list(label = "ex2-check")), solution = structure(c("# Get the house data", 
+    "sq_feet <- c(1800, 2200, 1600, 2100, 1950, 1850, 2350, 1750, 1900, 2500, 2150, 1700, 2300, 2050, 1850)", 
+    "price <- c(210000, 265000, 185000, 245000, 230000, 220000, 280000, 200000, ", 
+    "          225000, 295000, 255000, 190000, 275000, 240000, 215000)", 
+    "bedrooms <- c(3, 4, 2, 4, 3, 3, 4, 3, 3, 5, 4, 3, 4, 3, 3)", 
+    "", "# 1. Calculate range for each variable", "# Square feet", 
+    "min_sqft <- min(sq_feet)", "max_sqft <- max(sq_feet)", "range_sqft <- max_sqft - min_sqft", 
+    "", "# Price", "min_price <- min(price)", "max_price <- max(price)", 
+    "range_price <- max_price - min_price", "", "# Bedrooms", 
+    "min_beds <- min(bedrooms)", "max_beds <- max(bedrooms)", 
+    "range_beds <- max_beds - min_beds", "", "# 2. Calculate variance and standard deviation", 
+    "# Square feet", "var_sqft <- var(sq_feet)", "sd_sqft <- sd(sq_feet)", 
+    "", "# Price", "var_price <- var(price)", "sd_price <- sd(price)", 
+    "", "# Bedrooms", "var_beds <- var(bedrooms)", "sd_beds <- sd(bedrooms)", 
+    "", "# 3. Calculate IQR", "iqr_sqft <- IQR(sq_feet)", "iqr_price <- IQR(price)", 
+    "iqr_beds <- IQR(bedrooms)", "", "# 4. Create the describe_variability function", 
+    "describe_variability <- function(x) {", "  result <- list(", 
+    "    min = min(x),", "    max = max(x),", "    range = max(x) - min(x),", 
+    "    variance = var(x),", "    sd = sd(x),", "    IQR = IQR(x),", 
+    "    quartiles = quantile(x)", "  )", "  return(result)", 
+    "}", "", "# 5. Apply function to price data", "price_variability <- describe_variability(price)", 
+    "", "# 6. Create boxplot of house prices", "boxplot(price, main = \"Distribution of House Prices\", ylab = \"Price ($)\")", 
+    "", "# Display results", "cat(\"Range (min, max, difference) of Square Feet:\", min_sqft, max_sqft, range_sqft, \"\\n\")", 
+    "cat(\"Range (min, max, difference) of Price:\", min_price, max_price, range_price, \"\\n\")", 
+    "cat(\"Range (min, max, difference) of Bedrooms:\", min_beds, max_beds, range_beds, \"\\n\\n\")", 
+    "", "cat(\"Variance and SD of Square Feet:\", var_sqft, sd_sqft, \"\\n\")", 
+    "cat(\"Variance and SD of Price:\", var_price, sd_price, \"\\n\")", 
+    "cat(\"Variance and SD of Bedrooms:\", var_beds, sd_beds, \"\\n\\n\")", 
+    "", "cat(\"IQR of Square Feet:\", iqr_sqft, \"\\n\")", "cat(\"IQR of Price:\", iqr_price, \"\\n\")", 
+    "cat(\"IQR of Bedrooms:\", iqr_beds, \"\\n\\n\")", "", "print(price_variability)"
+    ), chunk_opts = list(label = "ex2-solution")), tests = NULL, 
+    options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
+        cache.path = "Module-11-Descriptive-Statistics-in-R_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "default", fig.path = "Module-11-Descriptive-Statistics-in-R_files/figure-html/", 
+        dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
+        fig.width = 7, fig.height = 5, fig.env = "figure", fig.cap = NULL, 
+        fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
+        fig.pos = "", out.width = 672, out.height = NULL, out.extra = NULL, 
+        fig.retina = 2, external = TRUE, sanitize = FALSE, interval = 1, 
+        aniopts = "controls,loop", warning = TRUE, error = FALSE, 
+        message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
+        engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
+        exercise.timelimit = 60, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        label = "ex2", exercise = TRUE, code = c("# Write your code here", 
+        ""), out.width.px = 672, out.height.px = 480, params.src = "ex2, exercise=TRUE", 
+        fig.num = 0, exercise.df_print = "paged"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-ex3-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-ex3-code-editor`)), session)
+output$`tutorial-exercise-ex3-output` <- renderUI({
+  `tutorial-exercise-ex3-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "ex3", global_setup = structure(c("library(learnr)", 
+"library(gradethis)", "gradethis::gradethis_setup()", "# Load additional packages", 
+"library(psych)", "library(moments)", "library(ggplot2)", "library(corrplot)"
+), chunk_opts = list(label = "setup", include = FALSE)), setup = NULL, 
+    chunks = list(list(label = "ex3", code = "# Write your code here\n", 
+        opts = list(label = "\"ex3\"", exercise = "TRUE"), engine = "r")), 
+    code_check = NULL, error_check = NULL, check = structure(c("grade_this({", 
+    "  # Check the student's submitted code", "  user_code <- .user_code", 
+    "  ", "  # Check for required data and calculations", "  has_datasets <- grepl(\"dataset_a\\\\s*<-|dataset_b\\\\s*<-|dataset_c\\\\s*<-\", user_code)", 
+    "  has_mean_calcs <- grepl(\"mean\\\\(dataset_a\\\\)|mean\\\\(dataset_b\\\\)|mean\\\\(dataset_c\\\\)\", user_code)", 
+    "  has_median_calcs <- grepl(\"median\\\\(dataset_a\\\\)|median\\\\(dataset_b\\\\)|median\\\\(dataset_c\\\\)\", user_code)", 
+    "  has_skew_calcs <- grepl(\"skewness\\\\(dataset_a\\\\)|skewness\\\\(dataset_b\\\\)|skewness\\\\(dataset_c\\\\)\", user_code)", 
+    "  has_kurt_calcs <- grepl(\"kurtosis\\\\(dataset_a\\\\)|kurtosis\\\\(dataset_b\\\\)|kurtosis\\\\(dataset_c\\\\)\", user_code)", 
+    "  has_describe_function <- grepl(\"describe_shape\\\\s*<-\\\\s*function\", user_code)", 
+    "  has_function_elements <- grepl(\"N\\\\s*=|Mean\\\\s*=|Median\\\\s*=|Skewness\\\\s*=|Kurtosis\\\\s*=\", user_code)", 
+    "  has_skew_description <- grepl(\"Symmetric|Skewed\", user_code)", 
+    "  uses_hist <- grepl(\"hist\\\\(dataset_a|hist\\\\(dataset_b|hist\\\\(dataset_c\", user_code)", 
+    "  ", "  # Check if all requirements are met", "  if (!has_datasets) {", 
+    "    fail(\"Make sure to create all three datasets as specified\")", 
+    "  } else if (!has_mean_calcs || !has_median_calcs) {", "    fail(\"Make sure to calculate the mean and median for each dataset\")", 
+    "  } else if (!has_skew_calcs || !has_kurt_calcs) {", "    fail(\"Make sure to calculate skewness and kurtosis for each dataset\")", 
+    "  } else if (!has_describe_function || !has_function_elements) {", 
+    "    fail(\"Make sure to create a function called 'describe_shape' with all required elements\")", 
+    "  } else if (!has_skew_description) {", "    fail(\"Make sure your function classifies the skewness as 'Approximately Symmetric', 'Positively Skewed', or 'Negatively Skewed'\")", 
+    "  } else if (!uses_hist) {", "    fail(\"Make sure to create histograms for all three datasets\")", 
+    "  } else {", "    pass(\"Great job! You've successfully analyzed the shape of different distributions using skewness and kurtosis.\")", 
+    "  }", "})"), chunk_opts = list(label = "ex3-check")), solution = structure(c("# Load the moments package", 
+    "library(moments)", "", "# 1. Create the datasets", "dataset_a <- c(20, 21, 22, 23, 25, 30, 32, 40, 41, 41, 45, 49, 50, 60, 99)", 
+    "dataset_b <- c(10, 10, 15, 30, 35, 37, 40, 40, 41, 45, 50, 52, 55, 60, 70, 90, 95)", 
+    "dataset_c <- c(60, 70, 71, 72, 73, 74, 74, 75, 75, 76, 77, 78, 80, 81, 84, 84, 85, 87, 90)", 
+    "", "# 2. Calculate statistics for each dataset", "# Dataset A", 
+    "mean_a <- mean(dataset_a)", "median_a <- median(dataset_a)", 
+    "skew_a <- skewness(dataset_a)", "kurt_a <- kurtosis(dataset_a)", 
+    "excess_kurt_a <- kurt_a - 3", "", "# Dataset B", "mean_b <- mean(dataset_b)", 
+    "median_b <- median(dataset_b)", "skew_b <- skewness(dataset_b)", 
+    "kurt_b <- kurtosis(dataset_b)", "excess_kurt_b <- kurt_b - 3", 
+    "", "# Dataset C", "mean_c <- mean(dataset_c)", "median_c <- median(dataset_c)", 
+    "skew_c <- skewness(dataset_c)", "kurt_c <- kurtosis(dataset_c)", 
+    "excess_kurt_c <- kurt_c - 3", "", "# 3. Create the describe_shape function", 
+    "describe_shape <- function(x) {", "  n <- length(x)", "  mean_val <- mean(x)", 
+    "  median_val <- median(x)", "  skew_val <- skewness(x)", 
+    "  kurt_val <- kurtosis(x)", "  ", "  # Determine skewness description", 
+    "  if (abs(skew_val) < 0.5) {", "    skew_desc <- \"Approximately Symmetric\"", 
+    "  } else if (skew_val >= 0.5) {", "    skew_desc <- \"Positively Skewed\"", 
+    "  } else {", "    skew_desc <- \"Negatively Skewed\"", "  }", 
+    "  ", "  # Create a data frame with the results", "  result <- data.frame(", 
+    "    N = n,", "    Mean = mean_val,", "    Median = median_val,", 
+    "    Skewness = skew_val,", "    Kurtosis = kurt_val,", "    ExcessKurtosis = kurt_val - 3,", 
+    "    SkewnessDescription = skew_desc", "  )", "  ", "  return(result)", 
+    "}", "", "# 4. Apply the function to all three datasets", 
+    "result_a <- describe_shape(dataset_a)", "result_b <- describe_shape(dataset_b)", 
+    "result_c <- describe_shape(dataset_c)", "", "# Combine results", 
+    "all_results <- rbind(", "  cbind(Dataset = \"A\", result_a),", 
+    "  cbind(Dataset = \"B\", result_b),", "  cbind(Dataset = \"C\", result_c)", 
+    ")", "", "# 5. Create histograms", "par(mfrow = c(1, 3))", 
+    "hist(dataset_a, main = \"Dataset A\", xlab = \"Value\", col = \"lightblue\")", 
+    "hist(dataset_b, main = \"Dataset B\", xlab = \"Value\", col = \"lightgreen\")", 
+    "hist(dataset_c, main = \"Dataset C\", xlab = \"Value\", col = \"lightpink\")", 
+    "par(mfrow = c(1, 1))", "", "# Display the results", "print(all_results)"
+    ), chunk_opts = list(label = "ex3-solution")), tests = NULL, 
+    options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
+        cache.path = "Module-11-Descriptive-Statistics-in-R_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "default", fig.path = "Module-11-Descriptive-Statistics-in-R_files/figure-html/", 
+        dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
+        fig.width = 7, fig.height = 5, fig.env = "figure", fig.cap = NULL, 
+        fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
+        fig.pos = "", out.width = 672, out.height = NULL, out.extra = NULL, 
+        fig.retina = 2, external = TRUE, sanitize = FALSE, interval = 1, 
+        aniopts = "controls,loop", warning = TRUE, error = FALSE, 
+        message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
+        engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
+        exercise.timelimit = 60, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        label = "ex3", exercise = TRUE, code = c("# Write your code here", 
+        ""), out.width.px = 672, out.height.px = 480, params.src = "ex3, exercise=TRUE", 
+        fig.num = 0, exercise.df_print = "paged"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-ex4-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-ex4-code-editor`)), session)
+output$`tutorial-exercise-ex4-output` <- renderUI({
+  `tutorial-exercise-ex4-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "ex4", global_setup = structure(c("library(learnr)", 
+"library(gradethis)", "gradethis::gradethis_setup()", "# Load additional packages", 
+"library(psych)", "library(moments)", "library(ggplot2)", "library(corrplot)"
+), chunk_opts = list(label = "setup", include = FALSE)), setup = NULL, 
+    chunks = list(list(label = "ex4", code = "# Write your code here\n", 
+        opts = list(label = "\"ex4\"", exercise = "TRUE"), engine = "r")), 
+    code_check = NULL, error_check = NULL, check = structure(c("grade_this({", 
+    "  # Check the student's submitted code", "  user_code <- .user_code", 
+    "  ", "  # Check for required functions and operations", 
+    "  uses_summary <- grepl(\"summary\\\\(mtcars\\\\)\", user_code)", 
+    "  uses_describe <- grepl(\"describe\\\\(mtcars\\\\)\", user_code)", 
+    "  has_custom_function <- grepl(\"car_summary\\\\s*<-\\\\s*function\", user_code)", 
+    "  has_function_calcs <- grepl(\"mean\\\\(|median\\\\(|sd\\\\(|min\\\\(|max\\\\(\", user_code)", 
+    "  uses_aggregate <- grepl(\"aggregate\\\\(.+~\\\\s*cyl\", user_code)", 
+    "  uses_boxplot <- grepl(\"boxplot\\\\(.+~\\\\s*cyl\", user_code)", 
+    "  ", "  # Check if all requirements are met", "  if (!uses_summary) {", 
+    "    fail(\"Make sure to use the summary() function on the mtcars dataset\")", 
+    "  } else if (!uses_describe) {", "    fail(\"Make sure to use the describe() function from the psych package\")", 
+    "  } else if (!has_custom_function) {", "    fail(\"Make sure to create a custom function called 'car_summary'\")", 
+    "  } else if (!has_function_calcs) {", "    fail(\"Make sure your custom function calculates mean, median, sd, min, and max\")", 
+    "  } else if (!uses_aggregate) {", "    fail(\"Make sure to use aggregate() to summarize mpg, hp, and wt by number of cylinders\")", 
+    "  } else if (!uses_boxplot) {", "    fail(\"Make sure to create a boxplot of mpg grouped by number of cylinders\")", 
+    "  } else {", "    pass(\"Great job! You've successfully used and created various summary functions.\")", 
+    "  }", "})"), chunk_opts = list(label = "ex4-check")), solution = structure(c("# Load the required packages", 
+    "library(psych)", "", "# 1. Basic summary of mtcars", "mtcars_summary <- summary(mtcars)", 
+    "print(mtcars_summary)", "", "# 2. More detailed statistics using describe()", 
+    "mtcars_describe <- describe(mtcars)", "print(mtcars_describe)", 
+    "", "# 3. Create custom summary function", "car_summary <- function(data) {", 
+    "  # Initialize an empty data frame for results", "  result <- data.frame(", 
+    "    Variable = character(),", "    Mean = numeric(),", "    Median = numeric(),", 
+    "    StdDev = numeric(),", "    Min = numeric(),", "    Max = numeric(),", 
+    "    stringsAsFactors = FALSE", "  )", "  ", "  # Process each numeric variable", 
+    "  for (var in names(data)) {", "    if (is.numeric(data[[var]])) {", 
+    "      row <- data.frame(", "        Variable = var,", "        Mean = mean(data[[var]]),", 
+    "        Median = median(data[[var]]),", "        StdDev = sd(data[[var]]),", 
+    "        Min = min(data[[var]]),", "        Max = max(data[[var]]),", 
+    "        stringsAsFactors = FALSE", "      )", "      result <- rbind(result, row)", 
+    "    }", "  }", "  ", "  return(result)", "}", "", "# 4. Apply the function to mtcars", 
+    "custom_summary <- car_summary(mtcars)", "print(custom_summary)", 
+    "", "# 5. Summarize by number of cylinders", "cyl_summary <- aggregate(cbind(mpg, hp, wt) ~ cyl, data = mtcars, FUN = mean)", 
+    "print(cyl_summary)", "", "# 6. Create boxplot of mpg by cylinders", 
+    "boxplot(mpg ~ cyl, data = mtcars, ", "        main = \"MPG by Number of Cylinders\",", 
+    "        xlab = \"Number of Cylinders\",", "        ylab = \"Miles Per Gallon\",", 
+    "        col = c(\"lightblue\", \"lightgreen\", \"lightpink\"))"
+    ), chunk_opts = list(label = "ex4-solution")), tests = NULL, 
+    options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
+        cache.path = "Module-11-Descriptive-Statistics-in-R_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "default", fig.path = "Module-11-Descriptive-Statistics-in-R_files/figure-html/", 
+        dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
+        fig.width = 7, fig.height = 5, fig.env = "figure", fig.cap = NULL, 
+        fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
+        fig.pos = "", out.width = 672, out.height = NULL, out.extra = NULL, 
+        fig.retina = 2, external = TRUE, sanitize = FALSE, interval = 1, 
+        aniopts = "controls,loop", warning = TRUE, error = FALSE, 
+        message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
+        engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
+        exercise.timelimit = 60, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        label = "ex4", exercise = TRUE, code = c("# Write your code here", 
+        ""), out.width.px = 672, out.height.px = 480, params.src = "ex4, exercise=TRUE", 
+        fig.num = 0, exercise.df_print = "paged"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+
+
+<script type="application/shiny-prerendered" data-context="server">
+`tutorial-exercise-ex5-result` <- learnr:::setup_exercise_handler(reactive(req(input$`tutorial-exercise-ex5-code-editor`)), session)
+output$`tutorial-exercise-ex5-output` <- renderUI({
+  `tutorial-exercise-ex5-result`()
+})
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+learnr:::store_exercise_cache(structure(list(label = "ex5", global_setup = structure(c("library(learnr)", 
+"library(gradethis)", "gradethis::gradethis_setup()", "# Load additional packages", 
+"library(psych)", "library(moments)", "library(ggplot2)", "library(corrplot)"
+), chunk_opts = list(label = "setup", include = FALSE)), setup = NULL, 
+    chunks = list(list(label = "ex5", code = "# Write your code here\n", 
+        opts = list(label = "\"ex5\"", exercise = "TRUE"), engine = "r")), 
+    code_check = NULL, error_check = NULL, check = structure(c("grade_this({", 
+    "  # Check the student's submitted code", "  user_code <- .user_code", 
+    "  ", "  # Check for required functions and operations", 
+    "  has_cor_calcs <- grepl(\"cor\\\\(mtcars\\\\$mpg,\\\\s*mtcars\\\\$wt\\\\)|cor\\\\(mtcars\\\\[,\\\\s*[\\\"']mpg[\\\"']\\\\],\\\\s*mtcars\\\\[,\\\\s*[\\\"']wt[\\\"']\\\\]\\\\)\", user_code)", 
+    "  has_cor_test <- grepl(\"cor\\\\.test\\\\(\", user_code)", 
+    "  has_interpret_function <- grepl(\"interpret_correlation\\\\s*<-\\\\s*function\", user_code)", 
+    "  has_abs_r <- grepl(\"abs\\\\(r\\\\)|abs_r\", user_code)", 
+    "  has_direction <- grepl(\"positive|negative\", user_code)", 
+    "  uses_pairs <- grepl(\"pairs\\\\(\", user_code)", "  uses_corrplot <- grepl(\"corrplot\\\\(\", user_code)", 
+    "  ", "  # Check if all requirements are met", "  if (!has_cor_calcs) {", 
+    "    fail(\"Make sure to calculate the correlations between the specified variables\")", 
+    "  } else if (!has_cor_test) {", "    fail(\"Make sure to test whether the correlations are statistically significant using cor.test()\")", 
+    "  } else if (!has_interpret_function) {", "    fail(\"Make sure to create a function called 'interpret_correlation'\")", 
+    "  } else if (!has_abs_r || !has_direction) {", "    fail(\"Make sure your function interprets both the strength and direction of the correlation\")", 
+    "  } else if (!uses_pairs) {", "    fail(\"Make sure to create a scatter plot matrix using pairs()\")", 
+    "  } else if (!uses_corrplot) {", "    fail(\"Make sure to create a correlation matrix visualization using corrplot()\")", 
+    "  } else {", "    pass(\"Great job! You've successfully performed and interpreted a correlation analysis.\")", 
+    "  }", "})"), chunk_opts = list(label = "ex5-check")), solution = structure(c("# Load required packages", 
+    "library(corrplot)", "", "# 1. Calculate correlations", "cor_mpg_wt <- cor(mtcars$mpg, mtcars$wt)", 
+    "cor_mpg_hp <- cor(mtcars$mpg, mtcars$hp)", "cor_hp_qsec <- cor(mtcars$hp, mtcars$qsec)", 
+    "", "# Display correlations", "cat(\"Correlation between mpg and wt:\", cor_mpg_wt, \"\\n\")", 
+    "cat(\"Correlation between mpg and hp:\", cor_mpg_hp, \"\\n\")", 
+    "cat(\"Correlation between hp and qsec:\", cor_hp_qsec, \"\\n\\n\")", 
+    "", "# 2. Test statistical significance", "cor_test_mpg_wt <- cor.test(mtcars$mpg, mtcars$wt)", 
+    "cor_test_mpg_hp <- cor.test(mtcars$mpg, mtcars$hp)", "cor_test_hp_qsec <- cor.test(mtcars$hp, mtcars$qsec)", 
+    "", "# Display test results", "cat(\"Test for mpg vs wt: p-value =\", cor_test_mpg_wt$p.value, \"\\n\")", 
+    "cat(\"Test for mpg vs hp: p-value =\", cor_test_mpg_hp$p.value, \"\\n\")", 
+    "cat(\"Test for hp vs qsec: p-value =\", cor_test_hp_qsec$p.value, \"\\n\\n\")", 
+    "", "# 3. Create the interpret_correlation function", "interpret_correlation <- function(r) {", 
+    "  # Calculate absolute value of r", "  abs_r <- abs(r)", 
+    "  ", "  # Determine strength", "  if (abs_r < 0.3) {", "    strength <- \"weak\"", 
+    "  } else if (abs_r < 0.5) {", "    strength <- \"moderate\"", 
+    "  } else if (abs_r < 0.7) {", "    strength <- \"strong\"", 
+    "  } else {", "    strength <- \"very strong\"", "  }", "  ", 
+    "  # Determine direction", "  direction <- ifelse(r > 0, \"positive\", \"negative\")", 
+    "  ", "  # Return interpretation", "  return(paste(\"This is a\", strength, direction, \"correlation (r =\", round(r, 3), \")\"))", 
+    "}", "", "# 4. Apply the function to the three correlations", 
+    "interpretation_mpg_wt <- interpret_correlation(cor_mpg_wt)", 
+    "interpretation_mpg_hp <- interpret_correlation(cor_mpg_hp)", 
+    "interpretation_hp_qsec <- interpret_correlation(cor_hp_qsec)", 
+    "", "# Display interpretations", "cat(\"mpg and wt:\", interpretation_mpg_wt, \"\\n\")", 
+    "cat(\"mpg and hp:\", interpretation_mpg_hp, \"\\n\")", "cat(\"hp and qsec:\", interpretation_hp_qsec, \"\\n\\n\")", 
+    "", "# 5. Create a scatter plot matrix", "pairs(mtcars[, c(\"mpg\", \"wt\", \"hp\", \"qsec\")], ", 
+    "      main = \"Scatter Plot Matrix\",", "      pch = 19,", 
+    "      col = \"blue\")", "", "# 6. Create a correlation matrix visualization", 
+    "car_cor <- cor(mtcars)", "corrplot(car_cor, method = \"circle\", type = \"upper\", ", 
+    "         tl.col = \"black\", tl.srt = 45,", "         addCoef.col = \"black\", number.cex = 0.7)"
+    ), chunk_opts = list(label = "ex5-solution")), tests = NULL, 
+    options = list(eval = FALSE, echo = TRUE, results = "markup", 
+        tidy = FALSE, tidy.opts = NULL, collapse = FALSE, prompt = FALSE, 
+        comment = NA, highlight = FALSE, size = "normalsize", 
+        background = "#F7F7F7", strip.white = TRUE, cache = 0, 
+        cache.path = "Module-11-Descriptive-Statistics-in-R_cache/html/", 
+        cache.vars = NULL, cache.lazy = TRUE, dependson = NULL, 
+        autodep = FALSE, cache.rebuild = FALSE, fig.keep = "high", 
+        fig.show = "asis", fig.align = "default", fig.path = "Module-11-Descriptive-Statistics-in-R_files/figure-html/", 
+        dev = "png", dev.args = NULL, dpi = 192, fig.ext = "png", 
+        fig.width = 7, fig.height = 5, fig.env = "figure", fig.cap = NULL, 
+        fig.scap = NULL, fig.lp = "fig:", fig.subcap = NULL, 
+        fig.pos = "", out.width = 672, out.height = NULL, out.extra = NULL, 
+        fig.retina = 2, external = TRUE, sanitize = FALSE, interval = 1, 
+        aniopts = "controls,loop", warning = TRUE, error = FALSE, 
+        message = TRUE, render = NULL, ref.label = NULL, child = NULL, 
+        engine = "r", split = FALSE, include = TRUE, purl = TRUE, 
+        exercise.timelimit = 60, exercise.checker = "function (label = NULL, solution_code = NULL, user_code = NULL, \n    check_code = NULL, envir_result = NULL, evaluate_result = NULL, \n    envir_prep = NULL, last_value = NULL, stage = NULL, ..., \n    solution_eval_fn = NULL) \n{\n    (utils::getFromNamespace(\"check_exercise\", \"gradethis\"))(label = label, \n        solution_code = solution_code, user_code = user_code, \n        check_code = check_code, envir_result = envir_result, \n        evaluate_result = evaluate_result, envir_prep = envir_prep, \n        last_value = last_value, stage = stage, ...)\n}", 
+        exercise.error.check.code = "gradethis_error_checker()", 
+        label = "ex5", exercise = TRUE, code = c("# Write your code here", 
+        ""), out.width.px = 672, out.height.px = 480, params.src = "ex5, exercise=TRUE", 
+        fig.num = 0, exercise.df_print = "paged"), engine = "r", 
+    version = "4"), class = c("r", "tutorial_exercise")))
+</script>
+</li>
+</ul>
+<!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="dependencies">
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["header-attrs"]},{"type":"character","attributes":{},"value":["2.29"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/pandoc"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["header-attrs.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.29"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["3.6.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/3.6.0"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery-3.6.0.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquerylib"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.1.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootstrap"]},{"type":"character","attributes":{},"value":["3.3.5"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/bootstrap"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["viewport"]}},"value":[{"type":"character","attributes":{},"value":["width=device-width, initial-scale=1"]}]},{"type":"character","attributes":{},"value":["js/bootstrap.min.js","shim/html5shiv.min.js","shim/respond.min.js"]},{"type":"character","attributes":{},"value":["css/bootstrap.min.css"]},{"type":"character","attributes":{},"value":["<style>h1 {font-size: 34px;}\n       h1.title {font-size: 38px;}\n       h2 {font-size: 30px;}\n       h3 {font-size: 24px;}\n       h4 {font-size: 18px;}\n       h5 {font-size: 16px;}\n       h6 {font-size: 12px;}\n       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}\n       pre:not([class]) { background-color: white }<\/style>"]},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.29"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["3.6.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/3.6.0"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery-3.6.0.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquerylib"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.1.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["navigation"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/navigation-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tabsets.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.29"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["highlightjs"]},{"type":"character","attributes":{},"value":["9.12.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/highlightjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["highlight.js"]},{"type":"character","attributes":{},"value":["default.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.29"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["pagedtable"]},{"type":"character","attributes":{},"value":["1.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["rmd/h/pagedtable-1.1"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/pagedtable.js"]},{"type":"character","attributes":{},"value":["css/pagedtable.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["rmarkdown"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["2.29"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["jquery"]},{"type":"character","attributes":{},"value":["3.6.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/3.6.0"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquery-3.6.0.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["jquerylib"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.1.4"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["font-awesome"]},{"type":"character","attributes":{},"value":["6.5.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fontawesome"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/all.min.css","css/v4-shims.min.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fontawesome"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.3"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["bootbox"]},{"type":"character","attributes":{},"value":["5.5.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/bootbox"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["bootbox.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["idb-keyvalue"]},{"type":"character","attributes":{},"value":["3.2.0"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/idb-keyval"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["idb-keyval-iife-compat.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["tutorial"]},{"type":"character","attributes":{},"value":["0.11.5.9000"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/tutorial"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["tutorial.js"]},{"type":"character","attributes":{},"value":["tutorial.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ace"]},{"type":"character","attributes":{},"value":["1.10.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/ace"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["ace.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["clipboardjs"]},{"type":"character","attributes":{},"value":["2.0.10"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["lib/clipboardjs"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["clipboard.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["learnr"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.11.5.9000"]}]}]}
+</script>
+<!--/html_preserve-->
+<!--html_preserve-->
+<script type="application/shiny-prerendered" data-context="execution_dependencies">
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62]}},"value":[{"type":"character","attributes":{},"value":["base","bslib","cachem","cli","colorspace","compiler","corrplot","datasets","digest","dplyr","evaluate","fastmap","fontawesome","generics","ggplot2","glue","gradethis","graphics","grDevices","grid","gtable","htmltools","htmlwidgets","httpuv","jquerylib","jsonlite","knitr","later","lattice","learnr","lifecycle","magrittr","methods","mime","mnormt","moments","munsell","nlme","parallel","pillar","pkgconfig","promises","psych","R6","Rcpp","rlang","rmarkdown","rprojroot","rstudioapi","sass","scales","shiny","stats","tibble","tidyselect","tools","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["4.4.1","0.9.0","1.1.0","3.6.4","2.1-1","4.4.1","0.95","4.4.1","0.6.37","1.1.4","1.0.3","1.2.0","0.5.3","0.1.3","3.5.1","1.8.0","0.2.14","4.4.1","4.4.1","4.4.1","0.3.6","0.5.8.1","1.6.4","1.6.15","0.1.4","1.9.1","1.49","1.4.1","0.22-6","0.11.5.9000","1.0.4","2.0.3","4.4.1","0.12","2.1.1","0.14.1","0.5.1","3.1-167","4.4.1","1.10.1","2.0.3","1.3.2","2.4.12","2.6.1","1.0.14","1.1.5","2.29","2.0.4","0.17.1","0.4.9","1.3.0","1.10.0","4.4.1","3.2.1","1.2.1","4.4.1","4.4.1","0.6.5","3.0.2","0.51","1.8-4","2.3.10"]}]}]}
+</script>
+<!--/html_preserve-->
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("section-TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

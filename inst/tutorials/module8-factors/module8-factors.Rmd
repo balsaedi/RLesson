@@ -1,0 +1,739 @@
+---
+title: "Module 8: Factors in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Learn how to create and work with factors in R"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+## Introduction to Factors in R
+
+Factors are a special data type in R used to represent categorical variables. They are useful for variables that have a fixed and known set of possible values, such as:
+
+- Days of the week
+- Months of the year
+- Gender
+- Blood types
+- Rating scales (e.g., "low", "medium", "high")
+- Experimental conditions
+
+Factors may look like character vectors, but they are actually integers under the hood, with each integer mapped to a label. This makes them more efficient to store and work with than character vectors.
+
+Key characteristics of factors:
+1. They store categorical data efficiently
+2. They have predefined levels (possible values)
+3. The levels can be ordered (ordinal) or unordered (nominal)
+4. They enable proper handling of categorical variables in statistical models and plots
+
+Let's explore how to create, manipulate, and work with factors in R!
+
+## Creating Factors
+
+Factors can be created using the `factor()` function.
+
+### Basic Factor Creation
+
+```{r factor-demo, echo=TRUE}
+# Create a character vector
+days <- c("Mon", "Tue", "Wed", "Tue", "Mon", "Fri", "Wed")
+
+# Convert to a factor
+days_factor <- factor(days)
+days_factor
+
+# Check the structure
+str(days_factor)
+
+# Get the levels
+levels(days_factor)
+```
+
+### Specifying Custom Levels
+
+You can specify the levels of a factor, including levels that don't yet exist in the data.
+
+```{r levels-demo, echo=TRUE}
+# Create a factor with specified levels
+blood_types <- c("AB", "A", "O", "B", "A", "AB")
+blood_factor <- factor(blood_types, levels = c("O", "A", "B", "AB"))
+blood_factor
+
+# Check the levels
+levels(blood_factor)
+
+# What happens with values not in the levels
+status <- c("Low", "Medium", "High", "Medium", "Unknown")
+status_factor <- factor(status, levels = c("Low", "Medium", "High"))
+status_factor  # "Unknown" becomes NA
+```
+
+### Ordered Factors
+
+For categorical variables with a natural ordering, you can create ordered factors.
+
+```{r ordered-demo, echo=TRUE}
+# Create an ordered factor
+sizes <- c("Medium", "Large", "Small", "Small", "Medium", "Large")
+sizes_ordered <- factor(sizes, levels = c("Small", "Medium", "Large"), ordered = TRUE)
+sizes_ordered
+
+# Check if it's ordered
+is.ordered(sizes_ordered)
+
+# Comparison operations work with ordered factors
+sizes_ordered[1] > sizes_ordered[3]  # Medium > Small
+sizes_ordered[1] < sizes_ordered[2]  # Medium < Large
+```
+
+### Exercise 1: Creating Factors
+
+Create the following factors:
+
+1. A basic factor called `weekdays_factor` from this vector: 
+   `c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Monday", "Wednesday")`
+
+2. A factor called `ratings_factor` with specified levels from this vector:
+   `c("Good", "Excellent", "Poor", "Good", "Fair", "Excellent")`
+   Use the levels in ascending order: "Poor", "Fair", "Good", "Excellent"
+
+3. An ordered factor called `education_level` from this vector:
+   `c("Bachelor's", "High School", "Master's", "Ph.D.", "High School", "Bachelor's")`
+   with levels in this order: "High School", "Bachelor's", "Master's", "Ph.D."
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+# 1. Basic factor
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Monday", "Wednesday")
+weekdays_factor <- factor(weekdays)
+
+# 2. Factor with specified levels
+ratings <- c("Good", "Excellent", "Poor", "Good", "Fair", "Excellent")
+ratings_factor <- factor(ratings, levels = c("Poor", "Fair", "Good", "Excellent"))
+
+# 3. Ordered factor
+education <- c("Bachelor's", "High School", "Master's", "Ph.D.", "High School", "Bachelor's")
+education_level <- factor(education, levels = c("High School", "Bachelor's", "Master's", "Ph.D."), ordered = TRUE)
+
+# Display the factors
+weekdays_factor
+ratings_factor
+education_level
+```
+
+```{r ex1-check}
+grade_this({
+  # Check the student's submitted code using the .user_code object
+  user_code <- .user_code
+  
+  # Check if the code includes all three variable names
+  has_weekdays <- grepl("weekdays_factor\\s*<-", user_code)
+  has_ratings <- grepl("ratings_factor\\s*<-", user_code)
+  has_education <- grepl("education_level\\s*<-", user_code)
+  
+  # Check for factor() function calls
+  uses_factor <- grepl("factor\\(", user_code)
+  
+  # Check for ordered=TRUE parameter
+  uses_ordered <- grepl("ordered\\s*=\\s*TRUE", user_code)
+  
+  # Check if they created each factor
+  if (!has_weekdays || !has_ratings || !has_education) {
+    missing_vars <- c()
+    if (!has_weekdays) missing_vars <- c(missing_vars, "weekdays_factor")
+    if (!has_ratings) missing_vars <- c(missing_vars, "ratings_factor")
+    if (!has_education) missing_vars <- c(missing_vars, "education_level")
+    fail(paste("Make sure to create all required variables:", paste(missing_vars, collapse=", ")))
+  } else if (!uses_factor) {
+    fail("Make sure to use the factor() function to create your factors")
+  } else if (!uses_ordered && has_education) {
+    fail("Make sure education_level is an ordered factor (use ordered=TRUE)")
+  } else {
+    pass("Great job! You've created all the required factors correctly.")
+  }
+})
+```
+```
+
+## Working with Factor Levels
+
+Once a factor is created, you can work with its levels in various ways:
+
+### Accessing and Modifying Levels
+
+```{r modify-levels-demo, echo=TRUE}
+# Create a factor
+colors <- factor(c("Red", "Blue", "Green", "Red", "Yellow", "Blue"))
+
+# Get levels
+levels(colors)
+
+# Change level names
+levels(colors) <- c("Rouge", "Bleu", "Vert", "Jaune")
+colors
+
+# Change specific level
+levels(colors)[levels(colors) == "Rouge"] <- "Red"
+colors
+```
+
+### Recoding Factor Levels
+
+```{r recode-demo, echo=TRUE}
+# Create a factor
+responses <- factor(c(1, 2, 3, 3, 1, 2, 3, 2, 1))
+
+# Recode with descriptive labels
+levels(responses) <- c("Disagree", "Neutral", "Agree")
+responses
+```
+
+### Combining Levels
+
+```{r combine-demo, echo=TRUE}
+# Create a factor
+income <- factor(c("Low", "Medium", "High", "Medium", "Low", "Very High", "Medium"))
+
+# Combine "High" and "Very High" into one level
+levels(income)[levels(income) %in% c("High", "Very High")] <- "High+"
+income
+```
+
+### Exercise 2: Working with Factor Levels
+
+Start with this factor:
+
+```
+survey_responses <- factor(c("Strongly Agree", "Agree", "Neutral", "Disagree", 
+                            "Strongly Disagree", "Neutral", "Agree", "Strongly Agree",
+                            "Disagree", "Neutral"))
+```
+
+Complete the following tasks:
+1. Display the levels of the factor
+2. Change the levels to be in logical order: "Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"
+3. Simplify the factor by combining "Strongly Agree" and "Agree" into "Positive", and "Strongly Disagree" and "Disagree" into "Negative", leaving "Neutral" as is
+4. Count the frequency of each level in the simplified factor
+
+```{r ex2, exercise=TRUE}
+# Create the survey_responses factor
+survey_responses <- factor(c("Strongly Agree", "Agree", "Neutral", "Disagree", 
+                            "Strongly Disagree", "Neutral", "Agree", "Strongly Agree",
+                            "Disagree", "Neutral"))
+
+# Write your code here
+
+```
+
+```{r ex2-solution}
+# Create the survey_responses factor
+survey_responses <- factor(c("Strongly Agree", "Agree", "Neutral", "Disagree", 
+                            "Strongly Disagree", "Neutral", "Agree", "Strongly Agree",
+                            "Disagree", "Neutral"))
+
+# 1. Display the levels
+original_levels <- levels(survey_responses)
+original_levels
+
+# 2. Change the order of levels
+survey_responses <- factor(survey_responses, 
+                          levels = c("Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"))
+
+# Display the reordered factor
+survey_responses
+
+# 3. Simplify by combining levels
+simplified_responses <- survey_responses  # Make a copy
+levels(simplified_responses) <- c("Negative", "Negative", "Neutral", "Positive", "Positive")
+
+# Display the simplified factor
+simplified_responses
+
+# 4. Count frequency of each level
+response_counts <- table(simplified_responses)
+response_counts
+```
+
+```{r ex2-check}
+grade_this({
+  # Check the student's submitted code
+  user_code <- .user_code
+  
+  # Check for required variable assignments
+  has_survey <- grepl("survey_responses\\s*<-", user_code)
+  has_simplified <- grepl("simplified_responses\\s*<-", user_code)
+  has_counts <- grepl("response_counts\\s*<-", user_code)
+  
+  # Check for required functions
+  uses_levels <- grepl("levels\\(", user_code)
+  uses_factor <- grepl("factor\\(", user_code)
+  uses_table <- grepl("table\\(", user_code)
+  
+  # Check if all required variables are created
+  if (!has_survey || !has_simplified || !has_counts) {
+    missing_vars <- c()
+    if (!has_survey) missing_vars <- c(missing_vars, "survey_responses (reordered)")
+    if (!has_simplified) missing_vars <- c(missing_vars, "simplified_responses")
+    if (!has_counts) missing_vars <- c(missing_vars, "response_counts")
+    
+    fail(paste("Make sure to create:", paste(missing_vars, collapse=", ")))
+  } else if (!uses_levels) {
+    fail("Make sure to use the levels() function to modify factor levels")
+  } else if (!uses_table) {
+    fail("Make sure to use the table() function to count frequencies")
+  } else {
+    pass("Excellent! You've successfully completed all the factor level operations.")
+  }
+})
+```
+
+## Converting Between Factors and Other Types
+
+You can convert factors to and from other data types:
+
+### Converting Factors to Other Types
+
+```{r convert-from-demo, echo=TRUE}
+# Create a factor
+ratings <- factor(c("Low", "Medium", "High", "Medium", "Low", "High"))
+
+# Convert factor to character
+ratings_char <- as.character(ratings)
+ratings_char
+
+# Convert factor to numeric (returns the internal integer codes)
+# Note: This is usually not what you want
+ratings_num <- as.numeric(ratings)
+ratings_num
+
+# To convert to meaningful numbers, convert to character first
+# Then to numeric (only if the levels are numeric strings)
+num_factor <- factor(c("10", "20", "30", "20", "10"))
+as.numeric(as.character(num_factor))
+```
+
+### Converting Other Types to Factors
+
+```{r convert-to-demo, echo=TRUE}
+# Character vector to factor
+days <- c("Mon", "Tue", "Wed", "Thu", "Fri")
+days_factor <- as.factor(days)
+days_factor
+
+# Numeric vector to factor
+codes <- c(1, 2, 3, 2, 1, 3, 2)
+codes_factor <- as.factor(codes)
+codes_factor
+```
+
+### Exercise 3: Converting Between Factors and Other Types
+
+Complete the following tasks:
+1. Create a factor `temp_factor` from this character vector:
+   `c("Cold", "Hot", "Cold", "Warm", "Hot", "Cold", "Warm")`
+
+2. Convert `temp_factor` to a character vector called `temp_char`
+
+3. Create a factor `score_factor` from this numeric vector:
+   `c(1, 2, 3, 1, 3, 2, 1, 2)`
+
+4. Assign descriptive labels to `score_factor`: 1="Low", 2="Medium", 3="High"
+   Store the result as `labeled_scores`
+
+5. Create a factor from this character vector of numeric strings:
+   `c("10", "20", "30", "20", "10", "30")`
+   Then convert it to an actual numeric vector and store as `numeric_values`
+
+```{r ex3, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex3-solution}
+# 1. Create temperature factor
+temp_factor <- factor(c("Cold", "Hot", "Cold", "Warm", "Hot", "Cold", "Warm"))
+
+# 2. Convert to character
+temp_char <- as.character(temp_factor)
+
+# 3. Create score factor from numeric vector
+score_factor <- factor(c(1, 2, 3, 1, 3, 2, 1, 2))
+
+# 4. Assign descriptive labels
+labeled_scores <- score_factor
+levels(labeled_scores) <- c("Low", "Medium", "High")
+
+# 5. Convert numeric strings
+numeric_strings <- factor(c("10", "20", "30", "20", "10", "30"))
+numeric_values <- as.numeric(as.character(numeric_strings))
+
+# Display results
+temp_factor
+temp_char
+score_factor
+labeled_scores
+numeric_values
+```
+
+```{r ex3-check}
+grade_this({
+  # Check the student's submitted code
+  user_code <- .user_code
+  
+  # Check for required variable assignments
+  has_temp_factor <- grepl("temp_factor\\s*<-", user_code)
+  has_temp_char <- grepl("temp_char\\s*<-", user_code)
+  has_score_factor <- grepl("score_factor\\s*<-", user_code)
+  has_labeled_scores <- grepl("labeled_scores\\s*<-", user_code)
+  has_numeric_values <- grepl("numeric_values\\s*<-", user_code)
+  
+  # Check for required functions
+  uses_factor <- grepl("factor\\(", user_code)
+  uses_as_character <- grepl("as\\.character\\(", user_code)
+  uses_as_numeric <- grepl("as\\.numeric\\(", user_code)
+  uses_levels <- grepl("levels\\(", user_code)
+  
+  # Check if all required variables are created
+  if (!has_temp_factor || !has_temp_char || !has_score_factor || !has_labeled_scores || !has_numeric_values) {
+    missing_vars <- c()
+    if (!has_temp_factor) missing_vars <- c(missing_vars, "temp_factor")
+    if (!has_temp_char) missing_vars <- c(missing_vars, "temp_char")
+    if (!has_score_factor) missing_vars <- c(missing_vars, "score_factor")
+    if (!has_labeled_scores) missing_vars <- c(missing_vars, "labeled_scores")
+    if (!has_numeric_values) missing_vars <- c(missing_vars, "numeric_values")
+    
+    fail(paste("Make sure to create all five variables:", paste(missing_vars, collapse=", ")))
+  } else if (!uses_factor) {
+    fail("Make sure to use the factor() function to create factors")
+  } else if (!uses_as_character) {
+    fail("Make sure to use as.character() to convert from factor to character")
+  } else if (!uses_as_numeric) {
+    fail("Make sure to use as.numeric() to convert to numeric values")
+  } else if (!uses_levels && has_labeled_scores) {
+    fail("Make sure to use levels() to assign descriptive labels to score_factor")
+  } else {
+    pass("Great job! All conversions between factors and other types are correct.")
+  }
+})
+```
+
+
+## Factors in Data Analysis
+
+Factors are particularly useful in data analysis for:
+
+### Tabulation and Summarization
+
+```{r tabulation-demo, echo=TRUE}
+# Create a factor
+gender <- factor(c("Male", "Female", "Female", "Male", "Male", "Female", "Female", "Male"))
+
+# Tabulate frequencies
+table(gender)
+
+# Cross-tabulation
+treatment <- factor(c("A", "A", "B", "B", "A", "B", "A", "B"))
+table(gender, treatment)
+
+# Proportions
+prop.table(table(gender))
+prop.table(table(gender, treatment))  # Joint proportions
+prop.table(table(gender, treatment), 1)  # Row proportions
+prop.table(table(gender, treatment), 2)  # Column proportions
+```
+
+### Plotting with Factors
+
+```{r plot-demo, echo=TRUE}
+# Create some example data
+education <- factor(c("High School", "Bachelor's", "Master's", "Ph.D.", 
+                      "High School", "Bachelor's", "Master's", "High School",
+                      "Bachelor's", "Master's", "Ph.D.", "High School"),
+                   levels = c("High School", "Bachelor's", "Master's", "Ph.D."),
+                   ordered = TRUE)
+
+salary <- c(45000, 65000, 80000, 100000, 42000, 63000, 81000, 47000, 66000, 79000, 105000, 44000)
+
+# Bar plot of education frequencies
+barplot(table(education), col = "lightblue", main = "Education Levels")
+
+# Boxplot of salary by education
+plot(education, salary, col = "lightgreen", main = "Salary by Education Level",
+     xlab = "Education", ylab = "Salary")
+```
+
+### Exercise 4: Working with Factors in Data Analysis
+
+Use the following data about customer satisfaction ratings at a restaurant:
+
+```
+ratings <- factor(c("Excellent", "Good", "Fair", "Poor", "Good", "Excellent", 
+                   "Good", "Fair", "Excellent", "Good", "Poor", "Fair", 
+                   "Good", "Excellent", "Excellent", "Good", "Fair", "Poor"),
+                  levels = c("Poor", "Fair", "Good", "Excellent"),
+                  ordered = TRUE)
+
+expenditure <- c(45, 32, 18, 15, 30, 50, 27, 20, 55, 34, 12, 22, 28, 48, 52, 35, 21, 14)
+```
+
+Complete the following tasks:
+1. Create a frequency table of the ratings and store as `rating_freq`
+2. Calculate the percentage of each rating and store as `rating_pct`
+3. Create a data frame called `rating_data` with the ratings and expenditure
+4. Calculate the average expenditure for each rating level and store as `avg_by_rating`
+5. Create a barplot of the rating frequencies
+
+```{r ex4, exercise=TRUE}
+# Create the ratings factor and expenditure vector
+ratings <- factor(c("Excellent", "Good", "Fair", "Poor", "Good", "Excellent", 
+                   "Good", "Fair", "Excellent", "Good", "Poor", "Fair", 
+                   "Good", "Excellent", "Excellent", "Good", "Fair", "Poor"),
+                  levels = c("Poor", "Fair", "Good", "Excellent"),
+                  ordered = TRUE)
+
+expenditure <- c(45, 32, 18, 15, 30, 50, 27, 20, 55, 34, 12, 22, 28, 48, 52, 35, 21, 14)
+
+# Write your code here
+
+```
+
+```{r ex4-solution}
+# Create the ratings factor and expenditure vector
+ratings <- factor(c("Excellent", "Good", "Fair", "Poor", "Good", "Excellent", 
+                   "Good", "Fair", "Excellent", "Good", "Poor", "Fair", 
+                   "Good", "Excellent", "Excellent", "Good", "Fair", "Poor"),
+                  levels = c("Poor", "Fair", "Good", "Excellent"),
+                  ordered = TRUE)
+
+expenditure <- c(45, 32, 18, 15, 30, 50, 27, 20, 55, 34, 12, 22, 28, 48, 52, 35, 21, 14)
+
+# 1. Create a frequency table
+rating_freq <- table(ratings)
+
+# 2. Calculate percentages
+rating_pct <- prop.table(rating_freq) * 100
+
+# 3. Create a data frame
+rating_data <- data.frame(Rating = ratings, Expenditure = expenditure)
+
+# 4. Calculate average expenditure by rating
+avg_by_rating <- aggregate(Expenditure ~ Rating, data = rating_data, FUN = mean)
+
+# 5. Create a barplot
+barplot(rating_freq, col = c("red", "orange", "green", "blue"), 
+        main = "Distribution of Customer Ratings",
+        xlab = "Rating", ylab = "Frequency")
+
+# Display results
+rating_freq
+rating_pct
+rating_data
+avg_by_rating
+```
+
+```{r ex4-check}
+grade_this({
+  # Check the student's submitted code
+  user_code <- .user_code
+  
+  # Check for required variable assignments
+  has_rating_freq <- grepl("rating_freq\\s*<-", user_code)
+  has_rating_pct <- grepl("rating_pct\\s*<-", user_code)
+  has_rating_data <- grepl("rating_data\\s*<-", user_code)
+  has_avg_by_rating <- grepl("avg_by_rating\\s*<-", user_code)
+  
+  # Check for required functions
+  uses_table <- grepl("table\\(", user_code)
+  uses_prop_table <- grepl("prop\\.table\\(", user_code)
+  uses_data_frame <- grepl("data\\.frame\\(", user_code)
+  uses_aggregate <- grepl("aggregate\\(", user_code)
+  uses_barplot <- grepl("barplot\\(", user_code)
+  
+  # Check if all required variables are created
+  if (!has_rating_freq || !has_rating_pct || !has_rating_data || !has_avg_by_rating) {
+    missing_vars <- c()
+    if (!has_rating_freq) missing_vars <- c(missing_vars, "rating_freq")
+    if (!has_rating_pct) missing_vars <- c(missing_vars, "rating_pct")
+    if (!has_rating_data) missing_vars <- c(missing_vars, "rating_data")
+    if (!has_avg_by_rating) missing_vars <- c(missing_vars, "avg_by_rating")
+    
+    fail(paste("Make sure to create all variables:", paste(missing_vars, collapse=", ")))
+  } else if (!uses_table) {
+    fail("Make sure to use the table() function to create a frequency table")
+  } else if (!uses_prop_table) {
+    fail("Make sure to use prop.table() to calculate percentages")
+  } else if (!uses_data_frame) {
+    fail("Make sure to use data.frame() to create a data frame with ratings and expenditures")
+  } else if (!uses_aggregate) {
+    fail("Make sure to use aggregate() to calculate average expenditure by rating")
+  } else if (!uses_barplot) {
+    fail("Make sure to create a barplot of the rating frequencies")
+  } else {
+    pass("Excellent! You've successfully completed all the factor data analysis tasks.")
+  }
+})
+```
+
+
+
+## Factors in Statistical Modeling
+
+Factors are particularly important for statistical modeling in R.
+
+### Model Building with Factors
+
+In statistical models, factors are automatically handled differently from numeric variables:
+- Factors with two levels are typically converted to 0/1 dummy variables
+- Factors with more than two levels are converted to a set of dummy variables
+
+```{r model-demo, echo=TRUE}
+# Create a simple dataset
+set.seed(123)  # For reproducibility
+treatment <- factor(rep(c("Control", "Drug A", "Drug B"), each = 10))
+age <- sample(30:70, 30, replace = TRUE)
+response <- rnorm(30, mean = c(5, 7, 9)[as.numeric(treatment)], sd = 1.5) + age/10
+
+# Build a linear model
+model <- lm(response ~ treatment + age)
+
+# View the model summary
+summary(model)
+```
+
+### Exercise 5: Factors in Statistical Modeling
+
+Use this simulated dataset about plant growth under different conditions:
+
+```
+# Generate data
+set.seed(456)
+fertilizer <- factor(rep(c("None", "Type A", "Type B"), each = 15))
+sunshine <- factor(rep(c("Low", "Medium", "High"), times = 15))
+water <- sample(5:15, 45, replace = TRUE)
+growth <- 2 + 0.5 * water + 
+          rnorm(45, mean = c(0, 2, 3)[as.numeric(fertilizer)], sd = 1) +
+          rnorm(45, mean = c(0, 1, 2)[as.numeric(sunshine)], sd = 0.5)
+```
+
+Complete the following tasks:
+1. Create a data frame called `plant_data` with all variables
+2. Check the structure of the data frame to verify factors are correctly recognized
+3. Calculate the average growth by fertilizer type and save as `growth_by_fertilizer`
+4. Calculate the average growth by sunshine level and save as `growth_by_sunshine`
+5. Build a linear model that predicts `growth` based on `fertilizer`, `sunshine`, and `water`, and save as `plant_model`
+
+```{r ex5, exercise=TRUE}
+# Generate data
+set.seed(456)
+fertilizer <- factor(rep(c("None", "Type A", "Type B"), each = 15))
+sunshine <- factor(rep(c("Low", "Medium", "High"), times = 15))
+water <- sample(5:15, 45, replace = TRUE)
+growth <- 2 + 0.5 * water + 
+          rnorm(45, mean = c(0, 2, 3)[as.numeric(fertilizer)], sd = 1) +
+          rnorm(45, mean = c(0, 1, 2)[as.numeric(sunshine)], sd = 0.5)
+
+# Write your code here
+
+```
+
+```{r ex5-solution}
+# Generate data
+set.seed(456)
+fertilizer <- factor(rep(c("None", "Type A", "Type B"), each = 15))
+sunshine <- factor(rep(c("Low", "Medium", "High"), times = 15))
+water <- sample(5:15, 45, replace = TRUE)
+growth <- 2 + 0.5 * water + 
+          rnorm(45, mean = c(0, 2, 3)[as.numeric(fertilizer)], sd = 1) +
+          rnorm(45, mean = c(0, 1, 2)[as.numeric(sunshine)], sd = 0.5)
+
+# 1. Create a data frame
+plant_data <- data.frame(
+  Fertilizer = fertilizer,
+  Sunshine = sunshine,
+  Water = water,
+  Growth = growth
+)
+
+# 2. Check the structure
+str(plant_data)
+
+# 3. Calculate average growth by fertilizer type
+growth_by_fertilizer <- aggregate(Growth ~ Fertilizer, data = plant_data, FUN = mean)
+
+# 4. Calculate average growth by sunshine level
+growth_by_sunshine <- aggregate(Growth ~ Sunshine, data = plant_data, FUN = mean)
+
+# 5. Build a linear model
+plant_model <- lm(Growth ~ Fertilizer + Sunshine + Water, data = plant_data)
+
+# Display results
+plant_data
+growth_by_fertilizer
+growth_by_sunshine
+summary(plant_model)
+```
+
+```{r ex5-check}
+grade_this({
+  # Check the student's submitted code
+  user_code <- .user_code
+  
+  # Check for required variable assignments
+  has_plant_data <- grepl("plant_data\\s*<-", user_code)
+  has_growth_by_fertilizer <- grepl("growth_by_fertilizer\\s*<-", user_code)
+  has_growth_by_sunshine <- grepl("growth_by_sunshine\\s*<-", user_code)
+  has_plant_model <- grepl("plant_model\\s*<-", user_code)
+  
+  # Check for required functions
+  uses_data_frame <- grepl("data\\.frame\\(", user_code)
+  uses_str <- grepl("str\\(", user_code)
+  uses_aggregate <- grepl("aggregate\\(", user_code)
+  uses_lm <- grepl("lm\\(", user_code)
+  
+  # Check if all required variables are created
+  if (!has_plant_data || !has_growth_by_fertilizer || !has_growth_by_sunshine || !has_plant_model) {
+    missing_vars <- c()
+    if (!has_plant_data) missing_vars <- c(missing_vars, "plant_data")
+    if (!has_growth_by_fertilizer) missing_vars <- c(missing_vars, "growth_by_fertilizer")
+    if (!has_growth_by_sunshine) missing_vars <- c(missing_vars, "growth_by_sunshine")
+    if (!has_plant_model) missing_vars <- c(missing_vars, "plant_model")
+    
+    fail(paste("Make sure to create all variables:", paste(missing_vars, collapse=", ")))
+  } else if (!uses_data_frame) {
+    fail("Make sure to use data.frame() to create a data frame with all variables")
+  } else if (!uses_str) {
+    fail("Make sure to check the structure of the data frame using str()")
+  } else if (!uses_aggregate) {
+    fail("Make sure to use aggregate() to calculate average growth by fertilizer and sunshine")
+  } else if (!uses_lm) {
+    fail("Make sure to use lm() to build a linear model predicting growth")
+  } else {
+    pass("Excellent! You've successfully completed all the factor modeling tasks.")
+  }
+})
+```
+
+## Summary
+
+In this module, you've learned about factors in R, including:
+
+1. Creating factors using the `factor()` function with specified levels and ordering
+2. Working with factor levels by accessing, modifying, and combining them
+3. Converting between factors and other data types such as character and numeric
+4. Using factors for data analysis through tabulation, summarization, and visualization
+5. Applying factors in statistical modeling to represent categorical variables
+
+Factors are essential for proper handling of categorical data in R. They ensure that categories are correctly represented in analyses, visualizations, and statistical models, which is crucial for accurate data interpretation and decision-making.
+
+This concludes our tutorial on basic data structures in R. You've now learned about the environment, variables, data types, vectors, matrices, lists, data frames, and factors—all the fundamental building blocks you need for effective data analysis in R!

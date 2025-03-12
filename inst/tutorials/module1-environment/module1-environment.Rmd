@@ -1,0 +1,240 @@
+---
+title: "Module 1: The R Environment"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    allow_restart: true  # Add this line
+runtime: shiny_prerendered
+description: "Learn about the R statistical environment and its core components"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+## Introduction to the R Environment
+
+Welcome to the R programming environment! R is a powerful language and environment for statistical computing and graphics. It provides a wide variety of statistical and graphical techniques, and is highly extensible.
+
+### Key Components of the R Environment
+
+1. **R Console**: This is where you execute R commands and see the results immediately.
+2. **R Scripts**: Text files containing R code that can be executed as a whole.
+3. **RStudio**: An integrated development environment (IDE) that makes working with R easier.
+4. **Packages**: Collections of R functions, data, and compiled code that extend R's functionality.
+5. **Workspace**: The current R working environment includes all defined objects.
+
+In this module, you'll learn about navigating the R environment, working with the console, managing packages, and understanding the workspace.
+
+## Working with the R Console
+
+The R console is the primary interface for interacting with R. When you start R, you'll see the console with a prompt symbol (`>`), indicating that R is ready to accept commands.
+
+```{r console-demo, echo=TRUE, eval=FALSE}
+# This is a simple R command
+2 + 3
+```
+
+### Exercise 1: Basic Console Operations
+
+Use the R console to calculate the result of 15 multiplied by 7, and then divide the result by 3.
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+15 * 7 / 3
+```
+
+```{r ex1-check}
+grade_this({
+  if (.result == 35) {
+    pass("Correct! You've successfully calculated (15 * 7) / 3 = 35.")
+  } else {
+    fail("Not quite. Try calculating 15 * 7 first, then divide by 3.")
+  }
+})
+```
+
+## Managing Packages in R
+
+R packages extend the functionality of base R. You can install packages using `install.packages()` and load them using `library()`.
+
+```{r packages-demo, echo=TRUE, eval=FALSE}
+# Install a package (only need to do this once)
+install.packages("dplyr")
+
+# Load a package (do this each time you start a new R session)
+library(dplyr)
+```
+
+### Exercise 2: Working with Packages
+
+Write the code to check which packages are currently installed on your system.
+
+```{r ex2, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex2-solution}
+installed.packages()
+```
+
+```{r ex2-check}
+grade_this({
+  if (identical(.result, installed.packages()) || 
+      identical(.last_value, installed.packages())) {
+    pass("Great job! You've successfully listed all installed packages.")
+  } else {
+    fail("Try using the installed.packages() function to list all installed packages.")
+  }
+})
+```
+
+## Understanding the R Workspace
+
+The R workspace contains all the objects (variables, functions, data) that you create during an R session.
+
+```{r workspace-demo, echo=TRUE}
+# Create some objects
+x <- 10
+y <- "hello"
+z <- c(1, 2, 3, 4, 5)
+
+# List objects in the workspace
+ls()
+```
+
+### Exercise 3: Modifying Variables
+
+Create a variable named `score` with a value of 85. Then, increase the value by 10 and store the result back in `score`. Finally, display the updated value of `score`.
+
+```{r ex5, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex3-solution}
+score <- 85
+score <- score + 10
+score
+```
+
+```{r ex3-check}
+grade_this({
+  # Use .result and .user_code instead of trying to access 'score' directly
+  
+  # Check if the variable name 'score' appears in the code
+  has_score_var <- grepl("score\\s*<-", .user_code)
+  
+  # Check if the code includes adding 10
+  has_addition <- grepl("\\+\\s*10|10\\s*\\+", .user_code)
+  
+  # Check if the result is 95
+  correct_result <- identical(.result, 95) || (is.numeric(.result) && abs(.result - 95) < 0.001)
+  
+  if (has_score_var && has_addition && correct_result) {
+    pass("Great job! You correctly created, modified, and displayed the score variable.")
+  } else if (!has_score_var) {
+    fail("Make sure to create a variable named 'score'.")
+  } else if (!has_addition) {
+    fail("Don't forget to add 10 to the score.")
+  } else if (!correct_result) {
+    fail("The final value should be 95. Start with 85 and add 10.")
+  } else {
+    fail("Make sure to create a variable named 'score' with a value of 85, then increase it by 10 to get 95.")
+  }
+})
+```
+## Getting Help in R
+
+R has a comprehensive built-in help system. You can access help for any function using `?function_name` or `help(function_name)`.
+
+```{r help-demo, echo=TRUE, eval=FALSE}
+# Get help on the mean function
+?mean
+
+# Alternative way to get help
+help(mean)
+```
+
+### Exercise 4: Using R's Help System
+
+Write code to get help on the `sum` function using both methods.
+
+```{r ex4, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex4-solution}
+# Using the ? operator
+?sum
+
+# Using the help function
+help(sum)
+```
+
+```{r ex4-check}
+grade_this({
+  if (grepl("\\?sum", .user_code) || grepl("help\\(sum\\)", .user_code)) {
+    pass("Great! You've learned how to access R's help system.")
+  } else {
+    fail("Try using either ?sum or help(sum) to access the help documentation.")
+  }
+})
+```
+
+## R Working Directory
+
+The working directory is the default location where R will look for files you want to load and where it will put files you write. You can check your current working directory with `getwd()` and change it with `setwd()`.
+
+```{r wd-demo, echo=TRUE, eval=FALSE}
+# Get the current working directory
+getwd()
+
+# Set the working directory (example)
+setwd("/path/to/directory")  # On Windows: setwd("C:/path/to/directory")
+```
+
+### Exercise 5: Working with Directories
+
+Write code to display your current working directory.
+
+```{r ex5, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex5-solution}
+getwd()
+```
+
+```{r ex5-check}
+grade_this({
+  if (identical(.last_value, getwd())) {
+    pass("Excellent! You've successfully displayed your current working directory.")
+  } else {
+    fail("Try using the getwd() function to display your current working directory.")
+  }
+})
+```
+
+## Summary
+
+In this module, you've learned about:
+
+1. The basic components of the R environment
+2. How to work with the R console
+3. Managing packages in R
+4. Understanding the R workspace
+5. Getting help in R
+6. Working with directories in R
+
+In the next module, we'll explore how to create variables in R and understand their properties.

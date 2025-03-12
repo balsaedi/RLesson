@@ -1,0 +1,745 @@
+---
+title: "Module 4: Vectors in R"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: "Learn how to create and manipulate vectors in R"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+```
+
+## Introduction to Vectors in R
+
+Vectors are one of the most fundamental data structures in R. A vector is a one-dimensional array that can hold multiple values of the same data type. Almost everything in R is built upon or derived from vectors.
+
+Key characteristics of vectors:
+1. All elements must have the same data type (numeric, character, logical, etc.)
+2. Vectors are ordered, meaning each element has a specific position
+3. Elements can be accessed by their index using square brackets `[]`
+
+Vectors are extensively used in R for:
+- Storing related values (e.g., a series of measurements)
+- Performing operations on multiple values at once (vectorized operations)
+- Creating more complex data structures like matrices and data frames
+
+Let's explore how to create, manipulate, and work with vectors in R!
+
+## Creating Vectors
+
+There are several ways to create vectors in R:
+
+### Using the combine function `c()`
+
+The most common way to create a vector is using the `c()` function, which combines values into a vector.
+
+```{r c-demo, echo=TRUE}
+# Numeric vector
+numbers <- c(10, 20, 30, 40, 50)
+numbers
+
+# Character vector
+fruits <- c("apple", "banana", "orange", "grape")
+fruits
+
+# Logical vector
+flags <- c(TRUE, FALSE, TRUE, TRUE)
+flags
+```
+
+### Using sequence functions
+
+R provides several functions to create vectors with sequential values:
+
+- `seq()` or `:` operator for creating sequences
+- `rep()` for repeating values
+
+```{r seq-demo, echo=TRUE}
+# Using the colon operator for integer sequences
+seq1 <- 1:10
+seq1
+
+# Using seq() for more control
+seq2 <- seq(from = 0, to = 1, by = 0.2)
+seq2
+
+seq3 <- seq(from = 0, to = 10, length.out = 5)
+seq3
+
+# Using rep() for repetition
+rep1 <- rep(5, times = 4)
+rep1
+
+rep2 <- rep(c(1, 2, 3), each = 2)
+rep2
+
+rep3 <- rep(c(1, 2, 3), times = 2)
+rep3
+```
+
+### Exercise 1: Creating Vectors
+
+Create the following vectors:
+1. A numeric vector named `temperatures` containing the values 68, 72, 75, 69, 71
+2. A character vector named `days` containing the days of the week (Monday through Sunday)
+3. A sequence vector named `countdown` with values from 10 down to 1
+
+```{r ex1, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex1-solution}
+# Numeric vector
+temperatures <- c(68, 72, 75, 69, 71)
+
+# Character vector
+days <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+# Sequence vector (counting down)
+countdown <- 10:1
+
+# Display vectors
+temperatures
+days
+countdown
+```
+
+```{r ex1-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_temperatures <- grepl("temperatures\\s*<-\\s*c\\s*\\(\\s*68\\s*,\\s*72\\s*,\\s*75\\s*,\\s*69\\s*,\\s*71\\s*\\)", .user_code)
+  
+  has_days <- grepl('days\\s*<-\\s*c\\s*\\(\\s*["\'](Monday|monday)["\'](\\s*,\\s*["\'].*["\']+\\s*)+\\)', .user_code) && 
+              grepl('["\'](Sunday|sunday)["\']', .user_code) &&
+              grepl('["\'](Saturday|saturday)["\']', .user_code)
+  
+  has_countdown <- grepl("countdown\\s*<-\\s*(10\\s*:\\s*1|seq\\s*\\(\\s*10\\s*,\\s*1\\s*)|rev\\s*\\(\\s*1\\s*:\\s*10\\s*\\))", .user_code)
+  
+  # Check if the outputs match expected values
+  if (exists("temperatures", envir = environment()) && exists("days", envir = environment()) && exists("countdown", envir = environment())) {
+    temp_matches <- is.numeric(temperatures) && length(temperatures) == 5 && 
+                   all(temperatures == c(68, 72, 75, 69, 71))
+    
+    days_matches <- is.character(days) && length(days) == 7 && 
+                    any(grepl("monday", tolower(days))) && 
+                    any(grepl("sunday", tolower(days)))
+    
+    countdown_matches <- is.numeric(countdown) && length(countdown) == 10 && 
+                          countdown[1] == 10 && countdown[10] == 1
+    
+    if (temp_matches && days_matches && countdown_matches) {
+      pass("Great job! You've successfully created all three vectors.")
+    } else if (!temp_matches) {
+      fail("Your temperatures vector doesn't match the expected values (68, 72, 75, 69, 71).")
+    } else if (!days_matches) {
+      fail("Your days vector doesn't contain all seven days of the week (Monday through Sunday).")
+    } else if (!countdown_matches) {
+      fail("Your countdown vector should contain numbers from 10 down to 1.")
+    } else {
+      fail("Check that your vectors match the required specifications.")
+    }
+  } else if (has_temperatures && has_days && has_countdown) {
+    pass("Great job! You've successfully created all three vectors.")
+  } else if (!has_temperatures) {
+    fail("Make sure to create a numeric vector named 'temperatures' with values 68, 72, 75, 69, 71.")
+  } else if (!has_days) {
+    fail("Make sure to create a character vector named 'days' with all seven days of the week (Monday through Sunday).")
+  } else if (!has_countdown) {
+    fail("Make sure to create a vector named 'countdown' with values from 10 down to 1 (10, 9, 8, ..., 1).")
+  } else {
+    fail("Make sure to create all three vectors with the correct names and values.")
+  }
+})
+```
+
+## Vector Operations
+
+One of the most powerful features of R is its ability to perform operations on entire vectors at once (vectorized operations). This makes code concise and efficient.
+
+### Arithmetic Operations
+
+When you perform arithmetic operations on vectors, R applies the operation element-wise.
+
+```{r vector-arith-demo, echo=TRUE}
+# Create vectors
+a <- c(1, 2, 3, 4, 5)
+b <- c(10, 20, 30, 40, 50)
+
+# Element-wise operations
+a + b
+a * b
+a / b
+a ^ 2  # Square each element
+
+# Operations with a single value
+a + 10
+a * 2
+```
+
+### Vector Recycling
+
+When operating on vectors of different lengths, R will "recycle" (repeat) the shorter vector to match the length of the longer one.
+
+```{r recycling-demo, echo=TRUE}
+# Vector recycling
+x <- c(1, 2, 3, 4, 5)
+y <- c(10, 20)
+
+# R will recycle y to c(10, 20, 10, 20, 10)
+x + y
+
+# With a warning if not a multiple
+z <- c(10, 20, 30)
+x + z  # Warning: length of x is not a multiple of length of z
+```
+
+### Exercise 2: Vector Operations
+
+Create two numeric vectors:
+- `prices` with values 10.99, 24.50, 5.75, 18.20
+- `quantities` with values 2, 1, 5, 3
+
+Then calculate and store:
+1. The `total_cost` for each item (price × quantity)
+2. A `discounted_prices` vector with a 15% discount applied to each price
+3. The `item_discount` amount saved for each item (original cost - discounted cost)
+
+```{r ex2, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex2-solution}
+# Create vectors
+prices <- c(10.99, 24.50, 5.75, 18.20)
+quantities <- c(2, 1, 5, 3)
+
+# Calculate totals
+total_cost <- prices * quantities
+
+# Apply discount
+discounted_prices <- prices * 0.85  # 15% discount means keeping 85%
+
+# Calculate savings per item
+item_discount <- (prices * quantities) - (discounted_prices * quantities)
+
+# Display results
+prices
+quantities
+total_cost
+discounted_prices
+item_discount
+```
+
+```{r ex2-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_prices <- grepl("prices\\s*<-\\s*c\\s*\\(\\s*10\\.99\\s*,\\s*24\\.50\\s*,\\s*5\\.75\\s*,\\s*18\\.20\\s*\\)", .user_code)
+  
+  has_quantities <- grepl("quantities\\s*<-\\s*c\\s*\\(\\s*2\\s*,\\s*1\\s*,\\s*5\\s*,\\s*3\\s*\\)", .user_code)
+  
+  has_total_cost <- grepl("total_cost\\s*<-\\s*prices\\s*\\*\\s*quantities", .user_code)
+  
+  has_discount <- grepl("discounted_prices\\s*<-\\s*prices\\s*\\*\\s*(0\\.85|1\\s*-\\s*0\\.15)|prices\\s*-\\s*prices\\s*\\*\\s*0\\.15", .user_code)
+  
+  has_item_discount <- grepl("item_discount\\s*<-\\s*\\(prices\\s*\\*\\s*quantities\\)\\s*-\\s*\\(discounted_prices\\s*\\*\\s*quantities\\)", .user_code)
+  
+  if (exists("prices", envir = environment()) && 
+      exists("quantities", envir = environment()) && 
+      exists("total_cost", envir = environment()) && 
+      exists("discounted_prices", envir = environment()) && 
+      exists("item_discount", envir = environment())) {
+    
+    prices_match <- all(abs(prices - c(10.99, 24.50, 5.75, 18.20)) < 0.001)
+    quantities_match <- all(quantities == c(2, 1, 5, 3))
+    total_cost_match <- all(abs(total_cost - (prices * quantities)) < 0.001)
+    discounted_match <- all(abs(discounted_prices - (prices * 0.85)) < 0.001)
+    discount_match <- all(abs(item_discount - ((prices * quantities) - (discounted_prices * quantities))) < 0.001)
+    
+    if (prices_match && quantities_match && total_cost_match && discounted_match && discount_match) {
+      pass("Excellent! All your vector calculations are correct.")
+    } else {
+      if (!prices_match) {
+        fail("Your prices vector should contain 10.99, 24.50, 5.75, 18.20.")
+      } else if (!quantities_match) {
+        fail("Your quantities vector should contain 2, 1, 5, 3.")
+      } else if (!total_cost_match) {
+        fail("Check your total_cost calculation. It should be prices * quantities.")
+      } else if (!discounted_match) {
+        fail("Check your discounted_prices calculation. It should be prices * 0.85 (applying 15% discount).")
+      } else if (!discount_match) {
+        fail("Check your item_discount calculation. It should be the difference between original and discounted total costs.")
+      }
+    }
+  } else if (has_prices && has_quantities && has_total_cost && has_discount && has_item_discount) {
+    pass("Excellent! All your vector calculations are correct.")
+  } else if (!has_prices) {
+    fail("Make sure to create the prices vector with values 10.99, 24.50, 5.75, 18.20.")
+  } else if (!has_quantities) {
+    fail("Make sure to create the quantities vector with values 2, 1, 5, 3.")
+  } else if (!has_total_cost) {
+    fail("Make sure to calculate total_cost as prices * quantities.")
+  } else if (!has_discount) {
+    fail("Make sure to calculate discounted_prices by applying a 15% discount to prices.")
+  } else if (!has_item_discount) {
+    fail("Make sure to calculate item_discount as the difference between original and discounted costs.")
+  } else {
+    fail("Make sure to create all five vectors with the correct calculations.")
+  }
+})
+```
+
+## Vector Indexing and Subsetting
+
+You can access elements of a vector using indexing, which allows you to work with specific elements or subsets of a vector.
+
+### Indexing with Positions
+
+In R, indices start at 1 (not 0 as in many other programming languages).
+
+```{r indexing-demo, echo=TRUE}
+# Create a vector
+x <- c(10, 20, 30, 40, 50)
+
+# Access a single element
+x[1]  # First element (10)
+x[3]  # Third element (30)
+
+# Access multiple elements
+x[c(1, 3, 5)]  # First, third, and fifth elements
+
+# Access a range of elements
+x[2:4]  # Elements 2 through 4
+```
+
+### Negative Indexing
+
+Using negative indices excludes those elements.
+
+```{r neg-indexing-demo, echo=TRUE}
+# Create a vector
+x <- c(10, 20, 30, 40, 50)
+
+# Exclude elements
+x[-1]  # All elements except the first
+x[-c(1, 3)]  # All elements except the first and third
+```
+
+### Logical Indexing
+
+You can use a logical vector to select elements that correspond to TRUE.
+
+```{r logical-indexing-demo, echo=TRUE}
+# Create a vector
+x <- c(10, 20, 30, 40, 50)
+
+# Create a logical condition
+condition <- x > 25
+
+# See the logical vector
+condition
+
+# Use logical indexing
+x[condition]  # Elements greater than 25
+
+# Directly in the index
+x[x > 25]  # Same result
+x[x >= 20 & x <= 40]  # Elements between 20 and 40 (inclusive)
+```
+
+### Exercise 3: Vector Indexing
+
+Using this vector of monthly sales data:
+```
+monthly_sales <- c(15200, 18500, 22100, 19800, 24500, 26300, 22800, 23900, 25600, 21400, 18900, 20300)
+```
+
+Complete the following tasks:
+1. Extract the sales figures for the first quarter (first 3 months)
+2. Extract the sales figures for the last quarter (last 3 months)
+3. Find all months with sales greater than 22000
+4. Find the sales figures for months 5, 7, and 10
+
+```{r ex3, exercise=TRUE}
+# Create the monthly sales vector
+monthly_sales <- c(15200, 18500, 22100, 19800, 24500, 26300, 22800, 23900, 25600, 21400, 18900, 20300)
+
+# Write your code here
+
+```
+
+```{r ex3-solution}
+# Create the monthly sales vector
+monthly_sales <- c(15200, 18500, 22100, 19800, 24500, 26300, 22800, 23900, 25600, 21400, 18900, 20300)
+
+# First quarter
+q1_sales <- monthly_sales[1:3]
+q1_sales
+
+# Last quarter
+q4_sales <- monthly_sales[10:12]
+q4_sales
+
+# Sales greater than 22000
+high_sales <- monthly_sales[monthly_sales > 22000]
+high_sales
+
+# Specific months
+selected_months <- monthly_sales[c(5, 7, 10)]
+selected_months
+```
+
+```{r ex3-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_q1 <- grepl("q1_sales\\s*<-\\s*monthly_sales\\s*\\[\\s*1\\s*:\\s*3\\s*\\]", .user_code)
+  
+  has_q4 <- grepl("q4_sales\\s*<-\\s*monthly_sales\\s*\\[\\s*10\\s*:\\s*12\\s*\\]", .user_code)
+  
+  has_high <- grepl("high_sales\\s*<-\\s*monthly_sales\\s*\\[\\s*monthly_sales\\s*>\\s*22000\\s*\\]", .user_code)
+  
+  has_selected <- grepl("selected_months\\s*<-\\s*monthly_sales\\s*\\[\\s*c\\s*\\(\\s*5\\s*,\\s*7\\s*,\\s*10\\s*\\)\\s*\\]", .user_code)
+  
+  if (exists("q1_sales", envir = environment()) && 
+      exists("q4_sales", envir = environment()) && 
+      exists("high_sales", envir = environment()) && 
+      exists("selected_months", envir = environment())) {
+    
+    q1_match <- all(q1_sales == monthly_sales[1:3])
+    q4_match <- all(q4_sales == monthly_sales[10:12])
+    high_match <- all(high_sales == monthly_sales[monthly_sales > 22000])
+    selected_match <- all(selected_months == monthly_sales[c(5, 7, 10)])
+    
+    if (q1_match && q4_match && high_match && selected_match) {
+      pass("Perfect! All your vector indexing operations are correct.")
+    } else {
+      if (!q1_match) {
+        fail("Your q1_sales should contain the first three elements of monthly_sales.")
+      } else if (!q4_match) {
+        fail("Your q4_sales should contain the last three elements of monthly_sales.")
+      } else if (!high_match) {
+        fail("Your high_sales should contain all elements greater than 22000.")
+      } else if (!selected_match) {
+        fail("Your selected_months should contain elements 5, 7, and 10 from monthly_sales.")
+      }
+    }
+  } else if (has_q1 && has_q4 && has_high && has_selected) {
+    pass("Perfect! All your vector indexing operations are correct.")
+  } else if (!has_q1) {
+    fail("Make sure to extract the first quarter sales as q1_sales <- monthly_sales[1:3].")
+  } else if (!has_q4) {
+    fail("Make sure to extract the last quarter sales as q4_sales <- monthly_sales[10:12].")
+  } else if (!has_high) {
+    fail("Make sure to find months with sales greater than 22000 as high_sales <- monthly_sales[monthly_sales > 22000].")
+  } else if (!has_selected) {
+    fail("Make sure to extract specific months as selected_months <- monthly_sales[c(5, 7, 10)].")
+  } else {
+    fail("Make sure to complete all four vector indexing operations.")
+  }
+})
+```
+
+## Vector Functions
+
+R provides many built-in functions for working with vectors:
+
+### Statistical Functions
+
+```{r stat-func-demo, echo=TRUE}
+# Create a numeric vector
+x <- c(5, 10, 15, 20, 25, 30)
+
+# Basic statistics
+sum(x)      # Sum of all elements
+mean(x)     # Mean (average)
+median(x)   # Median
+min(x)      # Minimum value
+max(x)      # Maximum value
+range(x)    # Range (minimum and maximum)
+sd(x)       # Standard deviation
+var(x)      # Variance
+```
+
+### Other Useful Functions
+
+```{r other-func-demo, echo=TRUE}
+# Create vectors
+x <- c(5, 10, 15, 20, 25, 30)
+names <- c("Alice", "Bob", "Charlie", "David", "Eva")
+
+# Length
+length(x)     # Number of elements
+length(names)
+
+# Sorting
+sort(x)                # Ascending order
+sort(x, decreasing = TRUE)  # Descending order
+sort(names)            # Alphabetical
+
+# Reversing
+rev(x)
+rev(names)
+
+# Unique values
+y <- c(1, 2, 2, 3, 3, 3, 4, 5, 5)
+unique(y)
+```
+
+### Exercise 4: Working with Vector Functions
+
+Using this vector of exam scores:
+```
+scores <- c(85, 92, 78, 65, 88, 75, 96, 82, 78, 90)
+```
+
+Calculate and store:
+1. The number of students (`num_students`)
+2. The average score (`avg_score`)
+3. The highest and lowest scores (`score_range`)
+4. The sorted scores in descending order (`sorted_scores`)
+5. The number of unique scores (`num_unique`)
+
+```{r ex4, exercise=TRUE}
+# Create the scores vector
+scores <- c(85, 92, 78, 65, 88, 75, 96, 82, 78, 90)
+
+# Write your code here
+
+```
+
+```{r ex4-solution}
+# Create the scores vector
+scores <- c(85, 92, 78, 65, 88, 75, 96, 82, 78, 90)
+
+# Number of students
+num_students <- length(scores)
+
+# Average score
+avg_score <- mean(scores)
+
+# Highest and lowest scores
+score_range <- range(scores)
+
+# Sorted scores (descending)
+sorted_scores <- sort(scores, decreasing = TRUE)
+
+# Number of unique scores
+num_unique <- length(unique(scores))
+
+# Display results
+num_students
+avg_score
+score_range
+sorted_scores
+num_unique
+```
+
+```{r ex4-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_num_students <- grepl("num_students\\s*<-\\s*length\\s*\\(\\s*scores\\s*\\)", .user_code)
+  
+  has_avg_score <- grepl("avg_score\\s*<-\\s*mean\\s*\\(\\s*scores\\s*\\)", .user_code)
+  
+  has_score_range <- grepl("score_range\\s*<-\\s*range\\s*\\(\\s*scores\\s*\\)", .user_code)
+  
+  has_sorted_scores <- grepl("sorted_scores\\s*<-\\s*sort\\s*\\(\\s*scores\\s*,\\s*decreasing\\s*=\\s*(TRUE|T)\\s*\\)", .user_code)
+  
+  has_num_unique <- grepl("num_unique\\s*<-\\s*length\\s*\\(\\s*unique\\s*\\(\\s*scores\\s*\\)\\s*\\)", .user_code)
+  
+  if (exists("num_students", envir = environment()) && 
+      exists("avg_score", envir = environment()) && 
+      exists("score_range", envir = environment()) && 
+      exists("sorted_scores", envir = environment()) && 
+      exists("num_unique", envir = environment())) {
+    
+    students_match <- num_students == 10
+    avg_match <- abs(avg_score - mean(scores)) < 0.0001
+    range_match <- all(score_range == range(scores))
+    sorted_match <- all(sorted_scores == sort(scores, decreasing = TRUE))
+    unique_match <- num_unique == length(unique(scores))
+    
+    if (students_match && avg_match && range_match && sorted_match && unique_match) {
+      pass("Excellent! All your vector function calculations are correct.")
+    } else {
+      if (!students_match) {
+        fail("Your num_students should equal the number of elements in scores (10).")
+      } else if (!avg_match) {
+        fail("Your avg_score should be the mean of the scores vector.")
+      } else if (!range_match) {
+        fail("Your score_range should contain the minimum and maximum values of scores.")
+      } else if (!sorted_match) {
+        fail("Your sorted_scores should be the scores sorted in descending order.")
+      } else if (!unique_match) {
+        fail("Your num_unique should be the number of unique values in scores.")
+      }
+    }
+  } else if (has_num_students && has_avg_score && has_score_range && has_sorted_scores && has_num_unique) {
+    pass("Excellent! All your vector function calculations are correct.")
+  } else if (!has_num_students) {
+    fail("Make sure to calculate the number of students as num_students <- length(scores).")
+  } else if (!has_avg_score) {
+    fail("Make sure to calculate the average score as avg_score <- mean(scores).")
+  } else if (!has_score_range) {
+    fail("Make sure to find the range of scores as score_range <- range(scores).")
+  } else if (!has_sorted_scores) {
+    fail("Make sure to sort the scores in descending order as sorted_scores <- sort(scores, decreasing = TRUE).")
+  } else if (!has_num_unique) {
+    fail("Make sure to count unique scores as num_unique <- length(unique(scores)).")
+  } else {
+    fail("Make sure to complete all five vector function calculations.")
+  }
+})
+```
+
+## Named Vectors
+
+You can assign names to elements in a vector, which can make your code more readable and help with accessing elements by name.
+
+```{r named-vector-demo, echo=TRUE}
+# Create a named vector
+monthly_sales <- c(Jan = 1500, Feb = 1800, Mar = 2200, Apr = 1900)
+monthly_sales
+
+# Alternative way to assign names
+sales <- c(1500, 1800, 2200, 1900)
+names(sales) <- c("Jan", "Feb", "Mar", "Apr")
+sales
+
+# Access elements by name
+monthly_sales["Feb"]
+monthly_sales[c("Jan", "Mar")]
+
+# Get the names
+names(monthly_sales)
+```
+
+### Exercise 5: Named Vectors
+
+Create a named vector called `capital_cities` with country names as the names and their capitals as the values for:
+- United States (Washington)
+- France (Paris)
+- Japan (Tokyo)
+- Brazil (Brasilia)
+- Egypt (Cairo)
+
+Then write code to:
+1. Access the capital of Japan
+2. Access the capitals of France and Brazil
+3. Create a new vector `population` with approximate populations (in millions) for each capital city
+4. Make sure the names match those in `capital_cities`
+
+```{r ex5, exercise=TRUE}
+# Write your code here
+
+```
+
+```{r ex5-solution}
+# Create named vector of capitals
+capital_cities <- c("United States" = "Washington", 
+                    "France" = "Paris", 
+                    "Japan" = "Tokyo", 
+                    "Brazil" = "Brasilia",
+                    "Egypt" = "Cairo")
+
+# Access Japan's capital
+japan_capital <- capital_cities["Japan"]
+
+# Access France and Brazil capitals
+france_brazil_capitals <- capital_cities[c("France", "Brazil")]
+
+# Create population vector (approximate values in millions)
+population <- c("United States" = 0.7, 
+                "France" = 2.2, 
+                "Japan" = 14.0, 
+                "Brazil" = 3.1,
+                "Egypt" = 10.0)
+
+# Display results
+capital_cities
+japan_capital
+france_brazil_capitals
+population
+```
+
+```{r ex5-check}
+grade_this({
+  # Check for pattern matches in the code
+  has_capital_cities <- grepl('capital_cities\\s*<-\\s*c\\s*\\(', .user_code) && 
+                        grepl('["\']United\\s*States["\']\\s*=\\s*["\']Washington["\']', .user_code) &&
+                        grepl('["\']France["\']\\s*=\\s*["\']Paris["\']', .user_code) &&
+                        grepl('["\']Japan["\']\\s*=\\s*["\']Tokyo["\']', .user_code) &&
+                        grepl('["\']Brazil["\']\\s*=\\s*["\']Brasilia["\']', .user_code) &&
+                        grepl('["\']Egypt["\']\\s*=\\s*["\']Cairo["\']', .user_code)
+  
+  has_japan_capital <- grepl('japan_capital\\s*<-\\s*capital_cities\\s*\\[\\s*["\']Japan["\']\\s*\\]', .user_code)
+  
+  has_france_brazil <- grepl('france_brazil_capitals\\s*<-\\s*capital_cities\\s*\\[\\s*c\\s*\\(\\s*["\']France["\']\\s*,\\s*["\']Brazil["\']\\s*\\)\\s*\\]', .user_code)
+  
+  has_population <- grepl('population\\s*<-\\s*c\\s*\\(', .user_code) && 
+                    grepl('["\']United\\s*States["\']\\s*=', .user_code) &&
+                    grepl('["\']France["\']\\s*=', .user_code) &&
+                    grepl('["\']Japan["\']\\s*=', .user_code) &&
+                    grepl('["\']Brazil["\']\\s*=', .user_code) &&
+                    grepl('["\']Egypt["\']\\s*=', .user_code)
+  
+  if (exists("capital_cities", envir = environment()) && exists("japan_capital", envir = environment()) && 
+      exists("france_brazil_capitals", envir = environment()) && exists("population", envir = environment())) {
+    
+    cities_ok <- is.character(capital_cities) && length(capital_cities) == 5 && 
+                all(c("United States", "France", "Japan", "Brazil", "Egypt") %in% names(capital_cities))
+    
+    japan_ok <- identical(japan_capital, capital_cities["Japan"])
+    
+    fb_ok <- identical(france_brazil_capitals, capital_cities[c("France", "Brazil")])
+    
+    pop_ok <- is.numeric(population) && length(population) == 5 && 
+             identical(sort(names(population)), sort(names(capital_cities)))
+    
+    if (cities_ok && japan_ok && fb_ok && pop_ok) {
+      pass("Excellent! You've successfully created and worked with named vectors.")
+    } else if (!cities_ok) {
+      fail("Your capital_cities vector should be a character vector with names for all five countries.")
+    } else if (!japan_ok) {
+      fail("Your japan_capital should contain just the capital of Japan from the capital_cities vector.")
+    } else if (!fb_ok) {
+      fail("Your france_brazil_capitals should contain the capitals of France and Brazil from the capital_cities vector.")
+    } else if (!pop_ok) {
+      fail("Your population vector should be numeric with the same country names as capital_cities.")
+    }
+  } else if (has_capital_cities && has_japan_capital && has_france_brazil && has_population) {
+    pass("Excellent! You've successfully created and worked with named vectors.")
+  } else if (!has_capital_cities) {
+    fail("Make sure to create a named vector capital_cities with all five countries and their capitals.")
+  } else if (!has_japan_capital) {
+    fail("Make sure to access Japan's capital with japan_capital <- capital_cities[\"Japan\"].")
+  } else if (!has_france_brazil) {
+    fail("Make sure to access France and Brazil capitals with france_brazil_capitals <- capital_cities[c(\"France\", \"Brazil\")].")
+  } else if (!has_population) {
+    fail("Make sure to create a population vector with the same country names as capital_cities.")
+  } else {
+    fail("Make sure to complete all parts of the exercise.")
+  }
+})
+```
+
+## Summary
+
+In this module, you've learned about vectors in R, including:
+
+1. How to create vectors using `c()`, sequence functions, and repetition
+2. Performing arithmetic operations on vectors
+3. Vector recycling when operating on vectors of different lengths
+4. Accessing vector elements using position, negative, and logical indexing
+5. Using common vector functions for statistical operations and manipulation
+6. Creating and working with named vectors
+
+Vectors are the foundation for many other data structures in R, and understanding them is crucial for effective R programming.
+
+Next, we'll explore matrices, which extend the concept of vectors to two dimensions.
