@@ -26,6 +26,7 @@ RLesson is a comprehensive educational package containing 12 interactive tutoria
 10. **Data Visualization in R**: Creating effective visualizations
 11. **Descriptive Statistics in R**: Calculating and interpreting statistics
 12. **Exploratory Data Analysis in R**: Techniques for data exploration
+13. **Final Project**: Data Analysis Challenge. Apply all your R skills to analyze a real-world dataset
 
 ## Installation
 
