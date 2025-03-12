@@ -166,6 +166,11 @@ Complete the following tasks:
 ```
 
 ```{r ex1-solution}
+# House data
+sq_feet <- c(1800, 2200, 1600, 2100, 1950, 1850, 2350, 1750, 1900, 2500, 2150, 1700, 2300, 2050, 1850)
+price <- c(210000, 265000, 185000, 245000, 230000, 220000, 280000, 200000, 
+          225000, 295000, 255000, 190000, 275000, 240000, 215000)
+bedrooms <- c(3, 4, 2, 4, 3, 3, 4, 3, 3, 5, 4, 3, 4, 3, 3)
 # 1. Create the data frame
 house_data <- data.frame(
   SqFeet = sq_feet,

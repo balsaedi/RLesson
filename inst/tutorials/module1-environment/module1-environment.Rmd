@@ -115,7 +115,7 @@ ls()
 
 Create a variable named `score` with a value of 85. Then, increase the value by 10 and store the result back in `score`. Finally, display the updated value of `score`.
 
-```{r ex5, exercise=TRUE}
+```{r ex3, exercise=TRUE}
 # Write your code here
 
 ```
